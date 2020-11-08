@@ -4,19 +4,27 @@ import os
 import flask
 import flask_socketio
 
+from room import Room
+
 
 app = flask.Flask(__name__)
 
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
 
+appRooms = {}
+
 
 @socketio.on('connect')
 def on_connect():
-	print('Someone connected!')
-	socketio.emit('connected', {
+	global appRooms
 
-	})
+	if len(appRooms) == 0:
+		room = Room()
+		appRooms[room.id] = room
+	else:
+		room = appRooms[appRooms.keys()[0]]
+
 
 
 @socketio.on('disconnect')
