@@ -16,10 +16,15 @@ export function YoutubeContainer() {
 			switch(data.state)
 			{
 				case 'play':
+					ytPlayerRef.current.seekTo(data.offset);
 					ytPlayerRef.current.playVideo();
 					break;
 				case 'pause':
+					ytPlayerRef.current.seekTo(data.offset);
 					ytPlayerRef.current.pauseVideo();
+					break;
+				case 'seek':
+					ytPlayerRef.current.seekTo(data.offset);
 					break;
 			}
 		});
@@ -36,7 +41,7 @@ export function YoutubeContainer() {
 
 		Socket.emit('yt-state-change', {
 			'state': 'play',
-			'offset': undefined
+			'offset': ytPlayerRef.current.getCurrentTime()
 		});
 	}
 
@@ -46,7 +51,7 @@ export function YoutubeContainer() {
 
 		Socket.emit('yt-state-change', {
 			'state': 'pause',
-			'offset': undefined
+			'offset': ytPlayerRef.current.getCurrentTime()
 		});
 	}
 
