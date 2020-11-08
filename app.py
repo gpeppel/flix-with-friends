@@ -5,6 +5,7 @@ import flask
 import flask_socketio
 
 from room import Room
+from user import User
 
 
 app = flask.Flask(__name__)
@@ -25,6 +26,8 @@ def on_connect():
 	else:
 		room = appRooms[appRooms.keys()[0]]
 
+	user = User(flask.request.sid)
+	room.addUser(user)
 
 
 @socketio.on('disconnect')
