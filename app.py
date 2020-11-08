@@ -18,12 +18,10 @@ def on_connect():
 
 	})
 
-	# TODO
-
 
 @socketio.on('disconnect')
 def on_disconnect():
-	print ('Someone disconnected!')
+	print('Someone disconnected!')
 
 
 @socketio.on('yt-load')
@@ -33,12 +31,23 @@ def on_yt_load(data):
 
 @socketio.on('yt-state-change')
 def on_yt_load(data):
-	pass
+	handleYtStateChange(flask.request, data)
 
 
 @app.route('/')
 def index():
 	return flask.render_template("index.html")
+
+
+def handleYtStateChange(request, data):
+	if data['state'] == 'play':
+		socketio.emit('yt-state-change', data, room=request.sid)
+	elif data['state'] == 'pause':
+		socketio.emit('yt-state-change', data, room=request.sid)
+	elif data['state'] == 'seek':
+		socketio.emit('yt-state-change', data, room=request.sid)
+	else:
+		raise Exception()
 
 
 if __name__ == '__main__':
