@@ -20,11 +20,12 @@ appRooms = {}
 def on_connect():
 	global appRooms
 
+	# TODO placeholder room assignment
 	if len(appRooms) == 0:
 		room = Room()
 		appRooms[room.id] = room
 	else:
-		room = appRooms[appRooms.keys()[0]]
+		room = appRooms[list(appRooms.keys())[0]]
 
 	user = User(flask.request.sid)
 	room.addUser(user)
@@ -32,7 +33,14 @@ def on_connect():
 
 @socketio.on('disconnect')
 def on_disconnect():
-	print('Someone disconnected!')
+	global appRooms
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	room.removeUser(User(flask.request.sid))
+
+	if len(room) == 0:
+		del appRooms[room.id]
 
 
 @socketio.on('yt-load')
@@ -51,6 +59,13 @@ def index():
 
 
 def handleYtStateChange(request, data):
+	user = User(flask.request.sid)
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	if room.creator.id != user.id:
+		return
+
 	if data['state'] == 'play':
 		socketio.emit('yt-state-change', data, include_self=False)
 	elif data['state'] == 'pause':
