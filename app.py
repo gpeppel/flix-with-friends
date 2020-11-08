@@ -41,11 +41,11 @@ def index():
 
 def handleYtStateChange(request, data):
 	if data['state'] == 'play':
-		socketio.emit('yt-state-change', data, room=request.sid)
+		socketio.emit('yt-state-change', data, include_self=False)
 	elif data['state'] == 'pause':
-		socketio.emit('yt-state-change', data, room=request.sid)
+		socketio.emit('yt-state-change', data, include_self=False)
 	elif data['state'] == 'seek':
-		socketio.emit('yt-state-change', data, room=request.sid)
+		socketio.emit('yt-state-change', data, include_self=False)
 	else:
 		raise Exception()
 
