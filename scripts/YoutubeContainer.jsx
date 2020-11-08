@@ -4,6 +4,7 @@ import { Socket } from './Socket';
 
 import YouTube from 'react-youtube';
 
+const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 
 export function YoutubeContainer() {
 	const [ytPlayer, setYtPlayer] = React.useState(null);
@@ -12,7 +13,7 @@ export function YoutubeContainer() {
 	ytPlayerRef.current = ytPlayer;
 
 	React.useEffect(() => {
-		Socket.on('yt-state-change', (data) => {
+		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
 			switch(data.state)
 			{
 				case 'play':
@@ -32,14 +33,20 @@ export function YoutubeContainer() {
 
 	function onYtReady(event)
 	{
+		console.log('ready', event);
 		setYtPlayer(event.target);
+
+		Socket.emit(EVENT_YT_STATE_CHANGE, {
+			'state': 'ready',
+			'offset': 0
+		});
 	}
 
 	function onYtPlay(event)
 	{
 		console.log('play', event);
 
-		Socket.emit('yt-state-change', {
+		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'play',
 			'offset': ytPlayerRef.current.getCurrentTime()
 		});
@@ -49,7 +56,7 @@ export function YoutubeContainer() {
 	{
 		console.log('pause', event);
 
-		Socket.emit('yt-state-change', {
+		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'pause',
 			'offset': ytPlayerRef.current.getCurrentTime()
 		});

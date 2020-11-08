@@ -8,6 +8,8 @@ from room import Room
 from user import User
 
 
+EVENT_YT_STATE_CHANGE = 'yt-state-change'
+
 app = flask.Flask(__name__)
 
 socketio = flask_socketio.SocketIO(app)
@@ -48,8 +50,8 @@ def on_yt_load(data):
 	pass
 
 
-@socketio.on('yt-state-change')
-def on_yt_load(data):
+@socketio.on(EVENT_YT_STATE_CHANGE)
+def on_yt_state_change(data):
 	handleYtStateChange(flask.request, data)
 
 
@@ -67,13 +69,13 @@ def handleYtStateChange(request, data):
 		return
 
 	if data['state'] == 'play':
-		socketio.emit('yt-state-change', data, include_self=False)
+		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
 	elif data['state'] == 'pause':
-		socketio.emit('yt-state-change', data, include_self=False)
+		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
 	elif data['state'] == 'seek':
-		socketio.emit('yt-state-change', data, include_self=False)
-	else:
-		raise Exception()
+		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
+	elif data['state'] == 'ready':
+		pass
 
 
 if __name__ == '__main__':
