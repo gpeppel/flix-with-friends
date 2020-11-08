@@ -68,12 +68,28 @@ def handleYtStateChange(request, data):
 	if room.creator.id != user.id:
 		return
 
+	offset = data.get('offset', 0)
+	if type(offset) != int:
+		try:
+			offset = abs(int(offset))
+		except:
+			offset = 0
+
 	if data['state'] == 'play':
-		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
+		socketio.emit(EVENT_YT_STATE_CHANGE, {
+			'state': 'play',
+			'offset': offset)
+		}, include_self=False)
 	elif data['state'] == 'pause':
-		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
+		socketio.emit(EVENT_YT_STATE_CHANGE, {
+			'state': 'pause',
+			'offset': offset
+		}, include_self=False)
 	elif data['state'] == 'seek':
-		socketio.emit(EVENT_YT_STATE_CHANGE, data, include_self=False)
+		socketio.emit(EVENT_YT_STATE_CHANGE, {
+			'state': 'seek',
+			'offset': offset
+		}, include_self=False)
 	elif data['state'] == 'ready':
 		pass
 
