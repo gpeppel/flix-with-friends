@@ -1,38 +1,32 @@
-    
 import * as React from 'react';
 
-
+import { FacebookButton } from './FacebookButton';
 import { Button } from './Button';
 import { Socket } from './Socket';
 
 export function Content() {
-    const [addresses, setAddresses] = React.useState([]);
+    const [FbUser, setFbUser] = React.useState([]);
     
-    function getNewAddresses() {
-        React.useEffect(() => {
-            Socket.on('addresses received', updateAddresses);
-            return () => {
-                Socket.off('addresses received', updateAddresses);
-            }
-        });
-    }
+    // function getNewUser() {
+    //     React.useEffect(() => {
+    //         Socket.on('user_received', updateAddresses);
+    //         return () => {
+    //             Socket.off('addresses received', updateAddresses);
+    //         }
+    //     });
+    // }
     
-    function updateAddresses(data) {
-        console.log("Received addresses from server: " + data['allAddresses']);
-        setAddresses(data['allAddresses']);
-    }
+    // function updateAddresses(data) {
+    //     console.log("Received addresses from server: " + data['allAddresses']);
+    //     setAddresses(data['allAddresses']);
+    // }
     
-    getNewAddresses();
+    // getNewAddresses();
 
     return (
         <div>
-            <h1>USPS Addresses!</h1>
-                <ol>
-                    {
-                    // TODO
-                    }
-                </ol>
-            <Button />
+            <h1>Facebook Button Test!</h1>
+            <FacebookButton />
         </div>
     );
 }
