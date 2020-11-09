@@ -4,6 +4,7 @@ import { Socket } from './Socket';
 
 import YouTube from 'react-youtube';
 
+
 const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 
 const PLAYER_UNSTARTED = -1;
@@ -12,6 +13,7 @@ const PLAYER_PLAYING = 1;
 const PLAYER_PAUSED = 2;
 const PLAYER_BUFFERING = 3;
 const PLAYER_CUED = 5;
+
 
 export function YoutubeContainer() {
 	const [ytPlayer, setYtPlayer] = React.useState(null);
@@ -40,6 +42,14 @@ export function YoutubeContainer() {
 					break;
 				case 'seek':
 					ytPlayerRef.current.seekTo(data.offset);
+					break;
+				case 'sync':
+					if(Math.abs(ytPlayerRef.current.getCurrentTime() - data.offset) > 3)
+					{
+						console.log("sync0");
+						ytPlayerRef.current.seekTo(data.offset);
+						console.log("sync1");
+					}
 					break;
 			}
 		});

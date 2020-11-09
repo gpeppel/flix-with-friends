@@ -90,6 +90,8 @@ def handleYtStateChange(request, data):
 			'state': 'seek',
 			'offset': offset
 		}, include_self=False)
+	elif data['state'] == 'sync':
+		pass
 	elif data['state'] == 'ready':
 		pass
 
