@@ -65,8 +65,8 @@ def handleYtStateChange(request, data):
 
 	# TODO placeholder room assignment
 	room = appRooms[list(appRooms.keys())[0]]
-	if room.creator.id != user.id:
-		return
+	#if room.creator.id != user.id:
+	#	return
 
 	offset = data.get('offset', 0)
 	if type(offset) != int:
@@ -78,7 +78,7 @@ def handleYtStateChange(request, data):
 	if data['state'] == 'play':
 		socketio.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'play',
-			'offset': offset)
+			'offset': offset
 		}, include_self=False)
 	elif data['state'] == 'pause':
 		socketio.emit(EVENT_YT_STATE_CHANGE, {
