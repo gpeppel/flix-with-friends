@@ -5,7 +5,7 @@ import { Socket } from './Socket';
 export function Chat()
 {
     const [message, setMessage] = React.useState('');
-    const [messages, setMessages] = React.useState(['test', 'matt', 'gonz']);
+    const [messages, setMessages] = React.useState([]);
 
     function handleSubmit()
     {
