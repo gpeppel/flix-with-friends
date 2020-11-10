@@ -1,4 +1,5 @@
-from dotenv import load_dotenv
+import datetime
+import json
 import os
 
 import flask
@@ -65,8 +66,10 @@ def handleYtStateChange(request, data):
 
 	# TODO placeholder room assignment
 	room = appRooms[list(appRooms.keys())[0]]
-	#if room.creator.id != user.id:
+	#if not room.isCreator(user):
 	#	return
+
+	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
 
 	offset = data.get('offset', 0)
 	if type(offset) != int:
@@ -75,25 +78,39 @@ def handleYtStateChange(request, data):
 		except:
 			offset = 0
 
-	if data['state'] == 'play':
-		socketio.emit(EVENT_YT_STATE_CHANGE, {
-			'state': 'play',
-			'offset': offset
-		}, include_self=False)
-	elif data['state'] == 'pause':
-		socketio.emit(EVENT_YT_STATE_CHANGE, {
-			'state': 'pause',
-			'offset': offset
-		}, include_self=False)
-	elif data['state'] == 'seek':
-		socketio.emit(EVENT_YT_STATE_CHANGE, {
-			'state': 'seek',
-			'offset': offset
-		}, include_self=False)
-	elif data['state'] == 'sync':
-		pass
-	elif data['state'] == 'ready':
-		pass
+	runAt = data.get('runAt', 0)
+	if type(runAt) != int:
+		try:
+			runAt = max(0, int(runAt))
+		except:
+			runAt = 0
+
+	tsnow = int((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+	timestamp = data.get('timestamp', 0)
+	if type(timestamp) != int:
+		try:
+			timestamp = int(timestamp)
+		except:
+			timestamp = tsnow
+
+	if data['state'] not in [
+		'ready',
+
+		'unstarted',
+		'ended',
+		'playing',
+		'paused',
+		'buffering',
+		'cued'
+	]:
+		return
+
+	socketio.emit(EVENT_YT_STATE_CHANGE, {
+		'state': data['state'],
+		'offset': offset,
+		'runAt': runAt,
+		'timestamp': timestamp
+	}, include_self=False)
 
 
 if __name__ == '__main__':

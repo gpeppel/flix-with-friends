@@ -21,8 +21,18 @@ class Room:
 	def removeUser(self, user):
 		del self.users[user.id]
 
-		if self.creator.id == user.id:
+		if self.isCreator(user):
 			self.creator = None
+
+
+	def hasUser(self, user):
+		return user.id in self.users
+
+
+	def isCreator(self, user):
+		if self.creator is None:
+			return False
+		return user.id == self.creator.id
 
 
 	def __len__(self):
