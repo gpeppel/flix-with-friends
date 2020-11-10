@@ -21,6 +21,10 @@ appRooms = {}
 
 @socketio.on('connect')
 def on_connect():
+	connectUser(flask.request)
+
+
+def connectUser(request):
 	global appRooms
 
 	# TODO placeholder room assignment
@@ -30,12 +34,16 @@ def on_connect():
 	else:
 		room = appRooms[list(appRooms.keys())[0]]
 
-	user = User(flask.request.sid)
+	user = User(request.sid)
 	room.addUser(user)
 
 
 @socketio.on('disconnect')
 def on_disconnect():
+	disconnectUser(flask.request)
+
+
+def disconnectUser(request):
 	global appRooms
 
 	# TODO placeholder room assignment
@@ -62,7 +70,7 @@ def index():
 
 
 def handleYtStateChange(request, data):
-	user = User(flask.request.sid)
+	user = User(request.sid)
 
 	# TODO placeholder room assignment
 	room = appRooms[list(appRooms.keys())[0]]
@@ -93,7 +101,7 @@ def handleYtStateChange(request, data):
 		except:
 			timestamp = tsnow
 
-	if data['state'] not in [
+	if data.get('state') not in [
 		'ready',
 
 		'unstarted',

@@ -1,5 +1,7 @@
 __pycache__/
+htmlcov/
 node_modules/
+.coverage
 package-lock.json
 sql.env
 todo.txt
