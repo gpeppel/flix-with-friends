@@ -6,6 +6,5 @@ class Message:
 		self.roomId = messageRoomId
 		self.userId = messageUserId
 
-	def generateMessageId(self, length)
 		
 
