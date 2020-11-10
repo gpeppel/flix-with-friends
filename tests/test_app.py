@@ -26,3 +26,5 @@ class AppTest(unittest.TestCase):
 			app.handleYtStateChange(mockReq, testData)
 
 			print(emitList)
+
+			app.disconnectUser(mockReq)
