@@ -44,5 +44,5 @@ class Room:
 		roomId = ""
 
 		for _ in range(length):
-			roomId += charset[random.randint(0, len(charset))]
+			roomId += charset[random.randint(0, len(charset) - 1)]
 		return roomId
