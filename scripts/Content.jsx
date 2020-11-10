@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 
-import { Button } from './Button';
+import { Chat } from './Chat';
 import { Socket } from './Socket';
 
 export function Content() {
@@ -26,13 +26,8 @@ export function Content() {
 
     return (
         <div>
-            <h1>USPS Addresses!</h1>
-                <ol>
-                    {
-                    // TODO
-                    }
-                </ol>
-            <Button />
+            <h1>Chat</h1>
+            <Chat />
         </div>
     );
 }

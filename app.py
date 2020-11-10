@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 import os
-
 import flask
 import flask_socketio
+import flask_sqlalchemy
 
+from message import Message
 
 app = flask.Flask(__name__)
 
@@ -18,12 +19,27 @@ def on_connect():
 
 	})
 
-	# TODO
-
 
 @socketio.on('disconnect')
 def on_disconnect():
 	print ('Someone disconnected!')
+
+@socketio.on('message-send')
+def new_message_received(data):
+    text = data['text']
+    print('RECEIVED NEW MESSAGE: %s' % text)
+    if len(text) > 0:
+        user = flask.request.sid
+
+        # self.id = messageId
+		# self.text = messageText
+		# self.timestamp = messageTimestamp
+		# self.roomId = messageRoomId
+		# self.userId = messageUserId
+
+        message_data = ()
+        message = Message(
+
 
 
 @socketio.on('yt-load')
