@@ -48,7 +48,7 @@ def disconnectUser(request):
 
 	# TODO placeholder room assignment
 	room = appRooms[list(appRooms.keys())[0]]
-	room.removeUser(User(flask.request.sid))
+	room.removeUser(User(request.sid))
 
 	if len(room) == 0:
 		del appRooms[room.id]
