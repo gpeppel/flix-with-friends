@@ -13,6 +13,7 @@ from user import User
 
 app = flask.Flask(__name__)
 
+MESSAGES_EMIT_CHANNEL = 'messages received'
 
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
@@ -27,6 +28,12 @@ db = flask_sqlalchemy.SQLAlchemy(app)
 db.app = app
 
 import message
+def emit_all_messages(channel):
+	all_messages = [
+		(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients 
+		for db_message in db.session.query(message.Message).all()
+	]
+	socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
 
 @socketio.on('connect')
 def on_connect():
@@ -34,6 +41,8 @@ def on_connect():
 	socketio.emit('connected', {
 
 	})
+	
+	emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 @socketio.on('disconnect')
 def on_disconnect():
@@ -59,6 +68,8 @@ def new_message_received(data):
 	message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
 	message.db.session.add(message_to_add)
 	message.db.session.commit()
+
+	emit_all_messages(MESSAGES_EMIT_CHANNEL)
 	
 	# message init model:
 	# self.id = messageId
