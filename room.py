@@ -43,6 +43,6 @@ class Room:
 		charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 		roomId = ""
 
-		for i in range(length):
-			roomId += charset[i]
+		for _ in range(length):
+			roomId += charset[random.randint(0, len(charset))]
 		return roomId
