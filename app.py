@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import re
 
 import flask
 import flask_socketio
@@ -56,10 +57,29 @@ def disconnectUser(request):
 
 @socketio.on('yt-load')
 def on_yt_load(data):
+	url = data.get('url')
+	if url is None:
+		return
+	
+	videoId = getYoutubeVideoId(url)
+	if videoId is None:
+		return
+	
 	socketio.emit('yt-load', {
-		'url': data['url']
+		'videoId': videoId
 	})
 
+
+def getYoutubeVideoId(s):
+	match = re.match(r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)', s)
+	if match is not None:
+		return match[1]
+
+	match = re.match(r'^([A-Za-z0-9_-]+)$', s)
+	if match is not None:
+		return match[1]
+		
+	return None
 
 @socketio.on(EVENT_YT_STATE_CHANGE)
 def on_yt_state_change(data):

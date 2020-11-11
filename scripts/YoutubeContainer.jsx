@@ -34,7 +34,7 @@ export function YoutubeContainer() {
 		ytPlayerRef.current = ytPlayer;
 
 		Socket.on('yt-load', (data) => {
-			ytPlayerRef.current.player.loadVideoByUrl(data.url);
+			ytPlayerRef.current.player.loadVideoById(data.videoId);
 		});
 
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
