@@ -57,8 +57,6 @@ export default class YoutubePlayer
 		player.player.setPlayback = function(t, s){
 			console.log("playback", s);
 
-			let offset = this.getCurrentTime();
-
 			if(this.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this, t))
 			{
 				console.log("playback cancel");

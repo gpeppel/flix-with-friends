@@ -89,7 +89,7 @@ export function YoutubeContainer() {
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'ready',
-			'offset': 0
+			'offset': 0,
 			'rate': 1,
 			'timestamp': (new Date()).getTime()
 		});
