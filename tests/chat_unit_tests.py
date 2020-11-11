@@ -2,14 +2,11 @@ import unittest
 import unittest.mock as mock
 import sys
 sys.path.append("..")
-import app
 import time
 from datetime import datetime
 
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
-
-
 
 class chatMessageTestCase(unittest.TestCase):
     def setUp(self):
