@@ -10,67 +10,64 @@ export default class YoutubePlayer
 		this.opts = opts;
 		this.onReady = onReady;
 		this.onStateChange = onStateChange;
-		
-		this.reactComponent = this.getReactComponent();
+
 		this.player = undefined;
 	}
-	
-	onReadyWrapper(event)
+
+	static onReadyWrapper(player, event, onReady)
 	{
-		console.log(event);
-		return;
-		
-		if(this.player === undefined)
-		{
-			console.log(this);
-			console.log(event);
-			this.player = event.target;
-			/*
-			this.player.play = function(t){
-				console.log("play", t);
+		player.player = event.target;
 
-				if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING)
-				{
-					console.log("play cancel");
-					return;
-				}
+		player.player.play = function(t){
+			console.log("play", t);
 
-				console.log("play0");
-				this.seekTo(t);
-				this.playVideo();
-				console.log("play1");
-			}.bind(this.player);
+			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING)
+			{
+				console.log("play cancel");
+				return;
+			}
 
-			this.player.pause = function(t){
-				console.log("pause", t);
+			console.log("play0");
+			this.seekTo(t);
+			this.playVideo();
+			console.log("play1");
+		}.bind(player.player);
 
-				if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED)
-				{
-					console.log("pause cancel");
-					return;
-				}
+		player.player.pause = function(t){
+			console.log("pause", t);
 
-				console.log("pause0");
-				this.seekTo(t);
-				this.pauseVideo();
-				console.log("pause1");
-			}.bind(this.player);
-			*/
-		}
-		
-		this.onReady.bind(event.target);
+			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED)
+			{
+				console.log("pause cancel");
+				return;
+			}
+
+			console.log("pause0");
+			this.seekTo(t);
+			this.pauseVideo();
+			console.log("pause1");
+		}.bind(player.player);
+
+		onReady(event);
 	}
-	
-	getReactComponent()
+
+	static createYoutubePlayer(videoId, opts, onReady, onStateChange)
 	{
-		return (
-			<YouTube
-				videoId={this.videoId}
-				opts={this.opts}
-				onReady={this.onReadyWrapper}
-				onStateChange={this.onStateChange}
-			/>	
-		);
+		let player = new YoutubePlayer(videoId, opts, onReady, onStateChange);
+
+		return [
+			player,
+			(
+				<YouTube
+					videoId={videoId}
+					opts={opts}
+					onReady={(event) => {
+						YoutubePlayer.onReadyWrapper(player, event, onReady);
+					}}
+					onStateChange={onStateChange}
+				/>
+			)
+		];
 	}
 }
 

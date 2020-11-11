@@ -9,10 +9,10 @@ const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 
 
 export function YoutubeContainer() {
-	const [ytPlayer, setYtPlayer] = React.useState(new YoutubePlayer(
-		'', {}, onYtReady, onYtStateChange
-	));
+	const [ytPlayer, setYtPlayer] = React.useState(null);
+	const [ytComponent, setYtComponent] = React.useState(null);
 	const [lastPlayerStates, setLastPlayerStates] = React.useState([null, null, null]);
+
 	const ytPlayerRef = React.useRef();
 	const lastPlayerStatesRef = React.useRef();
 
@@ -20,18 +20,23 @@ export function YoutubeContainer() {
 	lastPlayerStatesRef.current = lastPlayerStates;
 
 	React.useEffect(() => {
-		setYtPlayer(new YoutubePlayer('dQw4w9WgXcQ', {
+		let [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
 			playerVars: {
 				autoplay: 1,
 				controls: 1,
 				disablekb: 1
 			}
-		}, onYtReady, onYtStateChange));
-		
+		}, onYtReady, onYtStateChange);
+
+		setYtPlayer(player);
+		setYtComponent(component);
+
+		ytPlayerRef.current = ytPlayer;
+
 		Socket.on('yt-load', (data) => {
-			ytPlayerRef.current.player.loadVideoByUrl(data.url);	
+			ytPlayerRef.current.player.loadVideoByUrl(data.url);
 		});
-		
+
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
 			function doState(data)
 			{
@@ -117,7 +122,7 @@ export function YoutubeContainer() {
 
 	return (
 		<div>
-			{ytPlayer.reactComponent}
+			{ytComponent}
 		</div>
 	);
 }
