@@ -48,8 +48,8 @@ def on_connect():
 def on_disconnect():
 	print ('Someone disconnected!')
 
-def add_to_db(message):
-	message.db.session.add(message)
+def add_to_db(message_to_add):
+	message.db.session.add(message_to_add)
 	message.db.session.commit()
 	emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
