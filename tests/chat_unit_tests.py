@@ -2,6 +2,7 @@ import unittest
 import unittest.mock as mock
 import sys
 sys.path.append("..")
+import app
 import time
 from datetime import datetime
 
