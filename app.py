@@ -71,11 +71,11 @@ def on_yt_load(data):
 
 
 def getYoutubeVideoId(s):
-	match = re.match(r'(?:https?://)?(?:www\.)?youtube\.com/(?:embed/|watch\?v=)([A-Za-z0-9_-]+)', s)
+	match = re.match(r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)', s)
 	if match is not None:
 		return match[1]
 
-	match = re.match(r'([A-Za-z0-9_-]+)', s)
+	match = re.match(r'^([A-Za-z0-9_-]+)$', s)
 	if match is not None:
 		return match[1]
 		
