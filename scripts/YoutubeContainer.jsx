@@ -5,6 +5,7 @@ import { Socket } from './Socket';
 import YoutubePlayer from './youtube/youtube-player.js';
 
 
+const EVENT_YT_LOAD = 'yt-load';
 const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 
 
@@ -33,7 +34,7 @@ export function YoutubeContainer() {
 
 		ytPlayerRef.current = ytPlayer;
 
-		Socket.on('yt-load', (data) => {
+		Socket.on(EVENT_YT_LOAD, (data) => {
 			ytPlayerRef.current.player.loadVideoById(data.videoId);
 		});
 
@@ -89,6 +90,8 @@ export function YoutubeContainer() {
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'ready',
 			'offset': 0
+			'rate': 1,
+			'timestamp': (new Date()).getTime()
 		});
 	}
 
