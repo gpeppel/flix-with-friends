@@ -11,7 +11,6 @@ from user import User
 
 
 EVENT_YT_STATE_CHANGE = 'yt-state-change'
-EVENT_YT_PLAYBACK = 'yt-playback'
 
 app = flask.Flask(__name__)
 
@@ -87,11 +86,6 @@ def on_yt_state_change(data):
 	handleYtStateChange(flask.request, data)
 
 
-@socketio.on(EVENT_YT_PLAYBACK)
-def on_yt_playback(data):
-	handleYtPlayback(flask.request, data)
-
-
 @app.route('/')
 def index():
 	return flask.render_template("index.html")
@@ -121,6 +115,13 @@ def handleYtStateChange(request, data):
 		except:
 			runAt = 0
 
+	rate = data.get('rate', 1)
+	if type(rate) != int:
+		try:
+			rate = int(rate)
+		except:
+			rate = 1
+
 	tsnow = int((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
 	timestamp = data.get('timestamp', 0)
 	if type(timestamp) != int:
@@ -136,70 +137,18 @@ def handleYtStateChange(request, data):
 		'playing',
 		'paused',
 		'buffering',
-		'cued'
+		'cued',
+		'playback'
 	]:
 		return
 
 	socketio.emit(EVENT_YT_STATE_CHANGE, {
 		'state': data['state'],
-		'offset': offset,
-		'runAt': runAt,
 		'sender': user.id,
+		'offset': offset,
+		'rate': rate,
+		'runAt': runAt,
 		'timestamp': timestamp
-	}, include_self=False)
-
-
-def handleYtPlayback(request, data):
-	user = User(request.sid)
-
-	# TODO placeholder room assignment
-	room = appRooms[list(appRooms.keys())[0]]
-	#if not room.isCreator(user):
-	#	return
-
-	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
-
-	offset = data.get('offset', 0)
-	if type(offset) != int:
-		try:
-			offset = abs(int(offset))
-		except:
-			offset = 0
-
-	runAt = data.get('runAt', 0)
-	if type(runAt) != int:
-		try:
-			runAt = max(0, int(runAt))
-		except:
-			runAt = 0
-
-	tsnow = int((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
-	timestamp = data.get('timestamp', 0)
-	if type(timestamp) != int:
-		try:
-			timestamp = int(timestamp)
-		except:
-			timestamp = tsnow
-
-	rate = data.get('rate', 0)
-	if type(rate) != int:
-		try:
-			rate = int(rate)
-		except:
-			rate = 0
-
-	if data.get('state') not in [
-		'playback'
-	]:
-		return
-
-	socketio.emit(EVENT_YT_PLAYBACK, {
-		'state': data['state'],
-		'offset': offset,
-		'runAt': runAt,
-		'sender': user.id,
-		'timestamp': timestamp,
-		'rate': rate
 	}, include_self=False)
 
 

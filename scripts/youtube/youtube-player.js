@@ -120,3 +120,6 @@ YoutubePlayer.prototype.PLAYER_PLAYING_STR = 'playing';
 YoutubePlayer.prototype.PLAYER_PAUSED_STR = 'paused';
 YoutubePlayer.prototype.PLAYER_BUFFERING_STR = 'buffering';
 YoutubePlayer.prototype.PLAYER_CUED_STR = 'cued';
+
+YoutubePlayer.prototype.PLAYER_READY_STR = 'ready';
+YoutubePlayer.prototype.PLAYER_PLAYBACK_STR = 'playback';
