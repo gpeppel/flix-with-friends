@@ -48,7 +48,7 @@ export default class YoutubePlayer
 			console.log("pause1");
 		}.bind(player.player);
 
-		onReady(event);
+		player.onReady(event);
 	}
 
 	static createYoutubePlayer(videoId, opts, onReady, onStateChange)
@@ -59,12 +59,12 @@ export default class YoutubePlayer
 			player,
 			(
 				<YouTube
-					videoId={videoId}
-					opts={opts}
+					videoId={player.videoId}
+					opts={player.opts}
 					onReady={(event) => {
-						YoutubePlayer.onReadyWrapper(player, event, onReady);
+						YoutubePlayer.onReadyWrapper(player, event);
 					}}
-					onStateChange={onStateChange}
+					onStateChange={player.onStateChange}
 				/>
 			)
 		];
