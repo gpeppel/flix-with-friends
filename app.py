@@ -61,14 +61,25 @@ def on_yt_load(data):
 	if url is None:
 		return
 	
-	match = re.match(r'(?:https?://)?(?:www\.)?youtube\.com/(?:embed/|watch\?v=)([A-Za-z0-9_-]+)', url)
-	if match is None:
+	videoId = getYoutubeVideoId(url)
+	if videoId is None:
 		return
 	
 	socketio.emit('yt-load', {
-		'videoId': match[1]
+		'videoId': videoId
 	})
 
+
+def getYoutubeVideoId(s):
+	match = re.match(r'(?:https?://)?(?:www\.)?youtube\.com/(?:embed/|watch\?v=)([A-Za-z0-9_-]+)', s)
+	if match is not None:
+		return match[1]
+
+	match = re.match(r'([A-Za-z0-9_-]+)', s)
+	if match is not None:
+		return match[1]
+		
+	return None
 
 @socketio.on(EVENT_YT_STATE_CHANGE)
 def on_yt_state_change(data):
