@@ -87,12 +87,7 @@ export function YoutubeContainer() {
 
 		ytPlayerRef.current.player.pauseVideo();
 
-		Socket.emit(EVENT_YT_STATE_CHANGE, {
-			'state': 'ready',
-			'offset': 0,
-			'rate': 1,
-			'timestamp': (new Date()).getTime()
-		});
+		emitStateChange(ytPlayerRef.current.player, 'ready', 0, 1);
 	}
 
 	function onYtStateChange(event)
@@ -101,23 +96,27 @@ export function YoutubeContainer() {
 
 		setLastPlayerStates([lastPlayerStatesRef.current[1], lastPlayerStatesRef.current[2], event.data]);
 
-		Socket.emit(EVENT_YT_STATE_CHANGE, {
-			'state': YoutubePlayer.playerStateToStr(event.data),
-			'offset': ytPlayerRef.current.player.getCurrentTime(),
-			'rate': ytPlayerRef.current.player.getPlaybackRate(),
-			'timestamp': (new Date()).getTime()
-		});
+		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.playerStateToStr(event.data));
 	}
 
 	function onYtPlaybackRateChange(event)
 	{
 		console.log('playback change', event);
 
+		emitStateChange(ytPlayerRef.current.player, 'playback');
+	}
+
+	function emitStateChange(player, state, offset, rate, timestamp)
+	{
+		offset = offset || player.getCurrentTime();
+		rate = rate || player.getPlaybackRate();
+		timestamp = timestamp || (new Date()).getTime();
+
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
-			'state': 'playback',
-			'offset': ytPlayerRef.current.player.getCurrentTime(),
-			'rate': ytPlayerRef.current.player.getPlaybackRate(),
-			'timestamp': (new Date()).getTime()
+			'state': state,
+			'offset': offset,
+			'rate': rate,
+			'timestamp': timestamp
 		});
 	}
 
