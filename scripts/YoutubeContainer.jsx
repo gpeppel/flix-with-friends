@@ -2,28 +2,16 @@ import * as React from 'react';
 
 import { Socket } from './Socket';
 
-import YouTube from 'react-youtube';
+import YoutubePlayer from './youtube/youtube-player.js';
 
 
 const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 
-const PLAYER_UNSTARTED = -1;
-const PLAYER_ENDED = 0;
-const PLAYER_PLAYING = 1;
-const PLAYER_PAUSED = 2;
-const PLAYER_BUFFERING = 3;
-const PLAYER_CUED = 5;
-
-const PLAYER_UNSTARTED_STR = 'unstarted';
-const PLAYER_ENDED_STR = 'ended';
-const PLAYER_PLAYING_STR = 'playing';
-const PLAYER_PAUSED_STR = 'paused';
-const PLAYER_BUFFERING_STR = 'buffering';
-const PLAYER_CUED_STR = 'cued';
-
 
 export function YoutubeContainer() {
-	const [ytPlayer, setYtPlayer] = React.useState(null);
+	const [ytPlayer, setYtPlayer] = React.useState(new YoutubePlayer(
+		'', {}, onYtReady, onYtStateChange
+	));
 	const [lastPlayerStates, setLastPlayerStates] = React.useState([null, null, null]);
 	const ytPlayerRef = React.useRef();
 	const lastPlayerStatesRef = React.useRef();
@@ -32,8 +20,16 @@ export function YoutubeContainer() {
 	lastPlayerStatesRef.current = lastPlayerStates;
 
 	React.useEffect(() => {
+		setYtPlayer(new YoutubePlayer('dQw4w9WgXcQ', {
+			playerVars: {
+				autoplay: 1,
+				controls: 1,
+				disablekb: 1
+			}
+		}, onYtReady, onYtStateChange));
+		
 		Socket.on('yt-load', (data) => {
-			ytPlayerRef.current.loadVideoByUrl(data.url);	
+			ytPlayerRef.current.player.loadVideoByUrl(data.url);	
 		});
 		
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
@@ -50,11 +46,11 @@ export function YoutubeContainer() {
 
 				switch(data.state)
 				{
-					case PLAYER_PLAYING_STR:
-						ytPlayerRef.current.play(adjustedOffset);
+					case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
+						ytPlayerRef.current.player.play(adjustedOffset);
 						break;
-					case PLAYER_PAUSED_STR:
-						ytPlayerRef.current.pause(adjustedOffset);
+					case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
+						ytPlayerRef.current.player.pause(adjustedOffset);
 						break;
 				}
 			}
@@ -78,46 +74,9 @@ export function YoutubeContainer() {
 
 	function onYtReady(event)
 	{
-		setYtPlayer(event.target);
-
 		console.log('ready', event);
 
-		if(!ytPlayerRef.current.initialized)
-		{
-			ytPlayerRef.current.initialized = true;
-
-			ytPlayerRef.current.play = function(t){
-				console.log("play", t, lastPlayerStatesRef.current);
-
-				if(this.getPlayerState() == PLAYER_PLAYING)
-				{
-					console.log("play cancel");
-					return;
-				}
-
-				console.log("play0");
-				this.seekTo(t);
-				this.playVideo();
-				console.log("play1");
-			}.bind(ytPlayerRef.current);
-
-			ytPlayerRef.current.pause = function(t){
-				console.log("pause", t, lastPlayerStatesRef.current);
-
-				if(this.getPlayerState() == PLAYER_PAUSED)
-				{
-					console.log("pause cancel");
-					return;
-				}
-
-				console.log("pause0");
-				this.seekTo(t);
-				this.pauseVideo();
-				console.log("pause1");
-			}.bind(ytPlayerRef.current);
-		}
-
-		ytPlayerRef.current.pauseVideo();
+		ytPlayerRef.current.player.pauseVideo();
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': 'ready',
@@ -133,14 +92,14 @@ export function YoutubeContainer() {
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': playerStateToStr(event.data),
-			'offset': ytPlayerRef.current.getCurrentTime(),
+			'offset': ytPlayerRef.current.player.getCurrentTime(),
 			'timestamp': (new Date()).getTime()
 		});
 	}
 
 	function isStateContinuation(state)
 	{
-		return lastPlayerStatesRef.current[0] == state && lastPlayerStatesRef.current[2] == state && lastPlayerStatesRef.current[1] == PLAYER_BUFFERING;
+		return lastPlayerStatesRef.current[0] == state && lastPlayerStatesRef.current[2] == state && lastPlayerStatesRef.current[1] == YoutubePlayer.prototype.PLAYER_BUFFERING;
 	}
 
 	function playerStateToStr(state)
@@ -156,23 +115,9 @@ export function YoutubeContainer() {
 		][state + 1];
 	}
 
-	const videoId = 'dQw4w9WgXcQ';
-	const opts = {
-		playerVars: {
-			autoplay: 1,
-			controls: 1,
-			disablekb: 1
-		}
-	};
-
 	return (
 		<div>
-			<YouTube
-				videoId={videoId}
-				opts={opts}
-				onReady={onYtReady}
-				onStateChange={onYtStateChange}
-			/>
+			{ytPlayer.reactComponent}
 		</div>
 	);
 }
