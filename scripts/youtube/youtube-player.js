@@ -4,12 +4,13 @@ import YouTube from 'react-youtube';
 
 export default class YoutubePlayer
 {
-	constructor(videoId, opts, onReady, onStateChange)
+	constructor(videoId, opts, onReady, onStateChange, onPlaybackRateChange)
 	{
 		this.videoId = videoId;
 		this.opts = opts;
 		this.onReady = onReady;
 		this.onStateChange = onStateChange;
+		this.onPlaybackRateChange = onPlaybackRateChange;
 
 		this.player = undefined;
 	}
@@ -48,12 +49,27 @@ export default class YoutubePlayer
 			console.log("pause1");
 		}.bind(player.player);
 
+		player.player.setPlayback = function(t, s){
+			console.log("playback", s);
+
+			if(this.getPlaybackRate() == s)
+			{
+				console.log("playback cancel");
+				return;
+			}
+
+			console.log("playback0");
+			this.seekTo(t);
+			this.setPlaybackRate(s);
+			console.log("playback1");
+		}.bind(player.player);
+
 		player.onReady(event);
 	}
 
-	static createYoutubePlayer(videoId, opts, onReady, onStateChange)
+	static createYoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange)
 	{
-		let player = new YoutubePlayer(videoId, opts, onReady, onStateChange);
+		let player = new YoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange);
 
 		return [
 			player,
@@ -65,6 +81,7 @@ export default class YoutubePlayer
 						YoutubePlayer.onReadyWrapper(player, event);
 					}}
 					onStateChange={player.onStateChange}
+					onPlaybackRateChange={player.onPlaybackRateChange}
 				/>
 			)
 		];

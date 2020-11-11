@@ -6,6 +6,7 @@ import YoutubePlayer from './youtube/youtube-player.js';
 
 
 const EVENT_YT_STATE_CHANGE = 'yt-state-change';
+const EVENT_YT_PLAYBACK = 'yt-playback';
 
 
 export function YoutubeContainer() {
@@ -26,7 +27,7 @@ export function YoutubeContainer() {
 				controls: 1,
 				disablekb: 1
 			}
-		}, onYtReady, onYtStateChange);
+		}, onYtReady, onYtStateChange, onYtPlaybackRateChange);
 
 		setYtPlayer(player);
 		setYtComponent(component);
@@ -75,6 +76,11 @@ export function YoutubeContainer() {
 			}
 			*/
 		});
+
+		Socket.on(EVENT_YT_PLAYBACK, (data) => {
+			console.log(data);
+			ytPlayerRef.current.player.setPlayback(data.offset, data.rate);
+		});
 	}, []);
 
 	function onYtReady(event)
@@ -99,6 +105,18 @@ export function YoutubeContainer() {
 			'state': YoutubePlayer.playerStateToStr(event.data),
 			'offset': ytPlayerRef.current.player.getCurrentTime(),
 			'timestamp': (new Date()).getTime()
+		});
+	}
+
+	function onYtPlaybackRateChange(event)
+	{
+		console.log('playback change', event);
+
+		Socket.emit(EVENT_YT_PLAYBACK, {
+			'state': 'playback',
+			'offset': ytPlayerRef.current.player.getCurrentTime(),
+			'timestamp': (new Date()).getTime(),
+			'rate': ytPlayerRef.current.player.getPlaybackRate()
 		});
 	}
 
