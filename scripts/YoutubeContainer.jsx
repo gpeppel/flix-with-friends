@@ -45,10 +45,9 @@ export function YoutubeContainer() {
 
 				let ts = (new Date()).getTime();
 				let tsdiff = Math.max(0, ts - data.timestamp);
-				//let adjustedOffset = Math.max(0, data.offset + (tsdiff / 1000));
-				let adjustedOffset = data.offset;
+				let adjustedOffset = data.offset + (tsdiff / 1000);
 
-				//console.log(data.offset, adjustedOffset, ts, tsdiff);
+				console.log(data.offset, adjustedOffset, tsdiff / 1000);
 
 				switch(data.state)
 				{
