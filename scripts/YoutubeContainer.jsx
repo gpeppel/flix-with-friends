@@ -12,13 +12,9 @@ const EVENT_YT_STATE_CHANGE = 'yt-state-change';
 export function YoutubeContainer() {
 	const [ytPlayer, setYtPlayer] = React.useState(null);
 	const [ytComponent, setYtComponent] = React.useState(null);
-	const [lastPlayerStates, setLastPlayerStates] = React.useState([null, null, null]);
 
 	const ytPlayerRef = React.useRef();
-	const lastPlayerStatesRef = React.useRef();
-
 	ytPlayerRef.current = ytPlayer;
-	lastPlayerStatesRef.current = lastPlayerStates;
 
 	React.useEffect(() => {
 		let [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
@@ -92,8 +88,6 @@ export function YoutubeContainer() {
 	function onYtStateChange(event)
 	{
 		console.log('state change', event);
-
-		setLastPlayerStates([lastPlayerStatesRef.current[1], lastPlayerStatesRef.current[2], event.data]);
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.playerStateToStr(event.data));
 	}

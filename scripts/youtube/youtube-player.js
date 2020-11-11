@@ -13,6 +13,7 @@ export default class YoutubePlayer
 		this.onPlaybackRateChange = onPlaybackRateChange;
 
 		this.player = undefined;
+		this.lastStates = [null, null, null];
 	}
 
 	static checkSyncIgnore(player, t)
@@ -20,7 +21,7 @@ export default class YoutubePlayer
 		return Math.abs(t - player.getCurrentTime()) < YoutubePlayer.prototype.SYNC_IGNORE_SEC;
 	}
 
-	static onReadyWrapper(player, event, onReady)
+	static onReadyWrapper(player, event)
 	{
 		player.player = event.target;
 
@@ -71,6 +72,15 @@ export default class YoutubePlayer
 
 		player.onReady(event);
 	}
+	
+	static onStateChangeWrapper(player, event)
+	{
+		player.lastStates[0] = player.lastStates[1];
+		player.lastStates[1] = player.lastStates[2];
+		player.lastStates[2] = event.data;
+		
+		player.onStateChange(event);
+	}
 
 	static createYoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange)
 	{
@@ -85,7 +95,9 @@ export default class YoutubePlayer
 					onReady={(event) => {
 						YoutubePlayer.onReadyWrapper(player, event);
 					}}
-					onStateChange={player.onStateChange}
+					onStateChange={(event) => {
+						YoutubePlayer.onStateChangeWrapper(player, event);
+					}}
 					onPlaybackRateChange={player.onPlaybackRateChange}
 				/>
 			)
