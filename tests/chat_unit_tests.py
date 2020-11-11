@@ -32,7 +32,7 @@ class chatMessageTestCase(unittest.TestCase):
         attribute_dict = {}
         message_dict = message.__dict__
         for key in message_dict.keys():
-            if not key.startswith('_sa_instance_state'):
+            if not key.startswith('_'):
                 attribute_dict[key] = message_dict[key]
         return attribute_dict
 
