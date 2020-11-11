@@ -102,9 +102,9 @@ def handleYtStateChange(request, data):
 	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
 
 	offset = data.get('offset', 0)
-	if type(offset) != int:
+	if type(offset) != float:
 		try:
-			offset = abs(int(offset))
+			offset = abs(float(offset))
 		except:
 			offset = 0
 
