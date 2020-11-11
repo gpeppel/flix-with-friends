@@ -32,6 +32,10 @@ export function YoutubeContainer() {
 	lastPlayerStatesRef.current = lastPlayerStates;
 
 	React.useEffect(() => {
+		Socket.on('yt-load', (data) => {
+			ytPlayerRef.current.loadVideoByUrl(data.url);	
+		});
+		
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
 			function doState(data)
 			{

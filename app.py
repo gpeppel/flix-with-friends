@@ -56,7 +56,9 @@ def disconnectUser(request):
 
 @socketio.on('yt-load')
 def on_yt_load(data):
-	pass
+	socketio.emit('yt-load', {
+		'url': data['url']
+	})
 
 
 @socketio.on(EVENT_YT_STATE_CHANGE)
@@ -103,7 +105,6 @@ def handleYtStateChange(request, data):
 
 	if data.get('state') not in [
 		'ready',
-
 		'unstarted',
 		'ended',
 		'playing',
