@@ -15,6 +15,11 @@ export default class YoutubePlayer
 		this.player = undefined;
 	}
 
+	static checkSyncIgnore(player, t)
+	{
+		return Math.abs(t - player.getCurrentTime()) < YoutubePlayer.prototype.SYNC_IGNORE_SEC;
+	}
+
 	static onReadyWrapper(player, event, onReady)
 	{
 		player.player = event.target;
@@ -22,7 +27,7 @@ export default class YoutubePlayer
 		player.player.play = function(t){
 			console.log("play", t);
 
-			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING)
+			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING && YoutubePlayer.checkSyncIgnore(this, t))
 			{
 				console.log("play cancel");
 				return;
@@ -37,7 +42,7 @@ export default class YoutubePlayer
 		player.player.pause = function(t){
 			console.log("pause", t);
 
-			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED)
+			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED && YoutubePlayer.checkSyncIgnore(this, t))
 			{
 				console.log("pause cancel");
 				return;
@@ -52,7 +57,9 @@ export default class YoutubePlayer
 		player.player.setPlayback = function(t, s){
 			console.log("playback", s);
 
-			if(this.getPlaybackRate() == s)
+			let offset = this.getCurrentTime();
+
+			if(this.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this, t))
 			{
 				console.log("playback cancel");
 				return;
@@ -106,6 +113,8 @@ export default class YoutubePlayer
 		return lastStates[len - 3] == state && lastStates[len - 1] == state && lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
 	}
 }
+
+YoutubePlayer.prototype.SYNC_IGNORE_SEC = 3;
 
 YoutubePlayer.prototype.PLAYER_UNSTARTED = -1;
 YoutubePlayer.prototype.PLAYER_ENDED = 0;
