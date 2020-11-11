@@ -40,13 +40,19 @@ def on_connect():
 	print('Someone connected!')
 	socketio.emit('connected', {
 
-	})
 	
+	})
 	emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 @socketio.on('disconnect')
 def on_disconnect():
 	print ('Someone disconnected!')
+
+def add_to_db(message):
+	message.db.session.add(message)
+	message.db.session.commit()
+	emit_all_messages(MESSAGES_EMIT_CHANNEL)
+
 
 @socketio.on('message-send')
 def new_message_received(data):
@@ -65,11 +71,9 @@ def new_message_received(data):
 	print('roomId: %s' % room_id)
 	print('userId: %s\n' % user_id)
 
-	message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
-	message.db.session.add(message_to_add)
-	message.db.session.commit()
 
-	emit_all_messages(MESSAGES_EMIT_CHANNEL)
+	message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
+	return add_to_db(message_to_add)
 	
 	# message init model:
 	# self.id = messageId
