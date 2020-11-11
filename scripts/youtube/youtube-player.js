@@ -69,6 +69,25 @@ export default class YoutubePlayer
 			)
 		];
 	}
+
+	static playerStateToStr(state)
+	{
+		return [
+			'unstarted', // -1
+			'ended',     // 0
+			'playing',   // 1
+			'paused',    // 2
+			'buffering', // 3
+			'',
+			'cued'       // 5
+		][state + 1];
+	}
+
+	static isStateContinuation(lastStates, state)
+	{
+		let len = lastStates.length;
+		return lastStates[len - 3] == state && lastStates[len - 1] == state && lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
+	}
 }
 
 YoutubePlayer.prototype.PLAYER_UNSTARTED = -1;

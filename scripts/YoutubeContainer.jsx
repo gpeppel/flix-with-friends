@@ -96,28 +96,10 @@ export function YoutubeContainer() {
 		setLastPlayerStates([lastPlayerStatesRef.current[1], lastPlayerStatesRef.current[2], event.data]);
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
-			'state': playerStateToStr(event.data),
+			'state': YoutubePlayer.playerStateToStr(event.data),
 			'offset': ytPlayerRef.current.player.getCurrentTime(),
 			'timestamp': (new Date()).getTime()
 		});
-	}
-
-	function isStateContinuation(state)
-	{
-		return lastPlayerStatesRef.current[0] == state && lastPlayerStatesRef.current[2] == state && lastPlayerStatesRef.current[1] == YoutubePlayer.prototype.PLAYER_BUFFERING;
-	}
-
-	function playerStateToStr(state)
-	{
-		return [
-			'unstarted', // -1
-			'ended',     // 0
-			'playing',   // 1
-			'paused',    // 2
-			'buffering', // 3
-			'',
-			'cued'       // 5
-		][state + 1];
 	}
 
 	return (
