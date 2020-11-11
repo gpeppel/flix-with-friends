@@ -118,6 +118,7 @@ def handleYtStateChange(request, data):
 		'state': data['state'],
 		'offset': offset,
 		'runAt': runAt,
+		'sender': user.id,
 		'timestamp': timestamp
 	}, include_self=False)
 
