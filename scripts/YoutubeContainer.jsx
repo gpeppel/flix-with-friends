@@ -33,7 +33,7 @@ export function YoutubeContainer() {
 
 	React.useEffect(() => {
 		Socket.on('yt-load', (data) => {
-			ytPlayerRef.current.loadVideoByUrl(data.url);	
+			ytPlayerRef.current.loadVideoById(data.videoId);	
 		});
 		
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
