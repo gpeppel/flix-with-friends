@@ -38,6 +38,47 @@ def connectUser(request):
 	user = User(request.sid)
 	room.addUser(user)
 
+@socketio.on('new_temp_user')
+def on_new_temp_user(data):
+    # db.session.add(tables.Users(data['name'], data['email'], data['username']))
+    # db.session.commit()
+    print("Got an event for new temp user input with data:", data)
+
+@socketio.on('new_facebook_user')
+def on_new_facebook_user(data):
+    # db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
+    # db.session.commit()
+    print("Got an event for new google user input with data:", data)
+    
+@socketio.on('new_user')
+def newUserHandler(data):
+    # db.session.add(tables.Users(data['username'], data['password']))
+    # db.session.commit()
+    socketio.emit('new_user_recieved')
+
+# TODO - GET ACCESSS TOKEN FROM USER
+
+@socketio.on('user_status')
+def handleUserStatus(data):
+    # TODO
+    # for user in db.session.query(tables.Users).all():
+    #     if user.username == data['username'] and user.password == data['password']:
+    #         print('existing_user')
+    #         socketio.emit('existing_user', {'status' : True , 'username': data['username']} )
+    #         socketio.emit
+    #         db.session.commit()
+    #         break
+    #     else:
+    #         if user.username == data['username'] and user.password != data['password']:
+    #             print('wrong_password')
+    #             socketio.emit('wrong_password', { 'status' : False })
+    #             break
+    #         if user.username != data['username'] and user.password != data['password']:
+    #             print('new_user')
+    #             newUserHandler(data)
+    #             socketio.emit('existing_user',  { 'status' : True })
+    #             break
+    db.session.commit()
 
 @socketio.on('disconnect')
 def on_disconnect():
