@@ -1,18 +1,15 @@
-from os.path import join, dirname
-from dotenv import load_dotenv
-import sys
-
 import datetime
+from dotenv import load_dotenv
 import json
 import os
 import re
+import random
+import sys
+import time
 
 import flask
 import flask_socketio
 import flask_sqlalchemy
-from datetime import datetime
-import time
-import random
 
 from room import Room
 from user import User
@@ -28,7 +25,7 @@ socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
 
 
-dotenv_path = join(dirname(__file__), "sql.env")
+dotenv_path = os.path.join(os.path.dirname(__file__), "sql.env")
 load_dotenv(dotenv_path)
 
 database_uri = os.environ["DATABASE_URI"]
@@ -40,11 +37,11 @@ db.app = app
 import message
 def emit_all_messages(channel):
 	all_messages = [
-		(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients 
+		(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients
 		for db_message in db.session.query(message.Message).all()
 	]
 	socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
-  
+
 appRooms = {}
 roomIDs = []
 
@@ -57,7 +54,8 @@ def on_connect():
 def connectUser(request):
 	global appRooms
 
-	# TODO placeholder room assignment
+	# TODO room assignment
+	"""
 	if len(appRooms) == 0:
 		room = Room()
 		appRooms[room.id] = room
@@ -66,26 +64,29 @@ def connectUser(request):
 	else:
 		room = appRooms[list(appRooms.keys())[0]]
 		print("big list " + str(roomIDs))
-	
-	
+	"""
+
+
 	user = User(request.sid)
-	room.addUser(user)
-	print("Hello " + room.id)
+	#room.addUser(user)
+	#print("Hello " + room.id)
 	#print(roomIDs[0])
-	
+
 
 @socketio.on('disconnect')
 def on_disconnect():
 	disconnectUser(flask.request)
 
 def disconnectUser(request):
+	"""
 	global appRooms
 	room = appRooms[list(appRooms.keys())[0]]
 	room.removeUser(User(request.sid))
 
 	if len(room) == 0:
 		del appRooms[room.id]
-  
+	"""
+
 @socketio.on('new_temp_user')
 def on_new_temp_user(data):
     # db.session.add(tables.Users(data['name'], data['email'], data['username']))
@@ -97,7 +98,7 @@ def on_new_facebook_user(data):
     # db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
     # db.session.commit()
     print("Got an event for new google user input with data:", data)
-    
+
 @socketio.on('new_user')
 def newUserHandler(data):
     # db.session.add(tables.Users(data['username'], data['password']))
@@ -142,7 +143,7 @@ def new_message_received(data):
 	print('\nReceived New Message: %s' % text)
 	message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
 	user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
-	timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
+	timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	room_id = 'room_id_here' # TODO use actual room id
 
 
@@ -156,7 +157,7 @@ def new_message_received(data):
 
 	message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
 	return add_to_db(message_to_add)
-	
+
 	# message init model:
 	# self.id = messageId
 	# self.text = messageText
@@ -206,12 +207,9 @@ def index():
 def handleYtStateChange(request, data):
 	user = User(request.sid)
 
-	# TODO placeholder room assignment
-	room = appRooms[list(appRooms.keys())[0]]
-	#if not room.isCreator(user):
-	#	return
-
 	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
+
+	# TODO room assignment
 
 	offset = data.get('offset', 0)
 	if type(offset) != float:
