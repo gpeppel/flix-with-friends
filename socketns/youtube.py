@@ -113,15 +113,15 @@ class YoutubeNamespace(flask_socketio.Namespace):
 	def add_to_db(self, message_to_add):
 		self.flaskserver.db.session.add(message_to_add)
 		self.flaskserver.db.session.commit()
-		self.flaskserveremit_all_messages(MESSAGES_EMIT_CHANNEL)
+		self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
 
 
-	def messages_received(self, data):
+	def on_message_send(self, data):
 		text = data['text']
 		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
 		user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
-		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		room_id = 'room_id_here' # TODO use actual room id
 
 
@@ -145,6 +145,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def on_yt_load(self, data):
+		print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
+
 		url = data.get('url')
 		if url is None:
 			return
@@ -153,7 +155,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		if videoId is None:
 			return
 
-		self.flaskserversocketio.emit('yt_load', {
+		self.flaskserver.socketio.emit('yt_load', {
 			'videoId': videoId
 		})
 
