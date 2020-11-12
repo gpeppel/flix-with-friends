@@ -11,8 +11,6 @@ import flask
 import flask_socketio
 import flask_sqlalchemy
 
-from room import Room
-from user import User
 
 
 EVENT_YT_STATE_CHANGE = 'yt-state-change'
@@ -34,11 +32,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 db = flask_sqlalchemy.SQLAlchemy(app)
 db.app = app
 
-import message
+import db_models.user
+import db_models.message
+import db_models.room
+
 def emit_all_messages(channel):
 	all_messages = [
 		(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients
-		for db_message in db.session.query(message.Message).all()
+		for db_message in db.session.query(db_models.message.Message).all()
 	]
 	socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
 
@@ -199,13 +200,13 @@ def on_yt_state_change(data):
 
 @app.route('/')
 def index():
-	message.db.create_all()
-	message.db.session.commit()
+	db.create_all()
+	db.session.commit()
 	return flask.render_template("index.html")
 
 
 def handleYtStateChange(request, data):
-	user = User(request.sid)
+	user_ = db_models.user.User(request.sid)
 
 	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
 
@@ -257,7 +258,7 @@ def handleYtStateChange(request, data):
 
 	socketio.emit(EVENT_YT_STATE_CHANGE, {
 		'state': data['state'],
-		'sender': user.id,
+		'sender': user_.id,
 		'offset': offset,
 		'rate': rate,
 		'runAt': runAt,
