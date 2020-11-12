@@ -9,7 +9,6 @@ export function Chat()
     function getNewMessages() {
         React.useEffect(() => {
             Socket.on('messages_received', (data) => {
-
                 console.log('EMIT RECEIVED!');
                 console.log(data);
                 setMessages(data);

@@ -109,7 +109,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		self.flaskserver.db.session.commit()
 
 
-
 	def add_to_db(self, message_to_add):
 		self.flaskserver.db.session.add(message_to_add)
 		self.flaskserver.db.session.commit()
