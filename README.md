@@ -1,8 +1,8 @@
 # Flix With Friends
 
 #Sections:
-[Installation](#h1-installation)
-[Socket.io events](#h1-socketio-events)
+1. [Installation](#user-content-installation)
+2. [Socket.io events](#user-content-socketio-events)
 
 ---
 
