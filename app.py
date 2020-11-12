@@ -1,6 +1,7 @@
 from os.path import join, dirname
 from dotenv import load_dotenv
 import sys
+
 import datetime
 import json
 import os
@@ -16,6 +17,7 @@ import random
 from room import Room
 from user import User
 
+
 EVENT_YT_STATE_CHANGE = 'yt-state-change'
 
 app = flask.Flask(__name__)
@@ -24,6 +26,7 @@ MESSAGES_EMIT_CHANNEL = 'messages received'
 
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
+
 
 dotenv_path = join(dirname(__file__), "sql.env")
 load_dotenv(dotenv_path)
@@ -43,13 +46,13 @@ def emit_all_messages(channel):
 	socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
   
 appRooms = {}
+roomIDs = []
 
-@socketio.on('connect')
+
+@socketio.on('new room')
 def on_connect():
 	connectUser(flask.request)
-  emit_all_messages(MESSAGES_EMIT_CHANNEL)
-
-
+	emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 def connectUser(request):
 	global appRooms
@@ -58,12 +61,31 @@ def connectUser(request):
 	if len(appRooms) == 0:
 		room = Room()
 		appRooms[room.id] = room
+		roomIDs.append(room.id)
+		socketio.emit('new room id', roomIDs[0])
 	else:
 		room = appRooms[list(appRooms.keys())[0]]
-
+		print("big list " + str(roomIDs))
+	
+	
 	user = User(request.sid)
 	room.addUser(user)
+	print("Hello " + room.id)
+	#print(roomIDs[0])
+	
 
+@socketio.on('disconnect')
+def on_disconnect():
+	disconnectUser(flask.request)
+
+def disconnectUser(request):
+	global appRooms
+	room = appRooms[list(appRooms.keys())[0]]
+	room.removeUser(User(request.sid))
+
+	if len(room) == 0:
+		del appRooms[room.id]
+  
 @socketio.on('new_temp_user')
 def on_new_temp_user(data):
     # db.session.add(tables.Users(data['name'], data['email'], data['username']))
@@ -107,19 +129,6 @@ def handleUserStatus(data):
     db.session.commit()
 
 
-@socketio.on('disconnect')
-def on_disconnect():
-	disconnectUser(flask.request)
-
-def disconnectUser(request):
-	global appRooms
-
-	# TODO placeholder room assignment
-	room = appRooms[list(appRooms.keys())[0]]
-	room.removeUser(User(request.sid))
-
-	if len(room) == 0:
-		del appRooms[room.id]
 
 def add_to_db(message_to_add):
 	message.db.session.add(message_to_add)
@@ -181,6 +190,7 @@ def getYoutubeVideoId(s):
 
 	return None
 
+
 @socketio.on(EVENT_YT_STATE_CHANGE)
 def on_yt_state_change(data):
 	handleYtStateChange(flask.request, data)
@@ -207,6 +217,7 @@ def handleYtStateChange(request, data):
 	if type(offset) != float:
 		try:
 			offset = abs(float(offset))
+
 		except:
 			offset = 0
 
@@ -225,6 +236,7 @@ def handleYtStateChange(request, data):
 			rate = 1
 
 	tsnow = unixTimestamp()
+
 	timestamp = data.get('timestamp', 0)
 	if type(timestamp) != int:
 		try:
@@ -241,6 +253,7 @@ def handleYtStateChange(request, data):
 		'buffering',
 		'cued',
 		'playback'
+
 	]:
 		return
 
