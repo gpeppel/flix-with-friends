@@ -115,7 +115,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 
-	def messages_received(self, data):
+	def on_messages_received(self, data):
 		text = data['text']
 		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
