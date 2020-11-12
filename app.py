@@ -1,44 +1,131 @@
-from dotenv import load_dotenv
+import datetime
+import json
 import os
 
 import flask
 import flask_socketio
 
+from room import Room
+from user import User
+
+
+EVENT_YT_STATE_CHANGE = 'yt-state-change'
 
 app = flask.Flask(__name__)
 
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
 
+appRooms = {}
+roomIDs = []
 
-@socketio.on('connect')
+@socketio.on('new room')
 def on_connect():
-	print('Someone connected!')
-	socketio.emit('connected', {
+	connectUser(flask.request)
+	
 
-	})
+def connectUser(request):
+	global appRooms
 
-	# TODO
-
+	# TODO placeholder room assignment
+	if len(appRooms) == 0:
+		room = Room()
+		appRooms[room.id] = room
+		roomIDs.append(room.id)
+		socketio.emit('new room id', roomIDs[0])
+	else:
+		room = appRooms[list(appRooms.keys())[0]]
+		print("big list " + str(roomIDs))
+	
+	
+	user = User(request.sid)
+	room.addUser(user)
+	print("Hello " + room.id)
+	#print(roomIDs[0])
+	
 
 @socketio.on('disconnect')
 def on_disconnect():
-	print ('Someone disconnected!')
+	disconnectUser(flask.request)
+
+
+def disconnectUser(request):
+	global appRooms
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	room.removeUser(User(request.sid))
+
+	if len(room) == 0:
+		del appRooms[room.id]
 
 
 @socketio.on('yt-load')
 def on_yt_load(data):
-	pass
+	socketio.emit('yt-load', {
+		'url': data['url']
+	})
 
 
-@socketio.on('yt-state-change')
-def on_yt_load(data):
-	pass
+@socketio.on(EVENT_YT_STATE_CHANGE)
+def on_yt_state_change(data):
+	handleYtStateChange(flask.request, data)
 
 
 @app.route('/')
 def index():
 	return flask.render_template("index.html")
+
+
+def handleYtStateChange(request, data):
+	user = User(request.sid)
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	#if not room.isCreator(user):
+	#	return
+
+	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
+
+	offset = data.get('offset', 0)
+	if type(offset) != int:
+		try:
+			offset = abs(int(offset))
+		except:
+			offset = 0
+
+	runAt = data.get('runAt', 0)
+	if type(runAt) != int:
+		try:
+			runAt = max(0, int(runAt))
+		except:
+			runAt = 0
+
+	tsnow = int((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+	timestamp = data.get('timestamp', 0)
+	if type(timestamp) != int:
+		try:
+			timestamp = int(timestamp)
+		except:
+			timestamp = tsnow
+
+	if data.get('state') not in [
+		'ready',
+		'unstarted',
+		'ended',
+		'playing',
+		'paused',
+		'buffering',
+		'cued'
+	]:
+		return
+
+	socketio.emit(EVENT_YT_STATE_CHANGE, {
+		'state': data['state'],
+		'offset': offset,
+		'runAt': runAt,
+		'timestamp': timestamp
+	}, include_self=False)
 
 
 if __name__ == '__main__':
