@@ -1,34 +1,23 @@
-import datetime
-import json
 import os
-import re
-import random
-import sys
-import time
 
 from dotenv import load_dotenv
 import flask
 import flask_socketio
 import flask_sqlalchemy
 
-import message
+from message import Message
 from socketns.youtube import YoutubeNamespace
 import sqldb
 
-
-EVENT_YT_STATE_CHANGE = 'yt-state-change'
-MESSAGES_EMIT_CHANNEL = 'messages received'
+MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 
 class FlaskServer:
-	def __init__(self, app, db=None):
+	def __init__(self, app, db):
 		dotenv_path = os.path.join(os.path.dirname(__file__), 'sql.env')
 		load_dotenv(dotenv_path)
 
 		self.app = app
-		self.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
-		self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 		self.app.add_url_rule('/', 'index', self.index)
 
 		self.socketio = flask_socketio.SocketIO(self.app)
@@ -42,11 +31,11 @@ class FlaskServer:
 		self.users = {}
 
 
-	def run(self, debug=False):
+	def run(self, host, port, debug=False):
 		self.socketio.run(
 			self.app,
-			host=self.host,
-			port=self.port,
+			host=host,
+			port=port,
 			debug=debug
 		)
 
@@ -60,6 +49,6 @@ class FlaskServer:
 	def emit_all_messages(self, channel):
 		all_messages = [
 			(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients
-			for db_message in self.db.session.query(message.Message).all()
+			for db_message in self.db.session.query(Message).all()
 		]
-		socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
+		self.socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)

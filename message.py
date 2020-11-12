@@ -1,9 +1,3 @@
-
-class Message:
-	def __init__(self):
-		pass
-
-"""
 from app import db
 
 class Message(db.Model):
@@ -19,4 +13,3 @@ class Message(db.Model):
 		self.timestamp = messageTimestamp
 		self.roomId = messageRoomId
 		self.userId = messageUserId
-"""

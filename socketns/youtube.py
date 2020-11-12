@@ -1,9 +1,21 @@
+import datetime
+import json
+import os
+import re
+import random
+import sys
+import time
+
 import flask
 import flask_socketio
 
 import flaskserver
 from db_models.room import Room
 from db_models.user import User
+from message import Message
+
+
+EVENT_YT_STATE_CHANGE = 'yt_state_change'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
@@ -70,7 +82,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 	def newUserHandler(self, data):
 		# db.session.add(tables.Users(data['username'], data['password']))
 		# db.session.commit()
-		socketio.emit('new_user_recieved')
+		self.flaskserver.socketio.emit('new_user_recieved')
 
 	# TODO - GET ACCESSS TOKEN FROM USER
 
@@ -99,12 +111,12 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def add_to_db(self, message_to_add):
-		message.db.session.add(message_to_add)
-		message.db.session.commit()
-		emit_all_messages(MESSAGES_EMIT_CHANNEL)
+		self.flaskserver.db.session.add(message_to_add)
+		self.flaskserver.db.session.commit()
+		self.flaskserveremit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 
-	def new_message_received(self, data):
+	def messages_received(self, data):
 		text = data['text']
 		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
@@ -121,8 +133,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		print('userId: %s\n' % user_id)
 
 
-		message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
-		return add_to_db(message_to_add)
+		message_to_add = Message(message_id, text, timestamp, room_id, user_id)
+		return self.add_to_db(message_to_add)
 
 		# message init model:
 		# self.id = messageId
@@ -141,7 +153,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		if videoId is None:
 			return
 
-		socketio.emit('yt-load', {
+		self.flaskserversocketio.emit('yt_load', {
 			'videoId': videoId
 		})
 
@@ -191,7 +203,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 			except:
 				rate = 1
 
-		tsnow = unixTimestamp()
+		tsnow = self.unixTimestamp()
 
 		timestamp = data.get('timestamp', 0)
 		if type(timestamp) != int:
@@ -213,7 +225,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		]:
 			return
 
-		socketio.emit(EVENT_YT_STATE_CHANGE, {
+		self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
 			'state': data['state'],
 			'sender': user.id,
 			'offset': offset,
