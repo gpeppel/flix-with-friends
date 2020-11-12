@@ -1,3 +1,6 @@
+from os.path import join, dirname
+from dotenv import load_dotenv
+import sys
 import datetime
 import json
 import os
@@ -5,24 +8,47 @@ import re
 
 import flask
 import flask_socketio
+import flask_sqlalchemy
+from datetime import datetime
+import time
+import random
 
 from room import Room
 from user import User
-
 
 EVENT_YT_STATE_CHANGE = 'yt-state-change'
 
 app = flask.Flask(__name__)
 
+MESSAGES_EMIT_CHANNEL = 'messages received'
+
 socketio = flask_socketio.SocketIO(app)
 socketio.init_app(app, cors_allowed_origins='*')
 
-appRooms = {}
+dotenv_path = join(dirname(__file__), "sql.env")
+load_dotenv(dotenv_path)
 
+database_uri = os.environ["DATABASE_URI"]
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+
+db = flask_sqlalchemy.SQLAlchemy(app)
+db.app = app
+
+import message
+def emit_all_messages(channel):
+	all_messages = [
+		(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId) # TODO decide if userId should even be sent to clients 
+		for db_message in db.session.query(message.Message).all()
+	]
+	socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
+  
+appRooms = {}
 
 @socketio.on('connect')
 def on_connect():
 	connectUser(flask.request)
+  emit_all_messages(MESSAGES_EMIT_CHANNEL)
+
 
 
 def connectUser(request):
@@ -80,10 +106,10 @@ def handleUserStatus(data):
     #             break
     db.session.commit()
 
+
 @socketio.on('disconnect')
 def on_disconnect():
 	disconnectUser(flask.request)
-
 
 def disconnectUser(request):
 	global appRooms
@@ -95,6 +121,39 @@ def disconnectUser(request):
 	if len(room) == 0:
 		del appRooms[room.id]
 
+def add_to_db(message_to_add):
+	message.db.session.add(message_to_add)
+	message.db.session.commit()
+	emit_all_messages(MESSAGES_EMIT_CHANNEL)
+
+
+@socketio.on('message-send')
+def new_message_received(data):
+	text = data['text']
+	print('\nReceived New Message: %s' % text)
+	message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
+	user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
+	timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
+	room_id = 'room_id_here' # TODO use actual room id
+
+
+	print('\nAdding message to database:')
+	print('messageId:%s' % message_id)
+	print('text: %s' % text)
+	print('timestamp: %s' % timestamp)
+	print('roomId: %s' % room_id)
+	print('userId: %s\n' % user_id)
+
+
+	message_to_add = message.Message(message_id, text, timestamp, room_id, user_id)
+	return add_to_db(message_to_add)
+	
+	# message init model:
+	# self.id = messageId
+	# self.text = messageText
+	# self.timestamp = messageTimestamp
+	# self.roomId = messageRoomId
+	# self.userId = messageUserId
 
 @socketio.on('yt-load')
 def on_yt_load(data):
@@ -129,6 +188,8 @@ def on_yt_state_change(data):
 
 @app.route('/')
 def index():
+	message.db.create_all()
+	message.db.session.commit()
 	return flask.render_template("index.html")
 
 

@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { YoutubeContainer } from './YoutubeContainer';
 import { Socket } from './Socket';
-
+import { Chat } from './Chat';
 
 const EVENT_YT_LOAD = 'yt-load';
-
 
 export function Content() {
 	function onKeyUp(event)
@@ -21,6 +20,7 @@ export function Content() {
 		<div>
 			<input onKeyUp={onKeyUp} />
 			<YoutubeContainer />
+      <Chat />
 		</div>
 	);
 }
