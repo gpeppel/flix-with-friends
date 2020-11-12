@@ -1,4 +1,5 @@
 import flask_sqlalchemy
+
 from app import db
 
 class User(db.Model):

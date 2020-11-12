@@ -1,7 +1,6 @@
 import os
 
 from dotenv import load_dotenv
-import flask
 import flask_sqlalchemy
 
 
@@ -15,12 +14,14 @@ if DATABASE_URI is None:
 	sql_db = os.environ['SQL_DATABASE']
 	DATABASE_URI = 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
 
-app = flask.Flask(__name__)
-db = flask_sqlalchemy.SQLAlchemy(app)
 
-from flaskserver import FlaskServer
-flaskserver = FlaskServer(app, db)
+curDB = None
 
+def SQLAlchemy(app):
+	global curDB
 
-if __name__ == '__main__':
-	flaskserver.run(debug=True)
+	db = flask_sqlalchemy.SQLAlchemy(app)
+	db.app = app
+
+	curDB = db
+	return db
