@@ -122,7 +122,7 @@ def handleYtStateChange(request, data):
 		except:
 			rate = 1
 
-	tsnow = int((datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+	tsnow = unixTimestamp()
 	timestamp = data.get('timestamp', 0)
 	if type(timestamp) != int:
 		try:
@@ -150,6 +150,12 @@ def handleYtStateChange(request, data):
 		'runAt': runAt,
 		'timestamp': timestamp
 	}, include_self=False)
+
+
+def unixTimestamp(ts=None):
+	if ts is None:
+		ts = datetime.datetime.utcnow()
+	return int((ts - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
 
 
 if __name__ == '__main__':
