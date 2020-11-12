@@ -56,6 +56,8 @@ export function YoutubeContainer() {
 					case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
 						ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
 						break;
+					case 'sync':
+						break;
 				}
 			}
 
@@ -74,6 +76,10 @@ export function YoutubeContainer() {
 			}
 			*/
 		});
+		
+		setInterval(() => {
+			emitStateChange(ytPlayerRef.current.player, 'sync');
+		}, 3000);
 	}, []);
 
 	function onYtReady(event)

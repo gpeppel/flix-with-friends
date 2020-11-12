@@ -15,6 +15,15 @@ export default class YoutubePlayer
 		this.player = undefined;
 		this.lastStates = [null, null, null];
 	}
+	
+	isPlayerInState(state)
+	{
+		if(this.player.getPlayerState() == state)
+			return 1;
+		if(YoutubePlayer.isStateContinuation(this.lastStates, this.player.getPlayerState()))
+			return 2;
+		return 0;
+	}
 
 	static checkSyncIgnore(player, t)
 	{
@@ -27,8 +36,9 @@ export default class YoutubePlayer
 
 		player.player.play = function(t){
 			console.log("play", t);
-
-			if(this.player.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING && YoutubePlayer.checkSyncIgnore(this.player, t))
+			
+			let pis = this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING);
+			if(pis == 2 || pis == 1 && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
 				console.log("play cancel");
 				return;
@@ -43,7 +53,8 @@ export default class YoutubePlayer
 		player.player.pause = function(t){
 			console.log("pause", t);
 
-			if(this.player.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED && YoutubePlayer.checkSyncIgnore(this.player, t))
+			let pis = this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED);
+			if(pis == 2 || pis == 1 && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
 				console.log("pause cancel");
 				return;
