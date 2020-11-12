@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
+
 import { Button } from './Button';
+
+import * as React from 'react';
+import { YoutubeContainer } from './YoutubeContainer';
+
 import { Socket } from './Socket';
+import { Chat } from './Chat';
+
+const EVENT_YT_LOAD = 'yt-load';
 
 export function Content() {
-    const [addresses, setAddresses] = useState([]);
-    const [roomID, setRoomID] = useState([]);
+    
+    const [roomID, setRoomID] = React.useState([]);
     
     
     console.log("emitting")
     Socket.emit('new room');
     
-    useEffect(() => { Socket.on('new room id', setRoomID); }, []);
+    React.useEffect(() => { Socket.on('new room id', setRoomID); }, []);
     console.log(roomID)
-    
-    
-    function getNewAddresses() {
-        React.useEffect(() => {
-            Socket.on('addresses received', updateAddresses);
-            return () => {
-                Socket.off('addresses received', updateAddresses);
-            }
-        });
-    }
     
     
     function copyID() {
@@ -32,18 +29,21 @@ export function Content() {
       alert("Copied the text: " + copyText.value);
     }
     
-    function updateAddresses(data) {
-        console.log("Received addresses from server: " + data['allAddresses']);
-        setAddresses(data['allAddresses']);
-    }
-    
-    getNewAddresses();
+	function onKeyUp(event)
+	{
+		if(event.key == "Enter")
+		{
+			Socket.emit(EVENT_YT_LOAD, {
+				'url': event.target.value
+			});
+		}
+	}
 
-    return (
-        <div>
-            <h1>USPS Addresses!</h1>
-                <input type="text" value={roomID} id="myInput"/>
-                <button onClick={copyID}>Copy text</button>
-        </div>
-    );
+	return (
+		<div>
+			<input onKeyUp={onKeyUp} />
+			<YoutubeContainer />
+      <Chat />
+		</div>
+	);
 }
