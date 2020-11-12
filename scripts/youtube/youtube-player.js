@@ -28,47 +28,47 @@ export default class YoutubePlayer
 		player.player.play = function(t){
 			console.log("play", t);
 
-			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING && YoutubePlayer.checkSyncIgnore(this, t))
+			if(this.player.getPlayerState() == YoutubePlayer.prototype.PLAYER_PLAYING && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
 				console.log("play cancel");
 				return;
 			}
 
 			console.log("play0");
-			this.seekTo(t);
-			this.playVideo();
+			this.player.seekTo(t);
+			this.player.playVideo();
 			console.log("play1");
-		}.bind(player.player);
+		}.bind(player);
 
 		player.player.pause = function(t){
 			console.log("pause", t);
 
-			if(this.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED && YoutubePlayer.checkSyncIgnore(this, t))
+			if(this.player.getPlayerState() == YoutubePlayer.prototype.PLAYER_PAUSED && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
 				console.log("pause cancel");
 				return;
 			}
 
 			console.log("pause0");
-			this.seekTo(t);
-			this.pauseVideo();
+			this.player.seekTo(t);
+			this.player.pauseVideo();
 			console.log("pause1");
-		}.bind(player.player);
+		}.bind(player);
 
 		player.player.setPlayback = function(t, s){
 			console.log("playback", s);
 
-			if(this.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this, t))
+			if(this.player.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
 				console.log("playback cancel");
 				return;
 			}
 
 			console.log("playback0");
-			this.seekTo(t);
-			this.setPlaybackRate(s);
+			this.player.seekTo(t);
+			this.player.setPlaybackRate(s);
 			console.log("playback1");
-		}.bind(player.player);
+		}.bind(player);
 
 		player.onReady(event);
 	}
