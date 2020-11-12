@@ -109,11 +109,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		self.flaskserver.db.session.commit()
 
 
-
 	def add_to_db(self, message_to_add):
 		self.flaskserver.db.session.add(message_to_add)
 		self.flaskserver.db.session.commit()
-		self.flaskserveremit_all_messages(MESSAGES_EMIT_CHANNEL)
+		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 
 	def messages_received(self, data):
@@ -121,7 +120,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
 		user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
-		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		room_id = 'room_id_here' # TODO use actual room id
 
 

@@ -7,8 +7,8 @@ class Message(db.Model):
 	roomId = db.Column(db.String(12))
 	userId = db.Column(db.BigInteger)
 
-	def __init__(self, messageId, messageText, messageTimestamp, messageRoomId, messageUserId):
-		self.id = messageId
+	def __init__(self, messageText, messageTimestamp, messageRoomId, messageUserId):
+		self.id = Message.id
 		self.text = messageText
 		self.timestamp = messageTimestamp
 		self.roomId = messageRoomId
