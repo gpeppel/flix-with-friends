@@ -1,33 +1,26 @@
-    
 import * as React from 'react';
-
-
-import { Chat } from './Chat';
+import { YoutubeContainer } from './YoutubeContainer';
 import { Socket } from './Socket';
+import { Chat } from './Chat';
+
+const EVENT_YT_LOAD = 'yt-load';
 
 export function Content() {
-    const [addresses, setAddresses] = React.useState([]);
-    
-    function getNewAddresses() {
-        React.useEffect(() => {
-            Socket.on('addresses received', updateAddresses);
-            return () => {
-                Socket.off('addresses received', updateAddresses);
-            }
-        });
-    }
-    
-    function updateAddresses(data) {
-        console.log("Received addresses from server: " + data['allAddresses']);
-        setAddresses(data['allAddresses']);
-    }
-    
-    getNewAddresses();
+	function onKeyUp(event)
+	{
+		if(event.key == "Enter")
+		{
+			Socket.emit(EVENT_YT_LOAD, {
+				'url': event.target.value
+			});
+		}
+	}
 
-    return (
-        <div>
-            <h1>Chat</h1>
-            <Chat />
-        </div>
-    );
+	return (
+		<div>
+			<input onKeyUp={onKeyUp} />
+			<YoutubeContainer />
+      <Chat />
+		</div>
+	);
 }
