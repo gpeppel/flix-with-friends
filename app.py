@@ -1,50 +1,42 @@
-# app.py
-from os.path import join, dirname
-from dotenv import load_dotenv
+import datetime
+import json
 import os
-import flask
-import flask_sqlalchemy
-import flask_socketio
-import models 
+import re
 
-ADDRESSES_RECEIVED_CHANNEL = 'addresses received'
+import flask
+import flask_socketio
+
+from room import Room
+from user import User
+
+
+EVENT_YT_STATE_CHANGE = 'yt-state-change'
 
 app = flask.Flask(__name__)
 
 socketio = flask_socketio.SocketIO(app)
-socketio.init_app(app, cors_allowed_origins="*")
+socketio.init_app(app, cors_allowed_origins='*')
 
-dotenv_path = join(dirname(__file__), 'sql.env')
-load_dotenv(dotenv_path)
+appRooms = {}
 
-sql_user = os.environ['SQL_USER']
-sql_pwd = os.environ['SQL_PASSWORD']
-dbuser = os.environ['USER']
-
-database_uri = 'postgresql://{}:{}@localhost/postgres'.format(
-    sql_user, sql_pwd)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-
-db = flask_sqlalchemy.SQLAlchemy(app)
-db.init_app(app)
-db.app = app
-
-
-db.create_all()
-db.session.commit()
-
-def emit_all_addresses(channel):
-    # TODO
-    print("TODO")
 
 @socketio.on('connect')
 def on_connect():
-    print('Someone connected!')
-    socketio.emit('connected', {
-        'test': 'Connected'
-    })
+	connectUser(flask.request)
 
+
+def connectUser(request):
+	global appRooms
+
+	# TODO placeholder room assignment
+	if len(appRooms) == 0:
+		room = Room()
+		appRooms[room.id] = room
+	else:
+		room = appRooms[list(appRooms.keys())[0]]
+
+	user = User(request.sid)
+	room.addUser(user)
 
 @socketio.on('new_temp_user')
 def on_new_temp_user(data):
@@ -90,27 +82,127 @@ def handleUserStatus(data):
 
 @socketio.on('disconnect')
 def on_disconnect():
-    print ('Someone disconnected!')
+	disconnectUser(flask.request)
 
-@socketio.on('new address input')
-def on_new_address(data):
-    print("Got an event for new address input with data:", data)
-    
-    db.session.add(models.Usps(data["address"]));
-    db.session.commit();
-    
-    emit_all_addresses(ADDRESSES_RECEIVED_CHANNEL)
+
+def disconnectUser(request):
+	global appRooms
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	room.removeUser(User(request.sid))
+
+	if len(room) == 0:
+		del appRooms[room.id]
+
+
+@socketio.on('yt-load')
+def on_yt_load(data):
+	url = data.get('url')
+	if url is None:
+		return
+
+	videoId = getYoutubeVideoId(url)
+	if videoId is None:
+		return
+
+	socketio.emit('yt-load', {
+		'videoId': videoId
+	})
+
+
+def getYoutubeVideoId(s):
+	match = re.match(r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)', s)
+	if match is not None:
+		return match[1]
+
+	match = re.match(r'^([A-Za-z0-9_-]+)$', s)
+	if match is not None:
+		return match[1]
+
+	return None
+
+@socketio.on(EVENT_YT_STATE_CHANGE)
+def on_yt_state_change(data):
+	handleYtStateChange(flask.request, data)
+
 
 @app.route('/')
 def index():
-    emit_all_addresses(ADDRESSES_RECEIVED_CHANNEL)
+	return flask.render_template("index.html")
 
-    return flask.render_template("index.html")
 
-if __name__ == '__main__': 
-    socketio.run(
-        app,
-        host=os.getenv('IP', '0.0.0.0'),
-        port=int(os.getenv('PORT', 8080)),
-        debug=True
-    )
+def handleYtStateChange(request, data):
+	user = User(request.sid)
+
+	# TODO placeholder room assignment
+	room = appRooms[list(appRooms.keys())[0]]
+	#if not room.isCreator(user):
+	#	return
+
+	print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
+
+	offset = data.get('offset', 0)
+	if type(offset) != float:
+		try:
+			offset = abs(float(offset))
+		except:
+			offset = 0
+
+	runAt = data.get('runAt', 0)
+	if type(runAt) != int:
+		try:
+			runAt = max(0, int(runAt))
+		except:
+			runAt = 0
+
+	rate = data.get('rate', 1)
+	if type(rate) != int:
+		try:
+			rate = int(rate)
+		except:
+			rate = 1
+
+	tsnow = unixTimestamp()
+	timestamp = data.get('timestamp', 0)
+	if type(timestamp) != int:
+		try:
+			timestamp = int(timestamp)
+		except:
+			timestamp = tsnow
+
+	if data.get('state') not in [
+		'ready',
+		'unstarted',
+		'ended',
+		'playing',
+		'paused',
+		'buffering',
+		'cued',
+		'playback'
+	]:
+		return
+
+	socketio.emit(EVENT_YT_STATE_CHANGE, {
+		'state': data['state'],
+		'sender': user.id,
+		'offset': offset,
+		'rate': rate,
+		'runAt': runAt,
+		'timestamp': timestamp
+	}, include_self=False)
+
+
+def unixTimestamp(ts=None):
+	if ts is None:
+		ts = datetime.datetime.utcnow()
+	return int((ts - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+
+
+if __name__ == '__main__':
+	socketio.run(
+		app,
+		host=os.getenv('IP', '0.0.0.0'),
+		port=int(os.getenv('PORT', 8080)),
+		debug=True
+	)
