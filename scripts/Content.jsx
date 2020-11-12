@@ -4,7 +4,7 @@ import { YoutubeContainer } from './YoutubeContainer';
 import { Socket } from './Socket';
 import { Chat } from './Chat';
 
-const EVENT_YT_LOAD = 'yt-load';
+const EVENT_YT_LOAD = 'yt_load';
 
 export function Content() {
 

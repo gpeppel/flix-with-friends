@@ -5,8 +5,8 @@ import { Socket } from './Socket';
 import YoutubePlayer from './youtube/youtube-player.js';
 
 
-const EVENT_YT_LOAD = 'yt-load';
-const EVENT_YT_STATE_CHANGE = 'yt-state-change';
+const EVENT_YT_LOAD = 'yt_load';
+const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 
 
 export function YoutubeContainer() {
@@ -76,7 +76,7 @@ export function YoutubeContainer() {
 			}
 			*/
 		});
-		
+
 		setInterval(() => {
 			emitStateChange(ytPlayerRef.current.player, 'sync');
 		}, 3000);

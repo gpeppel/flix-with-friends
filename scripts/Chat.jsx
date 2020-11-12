@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { Socket } from './Socket';
 
-    
+
 export function Chat()
 {
     const [messages, setMessages] = React.useState([]);
 
     function getNewMessages() {
         React.useEffect(() => {
-            Socket.on('messages received', (data) => {
-                
+            Socket.on('messages_received', (data) => {
                 console.log('EMIT RECEIVED!');
                 console.log(data);
                 setMessages(data);
@@ -25,7 +24,7 @@ export function Chat()
         var messageInput = document.getElementById('messageInput');
         var messageText = messageInput.value;
 
-        Socket.emit('message-send', {
+        Socket.emit('message_send', {
             'text': messageText,
         });
         messageInput.value = '';
@@ -37,8 +36,8 @@ export function Chat()
         {
             handleSubmit();
         }
-    }        
-    
+    }
+
     getNewMessages();
 
     return (
