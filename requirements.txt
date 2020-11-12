@@ -1,4 +1,7 @@
 Flask
+Flask-SQLAlchemy
 flask-socketio
+google-api-python-client
+psycopg2-binary
 python-dotenv
 requests
