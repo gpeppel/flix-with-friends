@@ -1,4 +1,5 @@
 # Flix With Friends
+![travis build](https://travis-ci.com/gpeppel/flix-with-friends.svg?token=yKryxn23AXzDQ7RBndwC&branch=master)
 
 # Sections:
 1. [Installation](#user-content-installation)
@@ -185,4 +186,4 @@ Data:
 ---
 
 # Database
-![schema](docs/sql.png)
+![schema](docs/schema.png)
