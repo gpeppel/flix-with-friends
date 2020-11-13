@@ -1,16 +1,11 @@
-import os
-
-from dotenv import load_dotenv
 import flask
 import flask_socketio
-import flask_sqlalchemy
 
 from db_models.message import Message
 from db_models.room import Room
 from db_models.user import User
 
 import socketns.youtube
-import sqldb
 
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
@@ -18,9 +13,6 @@ MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 class FlaskServer:
     def __init__(self, app, db):
-        dotenv_path = os.path.join(os.path.dirname(__file__), 'sql.env')
-        load_dotenv(dotenv_path)
-
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
 
@@ -29,8 +21,8 @@ class FlaskServer:
 
         self.db = db
 
-        self.youtubeNs = socketns.youtube.YoutubeNamespace('/', self)
-        self.socketio.on_namespace(self.youtubeNs)
+        self.youtube_ns = socketns.youtube.YoutubeNamespace('/', self)
+        self.socketio.on_namespace(self.youtube_ns)
 
         self.rooms = {}
         self.users = {}
@@ -55,26 +47,26 @@ class FlaskServer:
         ]
         self.socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
 
-    def createUserFromRequest(self, request):
-        user = User(request.sid)
+    def create_user_from_request(self, request):
+        user = User.from_request(request)
         self.users[user.id] = user
 
         return user
 
-    def deleteUser(self, user):
+    def delete_user(self, user):
         del self.users[user.id]
 
-    def getUserByRequest(self, request):
+    def get_user_by_request(self, request):
         return self.users[request.sid]
 
-    def createRoom(self, roomId=None):
-        room = Room(roomId)
+    def create_room(self, room_id=None):
+        room = Room(room_id)
         self.rooms[room.id] = room
 
         return room
 
-    def deleteRoom(self, room):
+    def delete_room(self, room):
         for user in list(room.users.values()):
-            room.removeUser(user)
+            room.remove_user(user)
 
         del self.rooms[room.id]

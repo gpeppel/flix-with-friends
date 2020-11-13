@@ -1,18 +1,14 @@
 import datetime
 import json
-import os
 import re
 import random
 import sys
-import time
 
 import flask
 import flask_socketio
 
 import flaskserver
 from db_models.message import Message
-from db_models.room import Room
-from db_models.user import User
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -20,44 +16,24 @@ MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
-    def __init__(self, ns, server):
-        super().__init__(ns)
-        self.ns = ns
+    def __init__(self, namespace, server):
+        super().__init__(namespace)
+        self.namespace = namespace
         self.flaskserver = server
 
     def on_connect(self):
-        self.connectUser(flask.request)
+        self.connect_user(flask.request)
         self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
 
-    def connectUser(self, request):
-        # TODO room assignment
-        """
-        if len(appRooms) == 0:
-                room = Room()
-                appRooms[room.id] = room
-                roomIDs.append(room.id)
-                socketio.emit('new room id', roomIDs[0])
-        else:
-                room = appRooms[list(appRooms.keys())[0]]
-                print("big list " + str(roomIDs))
-        """
-
-        user = self.flaskserver.createUserFromRequest(request)
+    def connect_user(self, request):
+        self.flaskserver.create_user_from_request(request)
 
     def on_disconnect(self):
-        self.disconnectUser(flask.request)
+        self.disconnect_user(flask.request)
 
-    def disconnectUser(self, request):
-        user = self.flaskserver.getUserByRequest(request)
-        self.flaskserver.deleteUser(user)
-        """
-		room = appRooms[list(appRooms.keys())[0]]
-		room.removeUser(User(request.sid))
-
-		if len(room) == 0:
-			del appRooms[room.id]
-		"""
-
+    def disconnect_user(self, request):
+        user = self.flaskserver.get_user_by_request(request)
+        self.flaskserver.delete_user(user)
 
     def on_new_temp_user(self, data):
         # db.session.add(tables.Users(data['name'], data['email'], data['username']))
@@ -66,17 +42,21 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def on_new_facebook_user(self, data):
         print(data['response']['name'])
-        # db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
-        # db.session.commit()
+        """
+        db.session.add(
+            tables.Users(data['name'], data['email'], data['email'],data['accessToken'])
+        )
+        db.session.commit()
+        """
 
-    def newUserHandler(self, data):
+    def new_user_handler(self, data):
         # db.session.add(tables.Users(data['username'], data['password']))
         # db.session.commit()
         self.flaskserver.socketio.emit('new_user_recieved')
 
     # TODO - GET ACCESSS TOKEN FROM USER
 
-    def handleUserStatus(self, data):
+    def handle_user_status(self, data):
         # TODO
         # for user in db.session.query(tables.Users).all():
         #     if user.username == data['username'] and user.password == data['password']:
@@ -138,67 +118,58 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if url is None:
             return
 
-        videoId = self.getYoutubeVideoId(url)
-        if videoId is None:
+        video_id = self.get_youtube_video_id(url)
+        if video_id is None:
             return
 
-        self.flaskserversocketio.emit('yt_load', {
-            'videoId': videoId
+        self.flaskserver.socketio.emit('yt_load', {
+            'videoId': video_id
         })
 
-    def getYoutubeVideoId(self, s):
+    def get_youtube_video_id(self, url):
         match = re.match(
-            r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)', s)
+            r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)',
+            url
+        )
         if match is not None:
             return match[1]
 
-        match = re.match(r'^([A-Za-z0-9_-]+)$', s)
+        match = re.match(r'^([A-Za-z0-9_-]+)$', url)
         if match is not None:
             return match[1]
 
         return None
 
     def on_yt_state_change(self, data):
-        self.handleYtStateChange(flask.request, data)
+        self.handle_yt_state_change(flask.request, data)
 
-    def handleYtStateChange(self, request, data):
-        user = self.flaskserver.getUserByRequest(request)
+    def handle_yt_state_change(self, request, data):
+        user = self.flaskserver.get_user_by_request(request)
 
-        print(json.dumps(data).encode(
-            "ascii", errors="backslashreplace").decode("ascii"))
+        print(
+            json.dumps(data).encode(
+                "ascii", errors="backslashreplace").decode("ascii")
+        )
 
-        # TODO room assignment
+        def getval(key, fnc_chk, fnc_fix, default=None):
+            val = data.get(key, default)
+            if not fnc_chk(val):
+                try:
+                    val = fnc_fix(val)
+                except Exception:
+                    val = default
+            return val
 
-        offset = data.get('offset', 0)
-        if type(offset) != float:
-            try:
-                offset = abs(float(offset))
+        offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
+        run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
+        rate = getval('rate', lambda x: isinstance(x, int), lambda x: int(x), 1)
+        timestamp = getval(
+		    'timestamp',
+		    lambda x: isinstance(x, int),
+		    lambda x: int(x),
+		    self.unix_timestamp()
+		)
 
-            except:
-                offset = 0
-
-        runAt = data.get('runAt', 0)
-        if type(runAt) != int:
-            try:
-                runAt = max(0, int(runAt))
-            except:
-                runAt = 0
-
-        rate = data.get('rate', 1)
-        if type(rate) != int:
-            try:
-                rate = int(rate)
-            except:
-                rate = 1
-
-        tsnow = self.unixTimestamp()
-
-        timestamp = data.get('timestamp', 0)
-        if type(timestamp) != int:
-            try:
-                timestamp = int(timestamp)
-            except:
-                timestamp = tsnow
 
         if data.get('state') not in [
                 'ready',
@@ -218,11 +189,11 @@ class YoutubeNamespace(flask_socketio.Namespace):
             'sender': user.id,
             'offset': offset,
             'rate': rate,
-            'runAt': runAt,
+            'runAt': run_at,
             'timestamp': timestamp
         }, include_self=False)
 
-    def unixTimestamp(self, ts=None):
-        if ts is None:
-            ts = datetime.datetime.utcnow()
-        return int((ts - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+    def unix_timestamp(self, timestamp=None):
+        if timestamp is None:
+            timestamp = datetime.datetime.utcnow()
+        return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)

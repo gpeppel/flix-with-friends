@@ -13,7 +13,7 @@ MESSAGE_EXPECTED = 'Message()_expected'
 class ChatTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.flaskserver = app.createFlaskServer(app.db)
+        cls.flaskserver = app.create_flask_server(app.db)
 
     def setUp(self):
         self.success_tests = [
@@ -25,8 +25,8 @@ class ChatTest(unittest.TestCase):
                     'id': 1,
                     'text': 'test_message_text',
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    'roomId': 'room_id_here',
-                    'userId': 1,
+                    'room_id': 'room_id_here',
+                    'user_id': 1,
                 }
             }
         ]
@@ -44,7 +44,7 @@ class ChatTest(unittest.TestCase):
         for test in self.success_tests:
             with mock.patch('socketns.youtube.YoutubeNamespace.add_to_db', self.mocked_db_add):
                 mocked_id_generator.return_value = 1
-                response = self.flaskserver.youtubeNs.on_message_send(
+                response = self.flaskserver.youtube_ns.on_message_send(
                     test[INPUT_MESSAGE])
                 expected = test[MESSAGE_EXPECTED]
 

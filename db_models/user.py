@@ -9,8 +9,8 @@ class User(db.Model):
     email = db.Column(db.String(120))
     settings = db.Column(db.String(120))
 
-    def __init__(self, id, name=None, email=None, settings=None):
-        self.id = id
+    def __init__(self, user_id=None, name=None, email=None, settings=None):
+        self.id = user_id
         self.name = name
         self.email = email
         self.settings = settings
@@ -19,8 +19,8 @@ class User(db.Model):
         self.room = None
 
     @staticmethod
-    def fromRequest(req):
-        u = User()
-        u.sid = req.sid
+    def from_request(req):
+        user = User(req.sid)
+        user.sid = req.sid
 
-        return u
+        return user
