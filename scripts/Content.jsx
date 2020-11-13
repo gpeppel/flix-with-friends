@@ -12,7 +12,9 @@ export function Content() {
 
 
     console.log("emitting")
-    Socket.emit('new room');
+	Socket.emit('new room');
+
+	Socket.emit('chat_loaded')
 
     React.useEffect(() => { Socket.on('new room id', setRoomID); }, []);
     console.log(roomID)
