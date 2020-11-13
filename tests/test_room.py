@@ -1,8 +1,8 @@
 import random
 import unittest
 
-from room import Room
-from user import User
+from db_models.room import Room
+from db_models.user import User
 
 
 USERS = [

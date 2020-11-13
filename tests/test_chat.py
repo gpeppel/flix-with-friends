@@ -9,7 +9,7 @@ from datetime import datetime
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
 
-class chatMessageTestCase(unittest.TestCase):
+class ChatTest(unittest.TestCase):
     def setUp(self):
         self.success_tests = [
             {
