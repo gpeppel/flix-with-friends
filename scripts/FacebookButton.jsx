@@ -19,11 +19,15 @@ function handleSubmit(response) {
     // console.log('Sent the email ' + email + ' to server!');
     // console.log('Sent the imgage url ' + imgURL + ' to server!');
 
-    console.log(response)
+    console.log(response);
+
 }
 
 const responseFacebook = (response) => {
   console.log(response);
+  Socket.emit('new_facebook_user', {
+    'response': response
+  });
 }
 
 export function FacebookButton() {
