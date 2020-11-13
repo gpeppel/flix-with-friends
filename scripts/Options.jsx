@@ -21,10 +21,21 @@ export function Options() {
   
     return (
         <body>
+        <div className="header">
+        <img src="static/images/logo.png" alt="logo" />
+        </div>
+        <div className="split left">
+         <div className="centered">
+         <img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
+         <FacebookButton />
+         </div>
+        </div>
+        <div className="split right">
         <div className="centered">
-            <h1>Create New Viewing Room</h1>
-            <FacebookButton />
-             <button onClick={handleSubmit}>Create Now!</button>
+        <img className="popcorn_button" src="static/images/popcorn_button.png" alt="popcorn_button" />
+           
+        <button className="button" onClick={handleSubmit}>Create New Viewing Room!</button>
+            </div>
             </div>
         </body>
         )
