@@ -9,15 +9,17 @@ const EVENT_YT_LOAD = 'yt_load';
 const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 
 
-export function YoutubeContainer() {
+export function YoutubeContainer()
+{
 	const [ytPlayer, setYtPlayer] = React.useState(null);
 	const [ytComponent, setYtComponent] = React.useState(null);
 
 	const ytPlayerRef = React.useRef();
 	ytPlayerRef.current = ytPlayer;
 
-	React.useEffect(() => {
-		let [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
+	React.useEffect(() =>
+	{
+		const [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
 			playerVars: {
 				autoplay: 1,
 				controls: 1,
@@ -37,33 +39,35 @@ export function YoutubeContainer() {
 
 		ytPlayerRef.current.player.pauseVideo();
 
-		Socket.on(EVENT_YT_LOAD, (data) => {
+		Socket.on(EVENT_YT_LOAD, (data) =>
+		{
 			console.log('load video', data);
 			ytPlayerRef.current.player.loadVideoById(data.videoId);
 		});
 
-		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
+		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
+		{
 			function doState(data)
 			{
 				data.timestamp = parseInt(data.timestamp, 10);
 
-				let ts = (new Date()).getTime();
-				let tsdiff = Math.max(0, ts - data.timestamp);
-				let adjustedOffset = data.offset + (tsdiff / 1000);
+				const ts = (new Date()).getTime();
+				const tsdiff = Math.max(0, ts - data.timestamp);
+				const adjustedOffset = data.offset + (tsdiff / 1000);
 
 				switch(data.state)
 				{
-					case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
-						ytPlayerRef.current.player.play(adjustedOffset);
-						break;
-					case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
-						ytPlayerRef.current.player.pause(adjustedOffset);
-						break;
-					case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
-						ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
-						break;
-					case 'sync':
-						break;
+				case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
+					ytPlayerRef.current.player.play(adjustedOffset);
+					break;
+				case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
+					ytPlayerRef.current.player.pause(adjustedOffset);
+					break;
+				case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
+					ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
+					break;
+				case 'sync':
+					break;
 				}
 			}
 
@@ -83,21 +87,23 @@ export function YoutubeContainer() {
 			*/
 		});
 
-		function timeoutLoop(interval) {
-			setTimeout(() => {
+		function timeoutLoop(interval)
+		{
+			setTimeout(() =>
+			{
 				switch(ytPlayerRef.current.player.getPlayerState())
 				{
-					case YoutubePlayer.prototype.PLAYER_PLAYING:
-						emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYING_STR);
-						break;
-					case YoutubePlayer.prototype.PLAYER_PAUSED:
-						emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
-						break;
+				case YoutubePlayer.prototype.PLAYER_PLAYING:
+					emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYING_STR);
+					break;
+				case YoutubePlayer.prototype.PLAYER_PAUSED:
+					emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
+					break;
 				}
 
 				timeoutLoop(interval);
 			}, interval - ((new Date()).getTime() % interval));
-		};
+		}
 
 		timeoutLoop(5000);
 
