@@ -11,6 +11,7 @@ export function Chat()
             Socket.on('messages_received', (data) => {
                 console.log('Message feed updated.')
                 setMessages(data);
+                console.log(messages)
 
                 // TODO may have to set message scrollbar to bottom or something later
             });

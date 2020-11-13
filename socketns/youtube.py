@@ -72,6 +72,14 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 	def on_new_facebook_user(self, data):
 		print(data['response']['name'])
+		user = self.flaskserver.createUserFromRequest(flask.request)
+		user.name = data['response']['name']
+		user.email = data['response']['email']
+		user.image_url = data['response']['picture']['data']['url']
+		user.settings = None
+		user.oauth_id = data['response']['id']
+		user.oauth_type = 'FACEBOOK'
+
 		# db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
 		# db.session.commit()
 
@@ -106,7 +114,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		self.flaskserver.db.session.commit()
 
 	def on_chat_loaded(self):
-		print('\n\n\nCHAT_LOADED\n\n\n')
 		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 	def add_to_db(self, message_to_add):
@@ -116,10 +123,30 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def on_message_send(self, data):
+		user_request = flask.request
+
+		user_from_request = self.flaskserver.getUserByRequest(user_request)
+		user_name = user_from_request.name
+		user_email = user_from_request.email
+		user_image_url = user_from_request.image_url
+		user_settings = None
+		user_oauth_id = user_from_request.oauth_id
+		user_oauth_type = user_from_request.oauth_type
+
+		print('\n\n\nUSER_BY_REQ')
+		print(user_from_request)
+		print(user_name)
+		print(user_email)
+		print(user_image_url)
+		print(user_settings)
+		print(user_oauth_id)
+		print(user_oauth_type)
+		print('USER_BY_REQ\n\n\n')
+
 		text = data['text']
 		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
-		user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
+		user_id = user_oauth_id
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		room_id = 'room_id_here' # TODO use actual room id
 
