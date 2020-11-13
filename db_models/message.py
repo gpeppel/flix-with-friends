@@ -13,6 +13,3 @@ class Message(db.Model):
 		self.timestamp = messageTimestamp
 		self.roomId = messageRoomId
 		self.userId = messageUserId
-
-
-

@@ -6,7 +6,9 @@ import flask_socketio
 import flask_sqlalchemy
 
 from db_models.message import Message
+
 from db_models.user import User
+
 from socketns.youtube import YoutubeNamespace
 import sqldb
 
@@ -25,7 +27,7 @@ class FlaskServer:
 		self.socketio.init_app(self.app, cors_allowed_origins='*')
 
 		self.db = db
-
+		
 		self.socketio.on_namespace(YoutubeNamespace('/', self))
 
 		self.rooms = {}
@@ -42,8 +44,6 @@ class FlaskServer:
 
 
 	def index(self):
-		self.db.create_all()
-		self.db.session.commit()
 		return flask.render_template('index.html')
 
 
