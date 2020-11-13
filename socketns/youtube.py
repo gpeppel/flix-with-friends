@@ -10,9 +10,9 @@ import flask
 import flask_socketio
 
 import flaskserver
+from db_models.message import Message
 from db_models.room import Room
 from db_models.user import User
-from message import Message
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
