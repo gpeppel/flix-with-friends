@@ -29,21 +29,27 @@ export function YoutubeContainer() {
 		setYtComponent(component);
 
 		ytPlayerRef.current = ytPlayer;
+	}, []);
+
+	function onYtReady(event)
+	{
+		console.log('ready', event);
+
+		ytPlayerRef.current.player.pauseVideo();
 
 		Socket.on(EVENT_YT_LOAD, (data) => {
+			console.log('load video', data);
 			ytPlayerRef.current.player.loadVideoById(data.videoId);
 		});
 
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
 			function doState(data)
 			{
-				console.log(data);
+				data.timestamp = parseInt(data.timestamp, 10);
 
 				let ts = (new Date()).getTime();
 				let tsdiff = Math.max(0, ts - data.timestamp);
 				let adjustedOffset = data.offset + (tsdiff / 1000);
-
-				console.log(data.offset, adjustedOffset, tsdiff / 1000);
 
 				switch(data.state)
 				{
@@ -77,24 +83,29 @@ export function YoutubeContainer() {
 			*/
 		});
 
-		setInterval(() => {
-			emitStateChange(ytPlayerRef.current.player, 'sync');
-		}, 3000);
-	}, []);
+		function timeoutLoop(interval) {
+			setTimeout(() => {
+				switch(ytPlayerRef.current.player.getPlayerState())
+				{
+					case YoutubePlayer.prototype.PLAYER_PLAYING:
+						emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYING_STR);
+						break;
+					case YoutubePlayer.prototype.PLAYER_PAUSED:
+						emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
+						break;
+				}
 
-	function onYtReady(event)
-	{
-		console.log('ready', event);
+				timeoutLoop(interval);
+			}, interval - ((new Date()).getTime() % interval));
+		};
 
-		ytPlayerRef.current.player.pauseVideo();
+		timeoutLoop(5000);
 
-		emitStateChange(ytPlayerRef.current.player, 'ready', 0, 1);
+		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
 	}
 
 	function onYtStateChange(event)
 	{
-		console.log('state change', event);
-
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.playerStateToStr(event.data));
 	}
 
@@ -102,7 +113,7 @@ export function YoutubeContainer() {
 	{
 		console.log('playback change', event);
 
-		emitStateChange(ytPlayerRef.current.player, 'playback');
+		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYBACK_STR);
 	}
 
 	function emitStateChange(player, state, offset, rate, timestamp)
@@ -113,9 +124,9 @@ export function YoutubeContainer() {
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': state,
-			'offset': offset,
+			'offset': Math.round(offset * 10000) / 10000,
 			'rate': rate,
-			'timestamp': timestamp
+			'timestamp': timestamp.toString()
 		});
 	}
 

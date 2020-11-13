@@ -144,6 +144,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def on_yt_load(self, data):
+		self.handleYtLoad(flask.request, data)
+
+
+	def handleYtLoad(self, request, data):
 		url = data.get('url')
 		if url is None:
 			return
@@ -151,9 +155,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		videoId = self.getYoutubeVideoId(url)
 		if videoId is None:
 			return
-			
 
-		self.flaskserversocketio.emit('yt_load', {
+		self.flaskserver.socketio.emit('yt_load', {
 			'videoId': videoId
 		})
 
@@ -169,8 +172,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 		return None
 
+
 	def on_yt_state_change(self, data):
 		self.handleYtStateChange(flask.request, data)
+
 
 	def handleYtStateChange(self, request, data):
 		user = self.flaskserver.getUserByRequest(request)
@@ -179,36 +184,19 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 		# TODO room assignment
 
-		offset = data.get('offset', 0)
-		if type(offset) != float:
-			try:
-				offset = abs(float(offset))
+		def getval(key, fncChk, fncFix, default=None):
+			x = data.get(key, default)
+			if not fncChk(x):
+				try:
+					x = fncFix(x)
+				except:
+					x = default
+			return x
 
-			except:
-				offset = 0
-
-		runAt = data.get('runAt', 0)
-		if type(runAt) != int:
-			try:
-				runAt = max(0, int(runAt))
-			except:
-				runAt = 0
-
-		rate = data.get('rate', 1)
-		if type(rate) != int:
-			try:
-				rate = int(rate)
-			except:
-				rate = 1
-
-		tsnow = self.unixTimestamp()
-
-		timestamp = data.get('timestamp', 0)
-		if type(timestamp) != int:
-			try:
-				timestamp = int(timestamp)
-			except:
-				timestamp = tsnow
+		offset = getval('offset', lambda x: type(x) == float, lambda x: abs(float(x)), 0)
+		runAt = getval('runAt', lambda x: type(x) == int, lambda x: max(0, int(x)), 0)
+		rate = getval('rate', lambda x: type(x) == int, lambda x: int(x), 1)
+		timestamp = getval('timestamp', lambda x: type(x) == int, lambda x: int(x), self.unixTimestamp())
 
 		if data.get('state') not in [
 			'ready',
@@ -229,7 +217,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 			'offset': offset,
 			'rate': rate,
 			'runAt': runAt,
-			'timestamp': timestamp
+			'timestamp': str(timestamp)
 		}, include_self=False)
 
 
