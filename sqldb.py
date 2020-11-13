@@ -14,7 +14,5 @@ if DATABASE_URI is None:
 	DATABASE_URI = 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
 
 
-def SQLAlchemy(app):
-	db = flask_sqlalchemy.SQLAlchemy(app)
-	db.app = app
-	return db
+def SQLAlchemy():
+	return flask_sqlalchemy.SQLAlchemy()
