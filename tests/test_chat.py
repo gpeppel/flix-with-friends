@@ -47,6 +47,3 @@ class ChatTest(unittest.TestCase):
 					expected = test[MESSAGE_EXPECTED]
 
 					self.assertEqual(response, expected)
-
-if __name__ == "__main__":
-	unittest.main()
