@@ -24,7 +24,7 @@ class FlaskServer:
 		self.socketio.init_app(self.app, cors_allowed_origins='*')
 
 		self.db = db
-
+		
 		self.socketio.on_namespace(YoutubeNamespace('/', self))
 
 		self.rooms = {}

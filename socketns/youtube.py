@@ -75,9 +75,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def on_new_facebook_user(self, data):
+		print(data['response']['name'])
 		# db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
 		# db.session.commit()
-		print("Got an event for new google user input with data:", data)
 
 
 	def newUserHandler(self, data):
