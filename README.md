@@ -64,16 +64,16 @@ Send new chat messages to clients
 Data:
 ```
 {
-	"user": {
-		"id": string,
-		"name": string
-	},
-	"messages": [
-		{
-			"id": string,
-			"text": string,
-		}
-	]
+    "messages": [
+        {
+            "id": string,
+            "text": string,
+            "user": {
+                "id": string,
+                "name": string
+            },
+        }
+    ]
 }
 ```
 ---
