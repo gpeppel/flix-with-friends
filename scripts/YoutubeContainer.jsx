@@ -78,17 +78,23 @@ export function YoutubeContainer() {
 			*/
 		});
 
-		setInterval(() => {
-			switch(ytPlayerRef.current.player.getPlayerState())
-			{
-				case YoutubePlayer.prototype.PLAYER_PLAYING:
-					emitStateChange(ytPlayerRef.current.player, 'playing');
-					break;
-				case YoutubePlayer.prototype.PLAYER_PAUSED:
-					emitStateChange(ytPlayerRef.current.player, 'paused');
-					break;
-			}
-		}, 3000);
+		 function timeoutLoop(interval) {
+			setTimeout(() => {
+				switch(ytPlayerRef.current.player.getPlayerState())
+				{
+					case YoutubePlayer.prototype.PLAYER_PLAYING:
+						emitStateChange(ytPlayerRef.current.player, 'playing');
+						break;
+					case YoutubePlayer.prototype.PLAYER_PAUSED:
+						emitStateChange(ytPlayerRef.current.player, 'paused');
+						break;
+				}
+
+				timeoutLoop(interval);
+			}, interval - ((new Date()).getTime() % interval));
+		};
+
+		timeoutLoop(5000);
 	}, []);
 
 	function onYtReady(event)
