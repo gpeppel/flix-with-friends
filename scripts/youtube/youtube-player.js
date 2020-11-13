@@ -30,10 +30,14 @@ export default class YoutubePlayer
 	{
 		player.player = event.target;
 
-		player.player.play = function(t){
+		player.player.play = function(t)
+		{
 			console.log('play', t);
 
-			if(this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING) && YoutubePlayer.checkSyncIgnore(this.player, t))
+			if(
+				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING)
+				&& YoutubePlayer.checkSyncIgnore(this.player, t)
+			)
 			{
 				console.log('play cancel', this.lastStates, this.player.getPlayerState());
 				return;
@@ -43,10 +47,14 @@ export default class YoutubePlayer
 			this.player.playVideo();
 		}.bind(player);
 
-		player.player.pause = function(t){
+		player.player.pause = function(t)
+		{
 			console.log('pause', t);
 
-			if(this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED) && YoutubePlayer.checkSyncIgnore(this.player, t))
+			if(
+				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED)
+				&& YoutubePlayer.checkSyncIgnore(this.player, t)
+			)
 			{
 				console.log('pause cancel', this.lastStates, this.player.getPlayerState());
 				return;
@@ -56,7 +64,8 @@ export default class YoutubePlayer
 			this.player.pauseVideo();
 		}.bind(player);
 
-		player.player.setPlayback = function(t, s){
+		player.player.setPlayback = function(t, s)
+		{
 			console.log('playback', s);
 
 			if(this.player.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this.player, t))
@@ -83,18 +92,21 @@ export default class YoutubePlayer
 
 	static createYoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange)
 	{
-		let player = new YoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange);
+		const player = new YoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange);
 
 		return [
 			player,
 			(
 				<YouTube
+					key='yt-player'
 					videoId={player.videoId}
 					opts={player.opts}
-					onReady={(event) => {
+					onReady={(event) =>
+					{
 						YoutubePlayer.onReadyWrapper(player, event);
 					}}
-					onStateChange={(event) => {
+					onStateChange={(event) =>
+					{
 						YoutubePlayer.onStateChangeWrapper(player, event);
 					}}
 					onPlaybackRateChange={player.onPlaybackRateChange}
@@ -118,8 +130,10 @@ export default class YoutubePlayer
 
 	static isStateContinuation(lastStates, state)
 	{
-		let len = lastStates.length;
-		return lastStates[len - 3] == state && lastStates[len - 1] == state && lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
+		const len = lastStates.length;
+		return lastStates[len - 3] == state
+			&& lastStates[len - 1] == state
+			&& lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
 	}
 }
 
