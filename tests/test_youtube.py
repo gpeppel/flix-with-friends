@@ -43,13 +43,33 @@ class YoutubeTest(unittest.TestCase):
     def test_get_youtube_video_id(self):
         for vobj in YOUTUBE_VIDEO_IDS:
             self.assertEqual(
-                self.flaskserver.youtube_ns.get_youtube_video_id(vobj[URL]), vobj[ID])
+                self.flaskserver.youtube_ns.get_youtube_video_id(vobj[URL]),
+                vobj[ID]
+            )
 
-    def test_handle_yt_state_change(self):
-        test_data = {
-            'state': 'unstarted'
-        }
+    def test_handle_yt_load(self):
+        mock_req = MockRequest(TEST_SID)
 
+        with hookSocketEmit() as emitList:
+            self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
+
+            self.assertTrue(len(emitList) == 0)
+
+            for vobj in YOUTUBE_VIDEO_IDS:
+                self.flaskserver.youtube_ns.handle_yt_load(mock_req, {
+                    'url': vobj[URL]
+                })
+
+                if len(emitList) == 0:
+                    self.assertIsNone(vobj[ID])
+                    continue
+
+                emit = emitList.pop()
+
+                self.assertEqual(emit['event'], 'yt_load')
+                self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
+
+    def test_handle_yt_state_change_success(self):
         mock_req = MockRequest(TEST_SID)
 
         with hookSocketEmit() as emitList:
