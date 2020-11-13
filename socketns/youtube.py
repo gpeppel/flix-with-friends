@@ -41,13 +41,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
         print("Got an event for new temp user input with data:", data)
 
     def on_new_facebook_user(self, data):
-        print(data['response']['name'])
-        """
-        db.session.add(
-            tables.Users(data['name'], data['email'], data['email'],data['accessToken'])
-        )
-        db.session.commit()
-        """
+    	self.flaskserver.socketio.emit('verified_user')
+        
 
     def new_user_handler(self, data):
         # db.session.add(tables.Users(data['username'], data['password']))

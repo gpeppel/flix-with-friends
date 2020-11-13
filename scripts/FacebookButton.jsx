@@ -36,7 +36,7 @@ export function FacebookButton()
 	return (
 		<FacebookLogin
 			appId="2775898756021193"
-			autoLoad={true}
+			autoLoad={false}
 			fields="name,email,picture"
 			onClick={handleSubmit}
 			callback={responseFacebook} />
