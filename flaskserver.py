@@ -9,7 +9,7 @@ from db_models.message import Message
 
 from db_models.user import User
 
-from socketns.youtube import YoutubeNamespace
+import socketns.youtube
 import sqldb
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
@@ -27,8 +27,9 @@ class FlaskServer:
 		self.socketio.init_app(self.app, cors_allowed_origins='*')
 
 		self.db = db
-		
-		self.socketio.on_namespace(YoutubeNamespace('/', self))
+
+		self.youtubeNs = socketns.youtube.YoutubeNamespace('/', self)
+		self.socketio.on_namespace(self.youtubeNs)
 
 		self.rooms = {}
 		self.users = {}

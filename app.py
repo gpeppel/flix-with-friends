@@ -12,10 +12,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = sqldb.SQLAlchemy(app)
 
 
+def createFlaskServer(app, db):
+	from flaskserver import FlaskServer
+	return FlaskServer(app, db)
+
+
 if __name__ == '__main__':
 	db.create_all()
 	db.session.commit()
 
-	from flaskserver import FlaskServer
-	flaskserver = FlaskServer(app, db)
+	flaskserver = createFlaskServer(app, db)
 	flaskserver.run(os.environ.get('IP', '0.0.0.0'), int(os.environ.get('PORT', 8080)), debug=True)
