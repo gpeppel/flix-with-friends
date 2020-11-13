@@ -16,6 +16,7 @@ from message import Message
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
+MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
@@ -108,11 +109,14 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		#             break
 		self.flaskserver.db.session.commit()
 
+	def on_chat_loaded(self):
+		print('\n\n\nCHAT_LOADED\n\n\n')
+		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 	def add_to_db(self, message_to_add):
 		self.flaskserver.db.session.add(message_to_add)
 		self.flaskserver.db.session.commit()
-		self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
+		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
 
 	def on_message_send(self, data):
@@ -144,8 +148,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def on_yt_load(self, data):
-		print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
-
 		url = data.get('url')
 		if url is None:
 			return
@@ -153,8 +155,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		videoId = self.getYoutubeVideoId(url)
 		if videoId is None:
 			return
+			
 
-		self.flaskserver.socketio.emit('yt_load', {
+		self.flaskserversocketio.emit('yt_load', {
 			'videoId': videoId
 		})
 
@@ -170,10 +173,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 		return None
 
-
 	def on_yt_state_change(self, data):
 		self.handleYtStateChange(flask.request, data)
-
 
 	def handleYtStateChange(self, request, data):
 		user = User(request.sid)
