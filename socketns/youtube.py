@@ -12,7 +12,7 @@ import flask_socketio
 import flaskserver
 from db_models.room import Room
 from db_models.user import User
-from message import Message
+from db_models.message import Message
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -31,8 +31,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def connectUser(self, request):
-		global appRooms
-
 		# TODO room assignment
 		"""
 		if len(appRooms) == 0:
@@ -46,10 +44,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		"""
 
 
-		user = User(request.sid)
-		#room.addUser(user)
-		#print("Hello " + room.id)
-		#print(roomIDs[0])
+		user = self.flaskserver.createUserFromRequest(request)
 
 
 	def on_disconnect(self):
@@ -57,8 +52,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def disconnectUser(self, request):
+		user = self.flaskserver.getUserByRequest(request)
+		self.flaskserver.deleteUser(user)
 		"""
-		global appRooms
 		room = appRooms[list(appRooms.keys())[0]]
 		room.removeUser(User(request.sid))
 
@@ -176,7 +172,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 
 	def handleYtStateChange(self, request, data):
-		user = User(request.sid)
+		user = self.flaskserver.getUserByRequest(request)
 
 		print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
 

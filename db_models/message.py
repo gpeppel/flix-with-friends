@@ -14,5 +14,5 @@ class Message(db.Model):
 		self.roomId = messageRoomId
 		self.userId = messageUserId
 
-		
+
 
