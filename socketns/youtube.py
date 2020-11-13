@@ -58,6 +58,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 			del appRooms[room.id]
 		"""
 
+
     def on_new_temp_user(self, data):
         # db.session.add(tables.Users(data['name'], data['email'], data['username']))
         # db.session.commit()

@@ -15,14 +15,10 @@ export default class YoutubePlayer
 		this.player = undefined;
 		this.lastStates = [null, null, null];
 	}
-	
+
 	isPlayerInState(state)
 	{
-		if(this.player.getPlayerState() == state)
-			return 1;
-		if(YoutubePlayer.isStateContinuation(this.lastStates, this.player.getPlayerState()))
-			return 2;
-		return 0;
+		return this.player.getPlayerState() == state;
 	}
 
 	static checkSyncIgnore(player, t)
@@ -34,79 +30,83 @@ export default class YoutubePlayer
 	{
 		player.player = event.target;
 
-		player.player.play = function(t){
-			console.log("play", t);
-			
-			let pis = this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING);
-			if(pis == 2 || pis == 1 && YoutubePlayer.checkSyncIgnore(this.player, t))
+		player.player.play = function(t)
+		{
+			console.log('play', t);
+
+			if(
+				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING)
+				&& YoutubePlayer.checkSyncIgnore(this.player, t)
+			)
 			{
-				console.log("play cancel");
+				console.log('play cancel', this.lastStates, this.player.getPlayerState());
 				return;
 			}
 
-			console.log("play0");
 			this.player.seekTo(t);
 			this.player.playVideo();
-			console.log("play1");
 		}.bind(player);
 
-		player.player.pause = function(t){
-			console.log("pause", t);
+		player.player.pause = function(t)
+		{
+			console.log('pause', t);
 
-			let pis = this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED);
-			if(pis == 2 || pis == 1 && YoutubePlayer.checkSyncIgnore(this.player, t))
+			if(
+				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED)
+				&& YoutubePlayer.checkSyncIgnore(this.player, t)
+			)
 			{
-				console.log("pause cancel");
+				console.log('pause cancel', this.lastStates, this.player.getPlayerState());
 				return;
 			}
 
-			console.log("pause0");
 			this.player.seekTo(t);
 			this.player.pauseVideo();
-			console.log("pause1");
 		}.bind(player);
 
-		player.player.setPlayback = function(t, s){
-			console.log("playback", s);
+		player.player.setPlayback = function(t, s)
+		{
+			console.log('playback', s);
 
 			if(this.player.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
-				console.log("playback cancel");
+				console.log('playback cancel');
 				return;
 			}
 
-			console.log("playback0");
 			this.player.seekTo(t);
 			this.player.setPlaybackRate(s);
-			console.log("playback1");
 		}.bind(player);
 
 		player.onReady(event);
 	}
-	
+
 	static onStateChangeWrapper(player, event)
 	{
 		player.lastStates[0] = player.lastStates[1];
 		player.lastStates[1] = player.lastStates[2];
 		player.lastStates[2] = event.data;
-		
+
 		player.onStateChange(event);
 	}
 
 	static createYoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange)
 	{
-		let player = new YoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange);
+		const player = new YoutubePlayer(videoId, opts, onReady, onStateChange, onPlaybackRateChange);
 
 		return [
 			player,
 			(
 				<YouTube
+					key='yt-player'
 					videoId={player.videoId}
 					opts={player.opts}
-					onReady={(event) => {
+					onReady={(event) =>
+					{
 						YoutubePlayer.onReadyWrapper(player, event);
 					}}
-					onStateChange={(event) => {
+					onStateChange={(event) =>
+					{
 						YoutubePlayer.onStateChangeWrapper(player, event);
 					}}
 					onPlaybackRateChange={player.onPlaybackRateChange}
@@ -130,12 +130,14 @@ export default class YoutubePlayer
 
 	static isStateContinuation(lastStates, state)
 	{
-		let len = lastStates.length;
-		return lastStates[len - 3] == state && lastStates[len - 1] == state && lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
+		const len = lastStates.length;
+		return lastStates[len - 3] == state
+			&& lastStates[len - 1] == state
+			&& lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
 	}
 }
 
-YoutubePlayer.prototype.SYNC_IGNORE_SEC = 3;
+YoutubePlayer.prototype.SYNC_IGNORE_SEC = 1;
 
 YoutubePlayer.prototype.PLAYER_UNSTARTED = -1;
 YoutubePlayer.prototype.PLAYER_ENDED = 0;
