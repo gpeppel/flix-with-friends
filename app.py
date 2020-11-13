@@ -10,7 +10,7 @@ def createFlaskServer(db):
 	from flaskserver import FlaskServer
 
 	app = flask.Flask(__name__)
-	app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
+	app.config['SQLALCHEMY_DATABASE_URI'] = sqldb.getDatabaseUri()
 	app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 	db.app = app
