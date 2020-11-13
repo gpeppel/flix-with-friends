@@ -156,7 +156,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		if videoId is None:
 			return
 
-		self.flaskserversocketio.emit('yt_load', {
+		self.flaskserver.socketio.emit('yt_load', {
 			'videoId': videoId
 		})
 
