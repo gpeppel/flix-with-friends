@@ -21,22 +21,11 @@ export function Options() {
   
     return (
         <body>
-        <div className="split left">
         <div className="centered">
-            <h1>Hello</h1>
+            <h1>Create New Viewing Room</h1>
             <FacebookButton />
-             <button onClick={handleSubmit}>Create New Viewing Room</button>
+             <button onClick={handleSubmit}>Create Now!</button>
             </div>
-        </div>
-        
-        <div className="split right">
-           <div className="centered">
-            <h1>World</h1>
-            <input type="text" placeholder="Enter the room URL"></input>
-            <button onClick={handleSubmit}>Enter</button>
-            </div>
-        </div>
-        
         </body>
         )
 }
