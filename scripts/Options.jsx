@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Content } from './Content';
 import './options.css';
 import { Socket } from './Socket';
+import { FacebookButton } from './FacebookButton';
+
 
 export function Options() {
     const [userFlag, setFlag] = useState(false);
@@ -22,6 +24,7 @@ export function Options() {
         <div className="split left">
         <div className="centered">
             <h1>Hello</h1>
+            <FacebookButton />
              <button onClick={handleSubmit}>Create New Viewing Room</button>
             </div>
         </div>
