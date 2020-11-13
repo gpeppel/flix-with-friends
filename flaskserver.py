@@ -6,7 +6,7 @@ import flask_socketio
 import flask_sqlalchemy
 
 from db_models.message import Message
-
+from db_models.room import Room
 from db_models.user import User
 
 import socketns.youtube
@@ -79,7 +79,7 @@ class FlaskServer:
 
 
 	def deleteRoom(self, room):
-		for user in room.users.values():
+		for user in list(room.users.values()):
 			room.removeUser(user)
 
 		del self.rooms[room.id]
