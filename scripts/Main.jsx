@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { Options } from './Options';
+import { Login } from './Login';
 
-ReactDOM.render(<Options />, document.getElementById('content'));
+ReactDOM.render(<Login />, document.getElementById('content'));

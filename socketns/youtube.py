@@ -1,18 +1,14 @@
 import datetime
 import json
-import os
 import re
 import random
 import sys
-import time
 
 import flask
 import flask_socketio
 
 import flaskserver
 from db_models.message import Message
-from db_models.room import Room
-from db_models.user import User
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -20,208 +16,179 @@ MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
-	def __init__(self, ns, server):
-		super().__init__(ns)
-		self.ns = ns
-		self.flaskserver = server
+    def __init__(self, namespace, server):
+        super().__init__(namespace)
+        self.namespace = namespace
+        self.flaskserver = server
+
+    def on_connect(self):
+        self.connect_user(flask.request)
+        self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
+
+    def connect_user(self, request):
+        self.flaskserver.create_user_from_request(request)
+
+    def on_disconnect(self):
+        self.disconnect_user(flask.request)
+
+    def disconnect_user(self, request):
+        user = self.flaskserver.get_user_by_request(request)
+        self.flaskserver.delete_user(user)
+
+    def on_new_temp_user(self, data):
+        # db.session.add(tables.Users(data['name'], data['email'], data['username']))
+        # db.session.commit()
+        print("Got an event for new temp user input with data:", data)
+
+    def on_new_facebook_user(self, data):
+    	self.flaskserver.socketio.emit('verified_user')
+        
+
+    def new_user_handler(self, data):
+        # db.session.add(tables.Users(data['username'], data['password']))
+        # db.session.commit()
+        self.flaskserver.socketio.emit('new_user_recieved')
+
+    # TODO - GET ACCESSS TOKEN FROM USER
+
+    def handle_user_status(self, data):
+        # TODO
+        # for user in db.session.query(tables.Users).all():
+        #     if user.username == data['username'] and user.password == data['password']:
+        #         print('existing_user')
+        #         socketio.emit('existing_user', {'status' : True , 'username': data['username']} )
+        #         socketio.emit
+        #         db.session.commit()
+        #         break
+        #     else:
+        #         if user.username == data['username'] and user.password != data['password']:
+        #             print('wrong_password')
+        #             socketio.emit('wrong_password', { 'status' : False })
+        #             break
+        #         if user.username != data['username'] and user.password != data['password']:
+        #             print('new_user')
+        #             newUserHandler(data)
+        #             socketio.emit('existing_user',  { 'status' : True })
+        #             break
+        self.flaskserver.db.session.commit()
+
+    def on_chat_loaded(self):
+        print('\n\n\nCHAT_LOADED\n\n\n')
+        self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
+
+    def add_to_db(self, message_to_add):
+        self.flaskserver.db.session.add(message_to_add)
+        self.flaskserver.db.session.commit()
+        self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
+
+    def on_message_send(self, data):
+        text = data['text']
+        print('\nReceived New Message: %s' % text)
+        # TODO use an agreed upon id scheme
+        message_id = random.randint(1 - sys.maxsize, sys.maxsize)
+        # TODO use actual user id
+        user_id = random.randint(1 - sys.maxsize, sys.maxsize)
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        room_id = 'room_id_here'  # TODO use actual room id
+
+        print('\nAdding message to database:')
+        print('messageId:%s' % message_id)
+        print('text: %s' % text)
+        print('timestamp: %s' % timestamp)
+        print('roomId: %s' % room_id)
+        print('userId: %s\n' % user_id)
+
+        message_to_add = Message(message_id, text, timestamp, room_id, user_id)
+        return self.add_to_db(message_to_add)
+
+        # message init model:
+        # self.id = messageId
+        # self.text = messageText
+        # self.timestamp = messageTimestamp
+        # self.roomId = messageRoomId
+        # self.userId = messageUserId
+
+    def on_yt_load(self, data):
+        url = data.get('url')
+        if url is None:
+            return
+
+        video_id = self.get_youtube_video_id(url)
+        if video_id is None:
+            return
+
+        self.flaskserver.socketio.emit('yt_load', {
+            'videoId': video_id
+        })
+
+    def get_youtube_video_id(self, url):
+        match = re.match(
+            r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)',
+            url
+        )
+        if match is not None:
+            return match[1]
+
+        match = re.match(r'^([A-Za-z0-9_-]+)$', url)
+        if match is not None:
+            return match[1]
+
+        return None
+
+    def on_yt_state_change(self, data):
+        self.handle_yt_state_change(flask.request, data)
+
+    def handle_yt_state_change(self, request, data):
+        user = self.flaskserver.get_user_by_request(request)
+
+        print(
+            json.dumps(data).encode(
+                "ascii", errors="backslashreplace").decode("ascii")
+        )
+
+        def getval(key, fnc_chk, fnc_fix, default=None):
+            val = data.get(key, default)
+            if not fnc_chk(val):
+                try:
+                    val = fnc_fix(val)
+                except Exception:
+                    val = default
+            return val
+
+        offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
+        run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
+        rate = getval('rate', lambda x: isinstance(x, int), lambda x: int(x), 1)
+        timestamp = getval(
+		    'timestamp',
+		    lambda x: isinstance(x, int),
+		    lambda x: int(x),
+		    self.unix_timestamp()
+		)
 
 
-	def on_connect(self):
-		self.connectUser(flask.request)
-		self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
+        if data.get('state') not in [
+                'ready',
+                'unstarted',
+                'ended',
+                'playing',
+                'paused',
+                'buffering',
+                'cued',
+                'playback'
 
+        ]:
+            return
 
-	def connectUser(self, request):
-		# TODO room assignment
-		"""
-		if len(appRooms) == 0:
-			room = Room()
-			appRooms[room.id] = room
-			roomIDs.append(room.id)
-			socketio.emit('new room id', roomIDs[0])
-		else:
-			room = appRooms[list(appRooms.keys())[0]]
-			print("big list " + str(roomIDs))
-		"""
+        self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
+            'state': data['state'],
+            'sender': user.id,
+            'offset': offset,
+            'rate': rate,
+            'runAt': run_at,
+            'timestamp': timestamp
+        }, include_self=False)
 
-
-		user = self.flaskserver.createUserFromRequest(request)
-
-
-	def on_disconnect(self):
-		self.disconnectUser(flask.request)
-
-
-	def disconnectUser(self, request):
-		user = self.flaskserver.getUserByRequest(request)
-		self.flaskserver.deleteUser(user)
-		"""
-		room = appRooms[list(appRooms.keys())[0]]
-		room.removeUser(User(request.sid))
-
-		if len(room) == 0:
-			del appRooms[room.id]
-		"""
-
-
-	def on_new_temp_user(self, data):
-		# db.session.add(tables.Users(data['name'], data['email'], data['username']))
-		# db.session.commit()
-		print("Got an event for new temp user input with data:", data)
-
-
-	def on_new_facebook_user(self, data):
-		print(data['response']['name'])
-		# db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
-		# db.session.commit()
-
-
-	def newUserHandler(self, data):
-		# db.session.add(tables.Users(data['username'], data['password']))
-		# db.session.commit()
-		self.flaskserver.socketio.emit('new_user_recieved')
-
-	# TODO - GET ACCESSS TOKEN FROM USER
-
-
-	def handleUserStatus(self, data):
-		# TODO
-		# for user in db.session.query(tables.Users).all():
-		#     if user.username == data['username'] and user.password == data['password']:
-		#         print('existing_user')
-		#         socketio.emit('existing_user', {'status' : True , 'username': data['username']} )
-		#         socketio.emit
-		#         db.session.commit()
-		#         break
-		#     else:
-		#         if user.username == data['username'] and user.password != data['password']:
-		#             print('wrong_password')
-		#             socketio.emit('wrong_password', { 'status' : False })
-		#             break
-		#         if user.username != data['username'] and user.password != data['password']:
-		#             print('new_user')
-		#             newUserHandler(data)
-		#             socketio.emit('existing_user',  { 'status' : True })
-		#             break
-		self.flaskserver.db.session.commit()
-
-	def on_chat_loaded(self):
-		print('\n\n\nCHAT_LOADED\n\n\n')
-		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
-
-	def add_to_db(self, message_to_add):
-		self.flaskserver.db.session.add(message_to_add)
-		self.flaskserver.db.session.commit()
-		self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
-
-
-	def on_message_send(self, data):
-		text = data['text']
-		print('\nReceived New Message: %s' % text)
-		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
-		user_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use actual user id
-		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		room_id = 'room_id_here' # TODO use actual room id
-
-
-		print('\nAdding message to database:')
-		print('messageId:%s' % message_id)
-		print('text: %s' % text)
-		print('timestamp: %s' % timestamp)
-		print('roomId: %s' % room_id)
-		print('userId: %s\n' % user_id)
-
-
-		message_to_add = Message(message_id, text, timestamp, room_id, user_id)
-		return self.add_to_db(message_to_add)
-
-		# message init model:
-		# self.id = messageId
-		# self.text = messageText
-		# self.timestamp = messageTimestamp
-		# self.roomId = messageRoomId
-		# self.userId = messageUserId
-
-
-	def on_yt_load(self, data):
-		self.handleYtLoad(flask.request, data)
-
-
-	def handleYtLoad(self, request, data):
-		url = data.get('url')
-		if url is None:
-			return
-
-		videoId = self.getYoutubeVideoId(url)
-		if videoId is None:
-			return
-
-		self.flaskserver.socketio.emit('yt_load', {
-			'videoId': videoId
-		})
-
-
-	def getYoutubeVideoId(self, s):
-		match = re.match(r'^(?:https?://)?(?:www\.)?youtu(?:\.be/|be\.com/(?:embed/|watch\?v=))([A-Za-z0-9_-]+)', s)
-		if match is not None:
-			return match[1]
-
-		match = re.match(r'^([A-Za-z0-9_-]+)$', s)
-		if match is not None:
-			return match[1]
-
-		return None
-
-
-	def on_yt_state_change(self, data):
-		self.handleYtStateChange(flask.request, data)
-
-
-	def handleYtStateChange(self, request, data):
-		user = self.flaskserver.getUserByRequest(request)
-
-		print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
-
-		# TODO room assignment
-
-		def getval(key, fncChk, fncFix, default=None):
-			x = data.get(key, default)
-			if not fncChk(x):
-				try:
-					x = fncFix(x)
-				except:
-					x = default
-			return x
-
-		offset = getval('offset', lambda x: type(x) == float, lambda x: abs(float(x)), 0)
-		runAt = getval('runAt', lambda x: type(x) == int, lambda x: max(0, int(x)), 0)
-		rate = getval('rate', lambda x: type(x) == int, lambda x: int(x), 1)
-		timestamp = getval('timestamp', lambda x: type(x) == int, lambda x: int(x), self.unixTimestamp())
-
-		if data.get('state') not in [
-			'ready',
-			'unstarted',
-			'ended',
-			'playing',
-			'paused',
-			'buffering',
-			'cued',
-			'playback'
-
-		]:
-			return
-
-		self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
-			'state': data['state'],
-			'sender': user.id,
-			'offset': offset,
-			'rate': rate,
-			'runAt': runAt,
-			'timestamp': str(timestamp)
-		}, include_self=False)
-
-
-	def unixTimestamp(self, ts=None):
-		if ts is None:
-			ts = datetime.datetime.utcnow()
-		return int((ts - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+    def unix_timestamp(self, timestamp=None):
+        if timestamp is None:
+            timestamp = datetime.datetime.utcnow()
+        return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
