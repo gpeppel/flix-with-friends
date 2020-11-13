@@ -6,67 +6,62 @@ from db_models.user import User
 
 
 USERS = [
-	User('01234567890'),
-	User('abcdef'),
-	User('a1b2c3d4e5f6'),
+    User('01234567890'),
+    User('abcdef'),
+    User('a1b2c3d4e5f6'),
 ]
 
+
 class RoomTest(unittest.TestCase):
-	def test_add_users(self):
-		testRoom = Room()
+    def test_add_users(self):
+        test_room = Room()
 
-		for testUser in USERS:
-			testRoom.addUser(testUser)
-			self.assertTrue(testRoom.hasUser(testUser))
+        for test_user in USERS:
+            test_room.add_user(test_user)
+            self.assertTrue(test_room.has_user(test_user))
 
+    def test_remove_users_success(self):
+        test_room = Room()
 
-	def test_remove_users_success(self):
-		testRoom = Room()
+        for test_user in USERS:
+            test_room.add_user(test_user)
 
-		for testUser in USERS:
-			testRoom.addUser(testUser)
+        test_room.remove_user(USERS[0])
+        self.assertFalse(test_room.has_user(USERS[0]))
 
-		testRoom.removeUser(USERS[0])
-		self.assertFalse(testRoom.hasUser(USERS[0]))
+    def test_remove_users_fail(self):
+        test_room = Room()
+        test_room.add_user(USERS[0])
 
+        test_room.remove_user(USERS[1])
+        self.assertFalse(test_room.has_user(USERS[1]))
 
-	def test_remove_users_fail(self):
-		testRoom = Room()
-		testRoom.addUser(USERS[0])
+    def test_is_creator_success(self):
+        test_room = Room()
+        test_room.add_user(USERS[0])
+        test_room.set_creator(USERS[0])
 
-		testRoom.removeUser(USERS[1])
-		self.assertFalse(testRoom.hasUser(USERS[1]))
+        self.assertTrue(test_room.is_creator(USERS[0]))
 
+        test_room.set_creator(USERS[1])
+        self.assertTrue(test_room.has_user(USERS[1]))
+        self.assertTrue(test_room.is_creator(USERS[1]))
 
-	def test_is_creator_success(self):
-		testRoom = Room()
-		testRoom.addUser(USERS[0])
-		testRoom.setCreator(USERS[0])
+    def test_is_creator_fail(self):
+        test_room = Room()
+        test_room.add_user(USERS[0])
+        test_room.set_creator(None)
 
-		self.assertTrue(testRoom.isCreator(USERS[0]))
+        self.assertFalse(test_room.is_creator(USERS[0]))
 
-		testRoom.setCreator(USERS[1])
-		self.assertTrue(testRoom.hasUser(USERS[1]))
-		self.assertTrue(testRoom.isCreator(USERS[1]))
+    def test_length(self):
+        test_room = Room()
 
+        for test_user in USERS:
+            test_room.add_user(test_user)
 
-	def test_is_creator_fail(self):
-		testRoom = Room()
-		testRoom.addUser(USERS[0])
-		testRoom.setCreator(None)
+        self.assertEqual(len(test_room), len(USERS))
 
-		self.assertFalse(testRoom.isCreator(USERS[0]))
-
-
-	def test_length(self):
-		testRoom = Room()
-
-		for testUser in USERS:
-			testRoom.addUser(testUser)
-
-		self.assertEqual(len(testRoom), len(USERS))
-
-
-	def test_generateRoomId(self):
-		random.seed(7883)
-		self.assertEqual(Room().id, 'Zp5s_mMGCaTy')
+    def test_generateRoomId(self):
+        random.seed(7883)
+        self.assertEqual(Room().id, 'Zp5s_mMGCaTy')
