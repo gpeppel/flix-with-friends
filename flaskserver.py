@@ -11,6 +11,7 @@ from db_models.user import User
 
 from socketns.youtube import YoutubeNamespace
 import sqldb
+import app
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
@@ -46,14 +47,15 @@ class FlaskServer:
 	def index(self):
 		return flask.render_template('index.html')
 
-	def get_facebook_tuple(self, user_id):
-		for user in db.session.query(db_models.User).all():
-			if user.oauth_id == user_id:
-				return (user.name, user.image_url)
+	def get_facebook_tuple(self, user_id, all_users):
+		for fb_user in all_users:
+			if fb_user.oauth_id == str(user_id):
+				return (fb_user.name, fb_user.image_url)
 
 	def emit_all_messages(self, channel):
+		all_users = self.db.session.query(User).all()
 		all_messages = [
-			(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId, self.get_facebook_tuple(db_message.userId)) # TODO decide if userId should even be sent to clients
+			(db_message.id, db_message.text, str(db_message.timestamp), db_message.userId, self.get_facebook_tuple(db_message.userId, all_users))
 			for db_message in self.db.session.query(Message).all()
 		]
 		self.socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)

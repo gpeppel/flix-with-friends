@@ -72,7 +72,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 	def on_new_facebook_user(self, data):
 		print(data['response']['name'])
+
 		user = self.flaskserver.createUserFromRequest(flask.request)
+		self.flaskserver.db.session.add(user)
+
 		user.name = data['response']['name']
 		user.email = data['response']['email']
 		user.image_url = data['response']['picture']['data']['url']
@@ -80,8 +83,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		user.oauth_id = data['response']['id']
 		user.oauth_type = 'FACEBOOK'
 
-		# db.session.add(tables.Users(data['name'], data['email'], data['email'],data['accessToken']))
-		# db.session.commit()
+		self.flaskserver.db.session.add(user)
+		self.flaskserver.db.session.commit()
 
 
 	def newUserHandler(self, data):
@@ -126,25 +129,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		user_request = flask.request
 
 		user_from_request = self.flaskserver.getUserByRequest(user_request)
-		user_name = user_from_request.name
-		user_email = user_from_request.email
-		user_image_url = user_from_request.image_url
-		user_settings = None
+		self.flaskserver.db.session.add(user_from_request)
 		user_oauth_id = user_from_request.oauth_id
-		user_oauth_type = user_from_request.oauth_type
-
-		print('\n\n\nUSER_BY_REQ')
-		print(user_from_request)
-		print(user_name)
-		print(user_email)
-		print(user_image_url)
-		print(user_settings)
-		print(user_oauth_id)
-		print(user_oauth_type)
-		print('USER_BY_REQ\n\n\n')
 
 		text = data['text']
-		print('\nReceived New Message: %s' % text)
 		message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
 		user_id = user_oauth_id
 		timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -158,17 +146,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		print('roomId: %s' % room_id)
 		print('userId: %s\n' % user_id)
 
-
 		message_to_add = Message(message_id, text, timestamp, room_id, user_id)
 		return self.add_to_db(message_to_add)
-
-		# message init model:
-		# self.id = messageId
-		# self.text = messageText
-		# self.timestamp = messageTimestamp
-		# self.roomId = messageRoomId
-		# self.userId = messageUserId
-
 
 	def on_yt_load(self, data):
 		url = data.get('url')
@@ -201,6 +180,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 	def handleYtStateChange(self, request, data):
 		user = self.flaskserver.getUserByRequest(request)
+		self.flaskserver.db.session.add(user)
 
 		print(json.dumps(data).encode("ascii", errors="backslashreplace").decode("ascii"))
 

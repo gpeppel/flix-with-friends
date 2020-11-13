@@ -11,7 +11,7 @@ export function Chat()
             Socket.on('messages_received', (data) => {
                 console.log('Message feed updated.')
                 setMessages(data);
-                console.log(messages)
+                console.log(data)
 
                 // TODO may have to set message scrollbar to bottom or something later
             });
@@ -37,6 +37,23 @@ export function Chat()
         }
     }
 
+    function getFbName(message)
+    {
+        if (message[4] != null)
+        {
+            return message[4][0]
+        }
+    }
+
+    function getFbImageUrl(message)
+    {
+        if (message[4] != null)
+        {
+            return message[4][1]
+        }
+
+    }
+
     getNewMessages();
 
     return (
@@ -45,7 +62,16 @@ export function Chat()
                 <ul id='messageFeed' style={{ paddingLeft: "0" }}>
                     {messages.map((message, index) => (
                         <li key={index} style={{ listStyleType: "none", padding: '0', margin: '0' }}>
-                               <p>userId: {message[3]} <br /> {message[1]}<br />time: {message[2]}</p>
+                            <img alt="Profile" src={getFbImageUrl(message)}></img>
+                            <p>
+                                userId: {message[3]}
+                                <br /> 
+                                {message[1]}
+                                <br />
+                                time: {message[2]}
+                                <br />
+                                userFullName: {getFbName(message)}
+                            </p>
                         </li>
                     ))}
                 </ul>
