@@ -5,7 +5,7 @@ import flask
 import flask_socketio
 import flask_sqlalchemy
 
-from message import Message
+from db_models.message import Message
 from socketns.youtube import YoutubeNamespace
 import sqldb
 
@@ -41,8 +41,6 @@ class FlaskServer:
 
 
 	def index(self):
-		self.db.create_all()
-		self.db.session.commit()
 		return flask.render_template('index.html')
 
 
