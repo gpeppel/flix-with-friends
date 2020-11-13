@@ -4,18 +4,24 @@ import flask
 
 import sqldb
 
+db = sqldb.SQLAlchemy()
 
-app = flask.Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def createFlaskServer(db):
+	from flaskserver import FlaskServer
 
-db = sqldb.SQLAlchemy(app)
+	app = flask.Flask(__name__)
+	app.config['SQLALCHEMY_DATABASE_URI'] = sqldb.getDatabaseUri()
+	app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+	db.app = app
+	db.init_app(app)
+
+	return FlaskServer(app, db)
 
 
 if __name__ == '__main__':
 	db.create_all()
 	db.session.commit()
 
-	from flaskserver import FlaskServer
-	flaskserver = FlaskServer(app, db)
+	flaskserver = createFlaskServer(db)
 	flaskserver.run(os.environ.get('IP', '0.0.0.0'), int(os.environ.get('PORT', 8080)), debug=True)

@@ -6,31 +6,36 @@ import { Chat } from './Chat';
 
 const EVENT_YT_LOAD = 'yt_load';
 
-export function Content() {
+export function Content()
+{
 
-    const [roomID, setRoomID] = React.useState([]);
+	const [roomID, setRoomID] = React.useState([]);
 
 
-    console.log("emitting")
+	console.log('emitting');
 	Socket.emit('new room');
 
-	Socket.emit('chat_loaded')
+	Socket.emit('chat_loaded');
 
-    React.useEffect(() => { Socket.on('new room id', setRoomID); }, []);
-    console.log(roomID)
+	React.useEffect(() =>
+	{
+		Socket.on('new room id', setRoomID);
+	}, []);
+	console.log(roomID);
 
 
-    function copyID() {
-      var copyText = document.getElementById("myInput");
-      copyText.select();
-      document.execCommand("copy");
-      console.log('copied text' + copyText.value)
-      alert("Copied the text: " + copyText.value);
-    }
+	function copyID()
+	{
+		var copyText = document.getElementById('myInput');
+		copyText.select();
+		document.execCommand('copy');
+		console.log('copied text' + copyText.value);
+		alert('Copied the text: ' + copyText.value);
+	}
 
 	function onKeyUp(event)
 	{
-		if(event.key == "Enter")
+		if(event.key == 'Enter')
 		{
 			Socket.emit(EVENT_YT_LOAD, {
 				'url': event.target.value
@@ -42,7 +47,7 @@ export function Content() {
 		<div>
 			<input onKeyUp={onKeyUp} />
 			<YoutubeContainer />
-      <Chat />
+			<Chat />
 		</div>
 	);
 }
