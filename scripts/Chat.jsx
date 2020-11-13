@@ -1,23 +1,20 @@
 import * as React from 'react';
 import { Socket } from './Socket';
 
-    
+
 export function Chat()
 {
     const [messages, setMessages] = React.useState([]);
 
     function getNewMessages() {
         React.useEffect(() => {
-            Socket.on('messages received', (data) => {
-                
-                console.log('EMIT RECEIVED!');
-                console.log(data);
+            Socket.on('messages_received', (data) => {
+                console.log('Message feed updated.')
                 setMessages(data);
 
                 // TODO may have to set message scrollbar to bottom or something later
             });
         });
-
     }
 
     function handleSubmit()
@@ -25,7 +22,7 @@ export function Chat()
         var messageInput = document.getElementById('messageInput');
         var messageText = messageInput.value;
 
-        Socket.emit('message-send', {
+        Socket.emit('message_send', {
             'text': messageText,
         });
         messageInput.value = '';
@@ -37,8 +34,8 @@ export function Chat()
         {
             handleSubmit();
         }
-    }        
-    
+    }
+
     getNewMessages();
 
     return (
@@ -47,7 +44,7 @@ export function Chat()
                 <ul id='messageFeed' style={{ paddingLeft: "0" }}>
                     {messages.map((message, index) => (
                         <li key={index} style={{ listStyleType: "none", padding: '0', margin: '0' }}>
-                               <p>userId: {message[3]}<br></br>message: {message[1]}</p>
+                               <p>userId: {message[3]} <br /> {message[1]}<br />time: {message[2]}</p>
                         </li>
                     ))}
                 </ul>

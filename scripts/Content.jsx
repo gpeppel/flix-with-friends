@@ -4,7 +4,7 @@ import { YoutubeContainer } from './YoutubeContainer';
 import { Socket } from './Socket';
 import { Chat } from './Chat';
 
-const EVENT_YT_LOAD = 'yt-load';
+const EVENT_YT_LOAD = 'yt_load';
 
 export function Content() {
 
@@ -12,7 +12,9 @@ export function Content() {
 
 
     console.log("emitting")
-    Socket.emit('new room');
+	Socket.emit('new room');
+
+	Socket.emit('chat_loaded')
 
     React.useEffect(() => { Socket.on('new room id', setRoomID); }, []);
     console.log(roomID)
