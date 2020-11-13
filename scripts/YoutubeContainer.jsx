@@ -37,7 +37,8 @@ export function YoutubeContainer() {
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) => {
 			function doState(data)
 			{
-				console.log(data);
+
+				data.timestamp = parseInt(data.timestamp, 10);
 
 				let ts = (new Date()).getTime();
 				let tsdiff = Math.max(0, ts - data.timestamp);
@@ -78,7 +79,15 @@ export function YoutubeContainer() {
 		});
 
 		setInterval(() => {
-			emitStateChange(ytPlayerRef.current.player, 'sync');
+			switch(ytPlayerRef.current.player.getPlayerState())
+			{
+				case YoutubePlayer.prototype.PLAYER_PLAYING:
+					emitStateChange(ytPlayerRef.current.player, 'playing');
+					break;
+				case YoutubePlayer.prototype.PLAYER_PAUSED:
+					emitStateChange(ytPlayerRef.current.player, 'paused');
+					break;
+			}
 		}, 3000);
 	}, []);
 
@@ -113,9 +122,9 @@ export function YoutubeContainer() {
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': state,
-			'offset': offset,
+			'offset': Math.round(offset * 10000) / 10000,
 			'rate': rate,
-			'timestamp': timestamp
+			'timestamp': timestamp.toString()
 		});
 	}
 

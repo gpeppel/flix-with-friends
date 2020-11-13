@@ -226,13 +226,14 @@ class YoutubeNamespace(flask_socketio.Namespace):
 		]:
 			return
 
+		print('sent')
 		self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
 			'state': data['state'],
 			'sender': user.id,
 			'offset': offset,
 			'rate': rate,
 			'runAt': runAt,
-			'timestamp': timestamp
+			'timestamp': str(timestamp)
 		}, include_self=False)
 
 
