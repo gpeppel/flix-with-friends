@@ -2,6 +2,11 @@ from contextlib import contextmanager
 import unittest.mock as mock
 
 
+class MockRequest:
+	def __init__(self, sid):
+		self.sid = sid
+
+
 # https://docs.python.org/2.5/whatsnew/pep-343.html
 @contextmanager
 def hookSocketEmit(request=None):

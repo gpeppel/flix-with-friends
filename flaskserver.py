@@ -6,10 +6,10 @@ import flask_socketio
 import flask_sqlalchemy
 
 from db_models.message import Message
-
+from db_models.room import Room
 from db_models.user import User
 
-from socketns.youtube import YoutubeNamespace
+import socketns.youtube
 import sqldb
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
@@ -27,8 +27,9 @@ class FlaskServer:
 		self.socketio.init_app(self.app, cors_allowed_origins='*')
 
 		self.db = db
-		
-		self.socketio.on_namespace(YoutubeNamespace('/', self))
+
+		self.youtubeNs = socketns.youtube.YoutubeNamespace('/', self)
+		self.socketio.on_namespace(self.youtubeNs)
 
 		self.rooms = {}
 		self.users = {}
@@ -78,7 +79,7 @@ class FlaskServer:
 
 
 	def deleteRoom(self, room):
-		for user in room.users.values():
+		for user in list(room.users.values()):
 			room.removeUser(user)
 
 		del self.rooms[room.id]
