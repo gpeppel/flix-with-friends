@@ -77,6 +77,12 @@
         "arrow-body-style": [
 			"error",
 			"as-needed"
+        ],
+        "camelcase": [
+			"error",
+			{
+				"properties": "always"
+			}
         ]
     }
 }
