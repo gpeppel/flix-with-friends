@@ -164,7 +164,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
             return val
 
         offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
-        rate = getval('rate', lambda x: isinstance(x, int), lambda x: int(x), 1)
+        rate = getval('rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
         run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
         timestamp = getval(
             'timestamp',

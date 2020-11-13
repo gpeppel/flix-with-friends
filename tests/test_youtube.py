@@ -34,6 +34,112 @@ YOUTUBE_VIDEO_IDS = [
     }
 ]
 
+INPUT = 'input'
+OUTPUT = 'output'
+
+YT_STATE_NAMES_VALID = [
+    'ready',
+    'rEaDy',
+    'unstarted',
+    'ended',
+    'playing',
+    'paused',
+    'buffering',
+    'cued',
+    'playback'
+]
+
+YT_STATE_NAMES_INVALID = [
+    'invalid'
+]
+
+YT_STATE_CHANGES = {
+    'offset': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'rate': [
+        {
+            INPUT: None,
+            OUTPUT: 1
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 1
+        },
+        {
+            INPUT: 0.5,
+            OUTPUT: 0.5
+        },
+        {
+            INPUT: 2,
+            OUTPUT: 2
+        },
+    ],
+    'runAt': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -5,
+            OUTPUT: -5
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        },
+    ],
+    'timestamp': [
+        {
+            INPUT: None,
+            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+        },
+        {
+            INPUT: 100,
+            OUTPUT: 100
+        },
+    ]
+}
+
 
 class YoutubeTest(unittest.TestCase):
     @classmethod
@@ -70,14 +176,59 @@ class YoutubeTest(unittest.TestCase):
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
     def test_handle_yt_state_change_success(self):
+        def get_state_template():
+            return {
+                'state': 'ready',
+                'offset': 0,
+                'rate': 1,
+                'runAt': 0,
+                'timestamp': 0
+            }
+
         mock_req = MockRequest(TEST_SID)
 
         with hookSocketEmit() as emitList:
             self.flaskserver.youtube_ns.connect_user(mock_req)
-            self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, test_data)
+            emitList.clear()
 
-            print(emitList)
+            for key, value_list in YT_STATE_CHANGES.items():
+                state = get_state_template()
 
-            # TODO
+                for val in value_list:
+                    in_val = val[INPUT]
+                    out_val = val[OUTPUT]
+
+                    if in_val is None:
+                        if key in state:
+                            del state[key]
+                    else:
+                        state[key] = in_val
+
+                    self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
+
+                    emit = emitList.pop()
+
+                    self.assertEqual(emit['event'], 'yt_state_change')
+
+                    if isinstance(out_val, str) and out_val.startswith('eval:'):
+                        out_val = eval(out_val[len('eval:'):])
+
+                    self.assertEqual(emit['args'][0][key], out_val)
+
+            self.flaskserver.youtube_ns.disconnect_user(mock_req)
+
+    def test_handle_yt_state_change_fail(self):
+        mock_req = MockRequest(TEST_SID)
+
+        with hookSocketEmit() as emitList:
+            self.flaskserver.youtube_ns.connect_user(mock_req)
+            emitList.clear()
+
+            for name in YT_STATE_NAMES_INVALID:
+                self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, {
+                    'state': name
+                })
+
+                self.assertTrue(len(emitList) == 0)
 
             self.flaskserver.youtube_ns.disconnect_user(mock_req)
