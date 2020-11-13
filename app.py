@@ -20,8 +20,9 @@ def createFlaskServer(db):
 
 
 if __name__ == '__main__':
-	db.create_all()
-	db.session.commit()
+    flaskserver = createFlaskServer(db)
 
-	flaskserver = createFlaskServer(db)
-	flaskserver.run(os.environ.get('IP', '0.0.0.0'), int(os.environ.get('PORT', 8080)), debug=True)
+    db.create_all()
+    db.session.commit()
+
+    flaskserver.run(os.environ.get('IP', '0.0.0.0'), int(os.environ.get('PORT', 8080)), debug=True)
