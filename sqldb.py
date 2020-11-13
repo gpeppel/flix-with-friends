@@ -12,9 +12,13 @@ def getDatabaseUri():
 	if uri is not None and len(uri) != 0:
 		return uri
 
-	sql_user = os.environ['SQL_USER']
-	sql_pwd = os.environ['SQL_PASSWORD']
-	sql_db = os.environ['SQL_DATABASE']
+	try:
+		sql_user = os.environ['SQL_USER']
+		sql_pwd = os.environ['SQL_PASSWORD']
+		sql_db = os.environ['SQL_DATABASE']
+	except KeyError:
+		return None
+
 	return 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
 
 
