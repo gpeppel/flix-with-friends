@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Socket } from './Socket';
+import './chat.css'
 
 
 export function Chat()
@@ -14,8 +15,10 @@ export function Chat()
 			{
 				console.log('Message feed updated.');
 				setMessages(data);
-				console.log(data);
-
+                console.log(data);
+                
+                const messageBox = document.getElementById('chatBox');
+                messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;
 				// TODO may have to set message scrollbar to bottom or something later
 			});
 		});
@@ -65,16 +68,13 @@ export function Chat()
 				<ul id='messageFeed' style={{ paddingLeft: '0' }}>
 					{messages.map((message, index) => (
 						<li key={index} style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
-							<img alt="Profile" src={getFbImageUrl(message)}></img>
-							<p>
-                                userId: {message[3]}
+							<img id='profilePic' alt="Profile" src={getFbImageUrl(message)}></img>
+							<span>
+                                <p id='timestamp'> ({message[2]}) </p>
+                                <p id='name'>{getFbName(message)}: </p>
+                                <p id='message'>{message[1]}</p>
 								<br />
-								{message[1]}
-								<br />
-                                time: {message[2]}
-								<br />
-                                userFullName: {getFbName(message)}
-							</p>
+							</span>
 						</li>
 					))}
 				</ul>
