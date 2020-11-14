@@ -21,22 +21,22 @@ export function Options() {
   
     return (
         <body>
+        <div className="header">
+        <img src="static/images/logo.png" alt="logo" />
+        </div>
         <div className="split left">
-        <div className="centered">
-            <h1>Hello</h1>
-            <FacebookButton />
-             <button onClick={handleSubmit}>Create New Viewing Room</button>
-            </div>
+         <div className="centered">
+         <img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
+         <FacebookButton />
+         </div>
         </div>
-        
         <div className="split right">
-           <div className="centered">
-            <h1>World</h1>
-            <input type="text" placeholder="Enter the room URL"></input>
-            <button onClick={handleSubmit}>Enter</button>
+        <div className="centered">
+        <img className="popcorn_button" src="static/images/popcorn_button.png" alt="popcorn_button" />
+           
+        <button className="button" onClick={handleSubmit}>Create New Viewing Room!</button>
             </div>
-        </div>
-        
+            </div>
         </body>
         )
 }

@@ -1,32 +1,40 @@
 import * as React from 'react';
-
+import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
-import { Button } from './Button';
 import { Socket } from './Socket';
+import './options.css';
 
-export function Content() {
-    const [FbUser, setFbUser] = React.useState([]);
-    
-    // function getNewUser() {
-    //     React.useEffect(() => {
-    //         Socket.on('user_received', updateAddresses);
-    //         return () => {
-    //             Socket.off('addresses received', updateAddresses);
-    //         }
-    //     });
-    // }
-    
-    // function updateAddresses(data) {
-    //     console.log("Received addresses from server: " + data['allAddresses']);
-    //     setAddresses(data['allAddresses']);
-    // }
-    
-    // getNewAddresses();
+export function Login(){
+const [userFlag, setFlag] = React.useState(false);
 
-    return (
-        <div>
-            <h1>Facebook Button Test!</h1>
-            <FacebookButton />
+	function authUser() {
+    React.useEffect(() => {
+      Socket.on('verified_user', (data) => {
+        setFlag(true);
+      });
+    });
+  }
+
+	authUser();
+    
+	
+	if (userFlag) {
+    return (<Options />);
+  }
+  
+	return (
+		<body>
+        <div className="header">
+        <img src="static/images/logo.png" alt="logo" />
         </div>
-    );
+        <div>
+        
+         <img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
+         <FacebookButton />
+         
+        
+        </div>
+        
+        </body>
+	);
 }

@@ -2,6 +2,7 @@ import flask_sqlalchemy
 
 from app import db
 
+
 class User(db.Model):
 	id = db.Column(db.Text, primary_key=True)
 	name = db.Column(db.String(120))
@@ -19,4 +20,14 @@ class User(db.Model):
 		self.settings = settings
 		self.oauth_id = oauth_id
 		self.oauth_type = oauth_type
+
+		self.sid = None
+		self.room = None
+	
+	@staticmethod
+	def from_request(req):
+		user = User(req.sid)
+		user.sid = req.sid
 		
+		return user
+

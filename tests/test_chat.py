@@ -1,15 +1,20 @@
+from datetime import datetime
 import unittest
 import unittest.mock as mock
 import sys
-sys.path.append("..")
-import app
 import time
-from datetime import datetime
+
+import app
 
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
 
-class chatMessageTestCase(unittest.TestCase):
+
+class ChatTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.flaskserver = app.create_flask_server(app.db)
+
     def setUp(self):
         self.success_tests = [
             {
@@ -20,8 +25,8 @@ class chatMessageTestCase(unittest.TestCase):
                     'id': 1,
                     'text': 'test_message_text',
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    'roomId': 'room_id_here',
-                    'userId': 1,
+                    'room_id': 'room_id_here',
+                    'user_id': 1,
                 }
             }
         ]
@@ -37,17 +42,10 @@ class chatMessageTestCase(unittest.TestCase):
     @mock.patch('random.randint')
     def test_parse_chat_message_success(self, mocked_id_generator):
         for test in self.success_tests:
-                with mock.patch('app.add_to_db', self.mocked_db_add):
-                    mocked_id_generator.return_value = 1
-                    response = app.new_message_received(test[INPUT_MESSAGE])
-                    expected = test[MESSAGE_EXPECTED]
+            with mock.patch('socketns.youtube.YoutubeNamespace.add_to_db', self.mocked_db_add):
+                mocked_id_generator.return_value = 1
+                response = self.flaskserver.youtube_ns.on_message_send(
+                    test[INPUT_MESSAGE])
+                expected = test[MESSAGE_EXPECTED]
 
-                    self.assertEqual(response, expected)
-
-if __name__ == "__main__":
-    unittest.main()
-
-
-
-
-
+                self.assertEqual(response, expected)
