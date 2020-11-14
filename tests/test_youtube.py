@@ -3,7 +3,7 @@ import unittest
 
 import app
 import tests.helpers as helpers
-from tests.helpers import MockRequest, hookSocketEmit
+from tests.helpers import MockRequest, hook_socket_emit
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -156,21 +156,21 @@ class YoutubeTest(unittest.TestCase):
     def test_handle_yt_load(self):
         mock_req = MockRequest(TEST_SID)
 
-        with hookSocketEmit() as emitList:
+        with hook_socket_emit() as emit_list:
             self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
 
-            self.assertTrue(len(emitList) == 0)
+            self.assertTrue(len(emit_list) == 0)
 
             for vobj in YOUTUBE_VIDEO_IDS:
                 self.flaskserver.youtube_ns.handle_yt_load(mock_req, {
                     'url': vobj[URL]
                 })
 
-                if len(emitList) == 0:
+                if len(emit_list) == 0:
                     self.assertIsNone(vobj[ID])
                     continue
 
-                emit = emitList.pop()
+                emit = emit_list.pop()
 
                 self.assertEqual(emit['event'], 'yt_load')
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
@@ -187,9 +187,9 @@ class YoutubeTest(unittest.TestCase):
 
         mock_req = MockRequest(TEST_SID)
 
-        with hookSocketEmit() as emitList:
+        with hook_socket_emit() as emit_list:
             self.flaskserver.youtube_ns.connect_user(mock_req)
-            emitList.clear()
+            emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():
                 state = get_state_template()
@@ -206,7 +206,7 @@ class YoutubeTest(unittest.TestCase):
 
                     self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
 
-                    emit = emitList.pop()
+                    emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_state_change')
 
@@ -220,15 +220,15 @@ class YoutubeTest(unittest.TestCase):
     def test_handle_yt_state_change_fail(self):
         mock_req = MockRequest(TEST_SID)
 
-        with hookSocketEmit() as emitList:
+        with hook_socket_emit() as emit_list:
             self.flaskserver.youtube_ns.connect_user(mock_req)
-            emitList.clear()
+            emit_list.clear()
 
             for name in YT_STATE_NAMES_INVALID:
                 self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, {
                     'state': name
                 })
 
-                self.assertTrue(len(emitList) == 0)
+                self.assertTrue(len(emit_list) == 0)
 
             self.flaskserver.youtube_ns.disconnect_user(mock_req)

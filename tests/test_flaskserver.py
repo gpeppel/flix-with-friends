@@ -3,7 +3,7 @@ import unittest
 
 import app
 import tests.helpers as helpers
-from tests.helpers import MockRequest, hookSocketEmit
+from tests.helpers import MockRequest, hook_socket_emit
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
