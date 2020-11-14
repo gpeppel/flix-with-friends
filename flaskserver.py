@@ -42,7 +42,7 @@ class FlaskServer:
         all_messages = [
             # TODO decide if userId should even be sent to clients
             (db_message.id, db_message.text, str(
-                db_message.timestamp), db_message.userId)
+                db_message.timestamp), db_message.user_id)
             for db_message in self.db.session.query(Message).all()
         ]
         self.socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
