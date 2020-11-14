@@ -9,6 +9,7 @@ Watch videos with friends at the same time remotely!
 1. [Installation](#user-content-installation)
 2. [Socket.io Events](#user-content-socketio-events)
 3. [Database Schema](#user-content-database-schema)
+4. [Individualized Work Information](#user-content-individualized-work-information)
 
 ---
 
@@ -206,6 +207,8 @@ Avkash Patel:
 
 * Changed logic so that viewing room creation is only possible if Facebook login is passed
 
+---
+
 Greg Peppel:
 
 For the most part, we collaborated on lots of different parts of the project. Specifically, I felt I was most responsible for the overall design (look and feel) of the project. I also worked on connecting the technologies such as heroku and the facebook developer and getting them to talk to our project. Things I also was apart of:
@@ -217,6 +220,22 @@ Things that are incomplete
 
 * Adding a google login button
 * Overall css of the chat window and chat box
+
+---
+
+Daniel Vergilis:
+- Wrote the YouTube IFrame Embed API code that syncs the videos between users
+- Wrote skeleton backend server code
+- Wrote test cases
+- Used linter for source code
+- Set up Travis CI configuration
+
+Incomplete:
+- Complete coverage, all working test cases
+- Better syncing when buffering
+- Host-priority sync mode
+
+---
 
 Matt Gonzalez:
 * Set up chat functionality
