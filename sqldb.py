@@ -9,7 +9,7 @@ load_dotenv(dotenv_path)
 
 
 def get_database_uri():
-    uri = os.environ.get('DATABASE_URI')
+    uri = os.environ.get('DATABASE_URL')
     if uri is not None and len(uri) != 0:
         return uri
 
