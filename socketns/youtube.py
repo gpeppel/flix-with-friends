@@ -48,7 +48,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
         else:
             self.flaskserver.socketio.emit('verified_user')
             user = self.flaskserver.create_user_from_request(flask.request)
-            self.flaskserver.db.session.add(user)
+
+            if self.flaskserver.db_enabled():
+                self.flaskserver.db.session.add(user)
+
             user.name = data['response']['name']
             user.image_url = data['response']['picture']['data']['url']
             user.settings = None
@@ -83,6 +86,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
         self.flaskserver.emit_all_messages()
 
     def add_to_db(self, message_to_add):
+        if not self.flaskserver.db_enabled():
+            return
+
         self.flaskserver.db.session.add(message_to_add)
         self.flaskserver.db.session.commit()
         self.flaskserver.emit_all_messages()
@@ -91,7 +97,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
         user_request = flask.request
         user_from_request = \
         self.flaskserver.get_user_by_request(user_request)
-        self.flaskserver.db.session.add(user_from_request)
+
+        if self.flaskserver.db_enabled():
+            self.flaskserver.db.session.add(user_from_request)
+
         user_oauth_id = user_from_request.oauth_id
         text = data['text']
         message_id = \
