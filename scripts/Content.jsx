@@ -49,7 +49,7 @@ export function Content()
 				</div>
 
 			</div>
-			<input onKeyUp={onKeyUp} />
+			<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
 		</div>
 	);
 }
