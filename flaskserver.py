@@ -37,6 +37,9 @@ class FlaskServer:
         return flask.render_template('index.html')
 
     def emit_all_messages(self):
+        if self.db is None:
+            return
+
         all_users = self.db.session.query(User).all()
         all_messages = [
             (db_message.id, db_message.text, str(db_message.timestamp), \
