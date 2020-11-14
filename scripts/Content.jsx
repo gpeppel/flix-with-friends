@@ -23,16 +23,6 @@ export function Content()
 	}, []);
 	console.log(roomID);
 
-
-	function copyID()
-	{
-		var copyText = document.getElementById('myInput');
-		copyText.select();
-		document.execCommand('copy');
-		console.log('copied text' + copyText.value);
-		alert('Copied the text: ' + copyText.value);
-	}
-
 	function onKeyUp(event)
 	{
 		if(event.key == 'Enter')
@@ -45,21 +35,21 @@ export function Content()
 
 	return (
 		<div>
-		<div className="header">
-        <img src="static/images/logo.png" alt="logo" />
-        </div>
-		<div className="Content">
-            <div className="Wrapper">
-                <div className="RightContent">
-                  	<YoutubeContainer />
-                </div>
-               <div class="LeftContent">
-                 <Chat />
-              </div>
-             </div>
-              
-        </div>
-         <input onKeyUp={onKeyUp} />
-	</div>
+			<div className="header">
+				<img src="static/images/logo.png" alt="logo" />
+			</div>
+			<div className="Content">
+				<div className="Wrapper">
+					<div className="RightContent">
+						<YoutubeContainer />
+					</div>
+					<div className="LeftContent">
+						<Chat />
+					</div>
+				</div>
+
+			</div>
+			<input onKeyUp={onKeyUp} />
+		</div>
 	);
 }
