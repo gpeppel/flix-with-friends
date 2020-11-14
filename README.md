@@ -196,13 +196,12 @@ Data:
 # Individualized Work Information
 Avkash Patel:
 
-Worked on setting up the viewing room
+* Worked on setting up the viewing room
 
-Made room URL a sharable link through a copy button
+* Made room URL a sharable link through a copy button
 
-Was unable to create multiple individualized rooms, so user story was moved to Sprint 2
+* Was unable to create multiple individualized rooms, so user story was moved to Sprint 2
 
-Helped with styling for login page and viewing room
+* Helped with styling for login page and viewing room
 
-Changed logic so that viewing room creation is only possible if Facebook login is passed
-
+* Changed logic so that viewing room creation is only possible if Facebook login is passed
