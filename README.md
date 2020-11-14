@@ -192,3 +192,12 @@ Data:
 
 # Database Schema
 ![schema](docs/schema.png)
+
+# Individualized Work Information
+Avkash Patel:
+Worked on setting up the viewing room  
+Made room URL a sharable link through a copy button
+Was unable to create multiple individualized rooms, so user story was moved to Sprint 2
+Helped with styling for login page and viewing room
+Changed logic so that viewing room creation is only possible if Facebook login is passed
+
