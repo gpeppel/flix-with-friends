@@ -41,27 +41,24 @@ class YoutubeNamespace(flask_socketio.Namespace):
         print("Got an event for new temp user input with data:", data)
 
     def on_new_facebook_user(self, data):
-      print(data['response']['name'])
-      user = self.flaskserver.createUserFromRequest(flask.request)
-      self.flaskserver.db.session.add(user)
-
-		  user.name = data['response']['name']
-		  user.email = data['response']['email']
-		  user.image_url = data['response']['picture']['data']['url']
-		  user.settings = None
-		  user.oauth_id = data['response']['id']
-		  user.oauth_type = 'FACEBOOK'
-
-		  self.flaskserver.db.session.add(user)
-		  self.flaskserver.db.session.commit()
-      
-      key = 'status'
-      if key in data['response'].keys():
-        self.flaskserver.socketio.emit('unverified_user')
-       else:
-        self.flaskserver.socketio.emit('verified_user')
-
+        key = 'status'
+        if key in data['response'].keys():
+            self.flaskserver.socketio.emit('unverified_user')
+        else:
+            self.flaskserver.socketio.emit('verified_user')
         
+            user = self.flaskserver.create_user_from_request(flask.request)
+            self.flaskserver.db.session.add(user)
+        
+            user.name = data['response']['name']
+            # user.email = data['response']['email']
+            user.image_url = data['response']['picture']['data']['url']
+            user.settings = None
+            user.oauth_id = data['response']['id']
+            user.oauth_type = 'FACEBOOK'
+        
+            self.flaskserver.db.session.add(user)
+            self.flaskserver.db.session.commit()
 
     def new_user_handler(self, data):
         # db.session.add(tables.Users(data['username'], data['password']))
@@ -101,28 +98,27 @@ class YoutubeNamespace(flask_socketio.Namespace):
         self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
 
     def on_message_send(self, data):
-		  user_request = flask.request
-
-		  user_from_request = self.flaskserver.getUserByRequest(user_request)
-		  self.flaskserver.db.session.add(user_from_request)
-		  user_oauth_id = user_from_request.oauth_id
-
-		  text = data['text']
-		  message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
-		  user_id = user_oauth_id
-		  timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		  room_id = 'room_id_here' # TODO use actual room id
-
-
-		  print('\nAdding message to database:')
-		  print('messageId:%s' % message_id)
-		  print('text: %s' % text)
-		  print('timestamp: %s' % timestamp)
-		  print('roomId: %s' % room_id)
-		  print('userId: %s\n' % user_id)
-
-		  message_to_add = Message(message_id, text, timestamp, room_id, user_id)
-		  return self.add_to_db(message_to_add)
+        user_request = flask.request
+        
+        user_from_request = self.flaskserver.get_user_by_request(user_request)
+        self.flaskserver.db.session.add(user_from_request)
+        user_oauth_id = user_from_request.oauth_id
+        
+        text = data['text']
+        message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
+        user_id = user_oauth_id
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        room_id = 'room_id_here' # TODO use actual room id
+        
+        print('\nAdding message to database:')
+        print('messageId:%s' % message_id)
+        print('text: %s' % text)
+        print('timestamp: %s' % timestamp)
+        print('roomId: %s' % room_id)
+        print('userId: %s\n' % user_id)
+        
+        message_to_add = Message(message_id, text, timestamp, room_id, user_id)
+        return self.add_to_db(message_to_add)
     
     def on_yt_load(self, data):
         url = data.get('url')
