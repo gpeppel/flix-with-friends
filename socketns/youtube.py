@@ -24,7 +24,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def on_connect(self):
         self.connect_user(flask.request)
-        self.flaskserver.emit_all_messages(flaskserver.MESSAGES_EMIT_CHANNEL)
+        self.flaskserver.emit_all_messages()
 
     def connect_user(self, request):
         self.flaskserver.create_user_from_request(request)
@@ -80,12 +80,12 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def on_chat_loaded(self):
         print('\n\n\nCHAT_LOADED\n\n\n')
-        self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
+        self.flaskserver.emit_all_messages()
 
     def add_to_db(self, message_to_add):
         self.flaskserver.db.session.add(message_to_add)
         self.flaskserver.db.session.commit()
-        self.flaskserver.emit_all_messages(MESSAGES_EMIT_CHANNEL)
+        self.flaskserver.emit_all_messages()
 
     def on_message_send(self, data):
         user_request = flask.request
