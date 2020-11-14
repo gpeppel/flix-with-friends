@@ -29,6 +29,7 @@ const responseFacebook = (response) =>
 	Socket.emit('new_facebook_user', {
 		'response': response
 	});
+	document.body.style.backgroundColor = "#eea1b8";
 };
 
 export function FacebookButton()

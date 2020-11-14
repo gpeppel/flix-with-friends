@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { Socket } from './Socket';
-import './options.css';
+import './login.css';
 
 export function Login(){
 const [userFlag, setFlag] = React.useState(false);
@@ -33,12 +33,13 @@ const [userFlag, setFlag] = React.useState(false);
         <div className="header">
         <img src="static/images/logo.png" alt="logo" />
         </div>
-        <div>
+        <div className="login">
+        <div className="centered">
         
          <img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
          <FacebookButton />
          
-        
+        </div>
         </div>
         
         </body>
