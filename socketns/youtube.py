@@ -54,6 +54,13 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
 		  self.flaskserver.db.session.add(user)
 		  self.flaskserver.db.session.commit()
+      
+      key = 'status'
+      if key in data['response'].keys():
+        self.flaskserver.socketio.emit('unverified_user')
+       else:
+        self.flaskserver.socketio.emit('verified_user')
+
         
 
     def new_user_handler(self, data):

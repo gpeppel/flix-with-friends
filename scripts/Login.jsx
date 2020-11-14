@@ -6,7 +6,13 @@ import './options.css';
 
 export function Login(){
 const [userFlag, setFlag] = React.useState(false);
-
+	
+	 React.useEffect(() => {
+      Socket.on('unverified_user', (data) => {
+        setFlag(false);
+      });
+    });
+    
 	function authUser() {
     React.useEffect(() => {
       Socket.on('verified_user', (data) => {
@@ -14,7 +20,7 @@ const [userFlag, setFlag] = React.useState(false);
       });
     });
   }
-
+	
 	authUser();
     
 	
