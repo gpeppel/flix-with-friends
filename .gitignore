@@ -1,4 +1,7 @@
+__pycache__/
+htmlcov/
 node_modules/
+.coverage
 package-lock.json
-sql.env
-__pycache__
+todo.txt
+*.env

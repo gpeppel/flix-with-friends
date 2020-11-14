@@ -1,38 +1,55 @@
-    
 import * as React from 'react';
+import { YoutubeContainer } from './YoutubeContainer';
 
-
-import { Button } from './Button';
 import { Socket } from './Socket';
+import { Chat } from './Chat';
 
-export function Content() {
-    const [addresses, setAddresses] = React.useState([]);
-    
-    function getNewAddresses() {
-        React.useEffect(() => {
-            Socket.on('addresses received', updateAddresses);
-            return () => {
-                Socket.off('addresses received', updateAddresses);
-            }
-        });
-    }
-    
-    function updateAddresses(data) {
-        console.log("Received addresses from server: " + data['allAddresses']);
-        setAddresses(data['allAddresses']);
-    }
-    
-    getNewAddresses();
+const EVENT_YT_LOAD = 'yt_load';
+import './content.css';
+export function Content()
+{
 
-    return (
-        <div>
-            <h1>USPS Addresses!</h1>
-                <ol>
-                    {
-                    // TODO
-                    }
-                </ol>
-            <Button />
-        </div>
-    );
+	const [roomID, setRoomID] = React.useState([]);
+
+
+	console.log('emitting');
+	Socket.emit('new room');
+
+	Socket.emit('chat_loaded');
+
+	React.useEffect(() =>
+	{
+		Socket.on('new room id', setRoomID);
+	}, []);
+	console.log(roomID);
+
+	function onKeyUp(event)
+	{
+		if(event.key == 'Enter')
+		{
+			Socket.emit(EVENT_YT_LOAD, {
+				'url': event.target.value
+			});
+		}
+	}
+
+	return (
+		<div>
+			<div className="header">
+				<img src="static/images/logo.png" alt="logo" />
+			</div>
+			<div className="Content">
+				<div className="Wrapper">
+					<div className="RightContent">
+						<YoutubeContainer />
+					</div>
+					<div className="LeftContent">
+						<Chat />
+					</div>
+				</div>
+
+			</div>
+			<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
+		</div>
+	);
 }

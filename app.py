@@ -1,50 +1,33 @@
-from dotenv import load_dotenv
 import os
 
 import flask
-import flask_socketio
+
+import sqldb
+
+db = sqldb.SQLAlchemy()
 
 
-app = flask.Flask(__name__)
+def create_flask_server(dbobj):
+    from flaskserver import FlaskServer
 
-socketio = flask_socketio.SocketIO(app)
-socketio.init_app(app, cors_allowed_origins='*')
+    app = flask.Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = sqldb.get_database_uri()
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    dbobj.app = app
+    dbobj.init_app(app)
 
-@socketio.on('connect')
-def on_connect():
-	print('Someone connected!')
-	socketio.emit('connected', {
-
-	})
-
-	# TODO
-
-
-@socketio.on('disconnect')
-def on_disconnect():
-	print ('Someone disconnected!')
-
-
-@socketio.on('yt-load')
-def on_yt_load(data):
-	pass
-
-
-@socketio.on('yt-state-change')
-def on_yt_load(data):
-	pass
-
-
-@app.route('/')
-def index():
-	return flask.render_template("index.html")
+    return FlaskServer(app, dbobj)
 
 
 if __name__ == '__main__':
-	socketio.run(
-		app,
-		host=os.getenv('IP', '0.0.0.0'),
-		port=int(os.getenv('PORT', 8080)),
-		debug=True
-	)
+    flaskserver = create_flask_server(db)
+
+    db.create_all()
+    db.session.commit()
+
+    flaskserver.run(
+        os.environ.get('IP', '0.0.0.0'),
+        int(os.environ.get('PORT', 8080)),
+        debug=True
+    )
