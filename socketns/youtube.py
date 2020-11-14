@@ -24,10 +24,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def on_connect(self):
         self.connect_user(flask.request)
-        self.flaskserver.emit_all_messages()
 
     def connect_user(self, request):
         self.flaskserver.create_user_from_request(request)
+        self.flaskserver.emit_all_messages()
 
     def on_disconnect(self):
         self.disconnect_user(flask.request)
@@ -105,17 +105,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         return self.add_to_db(message_to_add)
 
     def on_yt_load(self, data):
-        url = data.get('url')
-        if url is None:
-            return
-
-        video_id = self.get_youtube_video_id(url)
-        if video_id is None:
-            return
-
-        self.flaskserver.socketio.emit('yt_load', {
-            'videoId': video_id
-        })
+        self.handle_yt_load(flask.request, data)
 
     def get_youtube_video_id(self, url):
         match = re.match(
@@ -130,6 +120,19 @@ class YoutubeNamespace(flask_socketio.Namespace):
             return match[1]
 
         return None
+
+    def handle_yt_load(self, request, data):
+        url = data.get('url')
+        if url is None:
+            return
+
+        video_id = self.get_youtube_video_id(url)
+        if video_id is None:
+            return
+
+        self.flaskserver.socketio.emit('yt_load', {
+            'videoId': video_id
+        })
 
     def on_yt_state_change(self, data):
         self.handle_yt_state_change(flask.request, data)
@@ -152,15 +155,14 @@ class YoutubeNamespace(flask_socketio.Namespace):
             return val
 
         offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
+        rate = getval('rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
         run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
-        rate = getval('rate', lambda x: isinstance(x, int), lambda x: int(x), 1)
         timestamp = getval(
-		    'timestamp',
-		    lambda x: isinstance(x, int),
-		    lambda x: int(x),
-		    self.unix_timestamp()
-		)
-
+            'timestamp',
+            lambda x: isinstance(x, int),
+            lambda x: int(x),
+            self.unix_timestamp()
+        )
 
         if data.get('state') not in [
                 'ready',
