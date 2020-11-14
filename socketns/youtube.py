@@ -173,7 +173,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
             self.unix_timestamp()
         )
 
-
         if data.get('state') not in [
                 'ready',
                 'unstarted',
