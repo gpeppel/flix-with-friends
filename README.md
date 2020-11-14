@@ -205,3 +205,14 @@ Avkash Patel:
 * Helped with styling for login page and viewing room
 
 * Changed logic so that viewing room creation is only possible if Facebook login is passed
+
+Greg Peppel:
+
+For the most part, we collaborated on lots of different parts of the project.  Specifically, I felt I was most responsible for the overall design (look and feel) of the project.  I also worked on connecting the technologies such as heroku and the facebook developer and getting them to talk to our project.  Things I also was apart of:
+* Facebook button and connecting the login functionality
+* Overall css and styling of the project (also art assets logo, buttons, etc.)
+
+Things that are incomplete
+
+* Adding a google login button
+* Overall css of the chat window and chat box
