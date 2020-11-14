@@ -23,5 +23,11 @@ def get_database_uri():
     return 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
 
 
+db_singleton = None
+
 def SQLAlchemy():
-    return flask_sqlalchemy.SQLAlchemy()
+    global db_singleton
+    if db_singleton is None:
+        db_singleton = flask_sqlalchemy.SQLAlchemy()
+
+    return db_singleton

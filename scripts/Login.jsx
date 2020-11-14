@@ -1,30 +1,54 @@
 import * as React from 'react';
-
+import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { Socket } from './Socket';
+import './login.css';
 
-export function Content()
+export function Login()
 {
-	// function getNewUser() {
-	//     React.useEffect(() => {
-	//         Socket.on('user_received', updateAddresses);
-	//         return () => {
-	//             Socket.off('addresses received', updateAddresses);
-	//         }
-	//     });
-	// }
+	const [userFlag, setFlag] = React.useState(false);
 
-	// function updateAddresses(data) {
-	//     console.log("Received addresses from server: " + data['allAddresses']);
-	//     setAddresses(data['allAddresses']);
-	// }
+	React.useEffect(() =>
+	{
+		Socket.on('unverified_user', () =>
+		{
+			setFlag(false);
+		});
+	});
 
-	// getNewAddresses();
+	function authUser()
+	{
+		React.useEffect(() =>
+		{
+			Socket.on('verified_user', () =>
+			{
+				setFlag(true);
+			});
+		});
+	}
+
+	authUser();
+
+
+	if (userFlag)
+	{
+		return (<Options />);
+	}
 
 	return (
-		<div>
-			<h1>Facebook Button Test!</h1>
-			<FacebookButton />
-		</div>
+		<body>
+			<div className="header">
+				<img src="static/images/logo.png" alt="logo" />
+			</div>
+			<div className="login">
+				<div className="centered">
+
+					<img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
+					<FacebookButton />
+
+				</div>
+			</div>
+
+		</body>
 	);
 }
