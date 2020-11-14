@@ -1,3 +1,4 @@
+# pylint: disable=missing-function-docstring
 import datetime
 import json
 import re
@@ -46,28 +47,17 @@ class YoutubeNamespace(flask_socketio.Namespace):
             self.flaskserver.socketio.emit('unverified_user')
         else:
             self.flaskserver.socketio.emit('verified_user')
-        
             user = self.flaskserver.create_user_from_request(flask.request)
             self.flaskserver.db.session.add(user)
-        
             user.name = data['response']['name']
-            # user.email = data['response']['email']
             user.image_url = data['response']['picture']['data']['url']
             user.settings = None
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
-        
             self.flaskserver.db.session.add(user)
             self.flaskserver.db.session.commit()
 
-    def new_user_handler(self, data):
-        # db.session.add(tables.Users(data['username'], data['password']))
-        # db.session.commit()
-        self.flaskserver.socketio.emit('new_user_recieved')
-
-    # TODO - GET ACCESSS TOKEN FROM USER
-
-    def handle_user_status(self, data):
+    # def handle_user_status(self, data):
         # TODO
         # for user in db.session.query(tables.Users).all():
         #     if user.username == data['username'] and user.password == data['password']:
@@ -86,7 +76,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         #             newUserHandler(data)
         #             socketio.emit('existing_user',  { 'status' : True })
         #             break
-        self.flaskserver.db.session.commit()
+        # self.flaskserver.db.session.commit()
 
     def on_chat_loaded(self):
         print('\n\n\nCHAT_LOADED\n\n\n')
@@ -99,27 +89,21 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def on_message_send(self, data):
         user_request = flask.request
-        
-        user_from_request = self.flaskserver.get_user_by_request(user_request)
+        user_from_request = \
+        self.flaskserver.get_user_by_request(user_request)
         self.flaskserver.db.session.add(user_from_request)
         user_oauth_id = user_from_request.oauth_id
-        
         text = data['text']
-        message_id = random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
+        message_id = \
+        random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
         user_id = user_oauth_id
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = \
+        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         room_id = 'room_id_here' # TODO use actual room id
-        
-        print('\nAdding message to database:')
-        print('messageId:%s' % message_id)
-        print('text: %s' % text)
-        print('timestamp: %s' % timestamp)
-        print('roomId: %s' % room_id)
-        print('userId: %s\n' % user_id)
-        
-        message_to_add = Message(message_id, text, timestamp, room_id, user_id)
+        message_to_add = \
+        Message(message_id, text, timestamp, room_id, user_id)
         return self.add_to_db(message_to_add)
-    
+
     def on_yt_load(self, data):
         url = data.get('url')
         if url is None:

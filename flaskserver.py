@@ -14,7 +14,6 @@ class FlaskServer:
     def __init__(self, app, db):
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
-        
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
 
@@ -37,20 +36,20 @@ class FlaskServer:
     def index(self):
         return flask.render_template('index.html')
 
-    def emit_all_messages(self, channel):
+    def emit_all_messages(self):
         all_users = self.db.session.query(User).all()
         all_messages = [
-            (db_message.id, db_message.text, str(db_message.timestamp), db_message.user_id, self.get_facebook_tuple(db_message.user_id, all_users))
+            (db_message.id, db_message.text, str(db_message.timestamp), \
+            db_message.user_id, self.get_facebook_tuple(db_message.user_id, all_users))
             for db_message in self.db.session.query(Message).all()
         ]
         self.socketio.emit(MESSAGES_EMIT_CHANNEL, all_messages)
-        
+
     def get_facebook_tuple(self, user_id, all_users):
         for fb_user in all_users:
             if fb_user.oauth_id == str(user_id):
                 return (fb_user.name, fb_user.image_url)
-    
-    
+
     def create_user_from_request(self, request):
         user = User.from_request(request)
         self.users[user.id] = user
