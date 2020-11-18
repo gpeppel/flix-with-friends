@@ -48,10 +48,10 @@ class ChatTest(unittest.TestCase):
         user = self.flaskserver.create_user_from_request(mock_req)
 
         with mock.patch('flask.request', mock_req):
-            with mock.patch('socketns.youtube.YoutubeNamespace.add_to_db', self.mocked_db_add):
+            with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
                 for test in self.success_tests:
                     mocked_id_generator.return_value = 1
-                    response = self.flaskserver.youtube_ns.on_message_send(
+                    response = self.flaskserver.chat_ns.on_message_send(
                         test[INPUT_MESSAGE])
                     expected = test[MESSAGE_EXPECTED]
 

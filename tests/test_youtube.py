@@ -188,7 +188,7 @@ class YoutubeTest(unittest.TestCase):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.youtube_ns.connect_user(mock_req)
+            self.flaskserver.base_ns.connect_user(mock_req)
             emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():
@@ -215,13 +215,13 @@ class YoutubeTest(unittest.TestCase):
 
                     self.assertEqual(emit['args'][0][key], out_val)
 
-            self.flaskserver.youtube_ns.disconnect_user(mock_req)
+            self.flaskserver.base_ns.disconnect_user(mock_req)
 
     def test_handle_yt_state_change_fail(self):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.youtube_ns.connect_user(mock_req)
+            self.flaskserver.base_ns.connect_user(mock_req)
             emit_list.clear()
 
             for name in YT_STATE_NAMES_INVALID:
@@ -231,4 +231,4 @@ class YoutubeTest(unittest.TestCase):
 
                 self.assertTrue(len(emit_list) == 0)
 
-            self.flaskserver.youtube_ns.disconnect_user(mock_req)
+            self.flaskserver.base_ns.disconnect_user(mock_req)
