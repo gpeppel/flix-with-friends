@@ -125,7 +125,7 @@ export function YoutubeContainer()
 			if(Object.keys(sphereProp).length == 0)
 				return requestAnimationFrame(update);
 
-			if(updateCounter++ == 4)
+			//if(updateCounter++ == 4)
 			{
 				//console.log(sphereProp);
 				Socket.emit('yt_sphereupdate', {
