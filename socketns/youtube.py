@@ -58,19 +58,11 @@ class YoutubeNamespace(flask_socketio.Namespace):
             ).decode("ascii")
         )
 
-        def getval(key, fnc_chk, fnc_fix, default=None):
-            val = data.get(key, default)
-            if not fnc_chk(val):
-                try:
-                    val = fnc_fix(val)
-                except Exception:
-                    val = default
-            return val
-
-        offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
-        rate = getval('rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
-        run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
-        timestamp = getval(
+        offset = self.getval(data, 'offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
+        rate = self.getval(data, 'rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
+        run_at = self.getval(data, 'runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
+        timestamp = self.getval(
+            data,
             'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
@@ -105,27 +97,19 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_sphereupdate(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
 
-        def getval(key, fnc_chk, fnc_fix, default=None):
-            obj = data
-            spl = key.split('.')
-            for i in range(0, len(spl) - 1):
-                obj = obj[spl[i]]
-
-            val = obj.get(spl[-1], default)
-            if not fnc_chk(val):
-                try:
-                    val = fnc_fix(val)
-                except Exception:
-                    val = default
-            return val
-
         def clamp(n, minval, maxval):
             return max(min(n, maxval), minval)
 
-        yaw = getval('properties.yaw', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        pitch = getval('properties.pitch', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        roll = getval('properties.roll', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        fov = getval('properties.fov', lambda x: isinstance(x, float) and x >= 30 and x <= 120, lambda x: clamp(float(x)), 100)
+        yaw = self.getval(data, 'properties.yaw', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        pitch = self.getval(data, 'properties.pitch', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        roll = self.getval(data, 'properties.roll', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        fov = self.getval(
+            data,
+            'properties.fov',
+            lambda x: isinstance(x, float) and x >= 30 and x <= 120,
+            lambda x: clamp(float(x)),
+            100
+        )
 
         self.flaskserver.socketio.emit('yt_sphereupdate', {
             'properties': {
@@ -135,6 +119,22 @@ class YoutubeNamespace(flask_socketio.Namespace):
                 'fov': fov
             }
         }, include_self=False)
+
+    def getval(self, data, key, fnc_chk, fnc_fix, default=None):
+        obj = data
+        spl = key.split('.')
+        for i in range(0, len(spl) - 1):
+            if spl[i] not in obj:
+                return default
+            obj = obj[spl[i]]
+
+        val = obj.get(spl[-1], default)
+        if not fnc_chk(val):
+            try:
+                val = fnc_fix(val)
+            except Exception:
+                val = default
+        return val
 
     def unix_timestamp(self, timestamp=None):
         if timestamp is None:
