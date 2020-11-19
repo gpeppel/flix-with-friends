@@ -1,30 +1,40 @@
 import os
+import sys
 
 import flask
 
 import sqldb
 
+
 db = sqldb.SQLAlchemy()
 
 
-def create_flask_server(dbobj):
+def create_flask_server(db_obj, db_uri=None):
     from flaskserver import FlaskServer
 
     app = flask.Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = sqldb.get_database_uri()
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    if db_uri is None:
+        db_uri = sqldb.get_database_uri()
 
-    dbobj.app = app
-    dbobj.init_app(app)
+    if db_uri is not None:
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    return FlaskServer(app, dbobj)
+        db_obj.init_app(app)
+    else:
+        db_obj = None
+
+    return FlaskServer(app, db_obj)
 
 
 if __name__ == '__main__':
     flaskserver = create_flask_server(db)
 
-    db.create_all()
-    db.session.commit()
+    if flaskserver.db_enabled():
+        flaskserver.db.create_all()
+        flaskserver.db.session.commit()
+    else:
+        print('WARNING: database not connected!', file=sys.stderr)
 
     flaskserver.run(
         os.environ.get('IP', '0.0.0.0'),
