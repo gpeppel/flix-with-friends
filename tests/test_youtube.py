@@ -213,7 +213,10 @@ class YoutubeTest(unittest.TestCase):
                     if isinstance(out_val, str) and out_val.startswith('eval:'):
                         out_val = eval(out_val[len('eval:'):])
 
-                    self.assertEqual(emit['args'][0][key], out_val)
+                    if key == 'timestamp':
+                        self.assertTrue(int(out_val) - emit['args'][0][key] < 5)
+                    else:
+                        self.assertEqual(emit['args'][0][key], out_val)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
 

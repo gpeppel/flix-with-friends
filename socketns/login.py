@@ -7,7 +7,7 @@ class LoginNamespace(flask_socketio.Namespace):
         super().__init__(namespace)
         self.namespace = namespace
         self.flaskserver = server
-        
+
     def on_new_temp_user(self, data):
         # db.session.add(tables.Users(data['name'], data['email'], data['username']))
         # db.session.commit()
@@ -23,14 +23,13 @@ class LoginNamespace(flask_socketio.Namespace):
 
             if self.flaskserver.db_enabled():
                 self.flaskserver.db.session.add(user)
+                self.flaskserver.db.session.commit()
 
             user.name = data['response']['name']
             user.image_url = data['response']['picture']['data']['url']
             user.settings = None
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
-            self.flaskserver.db.session.add(user)
-            self.flaskserver.db.session.commit()
 
     # def handle_user_status(self, data):
         # TODO

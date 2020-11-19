@@ -20,7 +20,6 @@ def create_flask_server(db_obj, db_uri=None):
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-        db_obj.app = app
         db_obj.init_app(app)
     else:
         db_obj = None
