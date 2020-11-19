@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Socket } from './Socket';
 
 import YoutubePlayer from './youtube/youtube-player.js';
+import Lerp from './youtube/lerp.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
