@@ -105,10 +105,24 @@ export function YoutubeContainer()
 			}, interval - ((new Date()).getTime() % interval));
 		}
 
+		let updateCounter = 0;
+
 		function update()
 		{
-			ytPlayerRef.current.player.getSphericalProperties();
-			requestAnimationFrame(update);
+			let sphereProp = ytPlayerRef.current.player.getSphericalProperties();
+			if(sphereProp === undefined)
+				return requestAnimationFrame(update);
+
+			if(Object.keys(sphereProp).length == 0)
+				return requestAnimationFrame(update);
+
+			if(updateCounter++ == 4)
+			{
+				console.log(sphereProp);
+				updateCounter = 0;
+			}
+
+			return requestAnimationFrame(update);
 		}
 
 		update();
