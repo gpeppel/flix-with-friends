@@ -7,12 +7,12 @@ export default class Lerp
 
 	static floatAngle(a, b, t)
 	{
-		let theta = b - a;
+		const theta = b - a;
 		if(theta > 180)
 		{
 			a += 360;
-		}else
-		if(theta < -180)
+		}
+		else if(theta < -180)
 		{
 			a -= 360;
 		}

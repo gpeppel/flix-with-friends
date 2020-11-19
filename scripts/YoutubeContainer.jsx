@@ -87,11 +87,47 @@ export function YoutubeContainer()
 		});
 
 		let passive = false;
+		let lastRotation = undefined;
+		let lastFrame = undefined;
 
-		Socket.on('yt_sphereupdate', (data) => {
+		function lerp(timestamp)
+		{
+			if(lastRotation === undefined)
+			{
+				lastFrame = timestamp;
+				requestAnimationFrame(lerp);
+				return;
+			}
+
+			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
+			const [yaw, pitch, roll] = Lerp.rotation(
+				sphereProp.yaw,
+				sphereProp.pitch,
+				sphereProp.roll,
+				lastRotation.yaw,
+				lastRotation.pitch,
+				lastRotation.roll,
+				(timestamp - lastFrame) / 1000 * 5
+			);
+
+			ytPlayerRef.current.player.setSphericalProperties({
+				yaw: yaw,
+				pitch: pitch,
+				roll: roll
+			});
+
+			lastFrame = timestamp;
+			requestAnimationFrame(lerp);
+		}
+		lerp();
+
+		Socket.on('yt_sphereupdate', (data) =>
+		{
 			//console.log(data);
 			passive = true;
-			ytPlayerRef.current.player.setSphericalProperties(data.properties);
+			lastRotation = data.properties;
+
+			//ytPlayerRef.current.player.setSphericalProperties(data.properties);
 		});
 
 		function timeoutLoop(interval)
@@ -119,14 +155,14 @@ export function YoutubeContainer()
 			if(passive)
 				return;
 
-			let sphereProp = ytPlayerRef.current.player.getSphericalProperties();
+			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
 			if(sphereProp === undefined)
 				return requestAnimationFrame(update);
 
 			if(Object.keys(sphereProp).length == 0)
 				return requestAnimationFrame(update);
 
-			//if(updateCounter++ == 4)
+			if(updateCounter++ == 6)
 			{
 				//console.log(sphereProp);
 				Socket.emit('yt_sphereupdate', {
