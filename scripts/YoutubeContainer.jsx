@@ -105,6 +105,14 @@ export function YoutubeContainer()
 			}, interval - ((new Date()).getTime() % interval));
 		}
 
+		function update()
+		{
+			ytPlayerRef.current.player.getSphericalProperties();
+			requestAnimationFrame(update);
+		}
+
+		update();
+
 		timeoutLoop(5000);
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
