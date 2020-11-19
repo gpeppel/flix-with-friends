@@ -105,10 +105,35 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_sphereupdate(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
 
-        print('sphereupdate')
+        def getval(key, fnc_chk, fnc_fix, default=None):
+            obj = data
+            spl = key.split('.')
+            for i in range(0, len(spl) - 1):
+                obj = obj[spl[i]]
+
+            val = obj.get(spl[-1], default)
+            if not fnc_chk(val):
+                try:
+                    val = fnc_fix(val)
+                except Exception:
+                    val = default
+            return val
+
+        def clamp(n, minval, maxval):
+            return max(min(n, maxval), minval)
+
+        yaw = getval('properties.yaw', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        pitch = getval('properties.pitch', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        roll = getval('properties.roll', lambda x: isinstance(x, float), lambda x: float(x), 0)
+        fov = getval('properties.fov', lambda x: isinstance(x, float) and x >= 30 and x <= 120, lambda x: clamp(float(x)), 100)
 
         self.flaskserver.socketio.emit('yt_sphereupdate', {
-            'properties': data['properties']
+            'properties': {
+                'yaw': yaw,
+                'pitch': pitch,
+                'roll': roll,
+                'fov': fov
+            }
         }, include_self=False)
 
     def unix_timestamp(self, timestamp=None):
