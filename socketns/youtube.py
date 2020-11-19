@@ -1,15 +1,9 @@
-# pylint: disable=missing-function-docstring
 import datetime
 import json
 import re
-import random
-import sys
 
 import flask
 import flask_socketio
-
-import flaskserver
-from db_models.message import Message
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -21,97 +15,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
         super().__init__(namespace)
         self.namespace = namespace
         self.flaskserver = server
-
-    def on_connect(self):
-        self.connect_user(flask.request)
-
-    def connect_user(self, request):
-        self.flaskserver.create_user_from_request(request)
-        self.flaskserver.emit_all_messages()
-
-    def on_disconnect(self):
-        self.disconnect_user(flask.request)
-
-    def disconnect_user(self, request):
-        user = self.flaskserver.get_user_by_request(request)
-        self.flaskserver.delete_user(user)
-
-    def on_new_temp_user(self, data):
-        # db.session.add(tables.Users(data['name'], data['email'], data['username']))
-        # db.session.commit()
-        print("Got an event for new temp user input with data:", data)
-
-    def on_new_facebook_user(self, data):
-        key = 'status'
-        if key in data['response'].keys():
-            self.flaskserver.socketio.emit('unverified_user')
-        else:
-            self.flaskserver.socketio.emit('verified_user')
-            user = self.flaskserver.create_user_from_request(flask.request)
-
-            if self.flaskserver.db_enabled():
-                self.flaskserver.db.session.add(user)
-
-            user.name = data['response']['name']
-            user.image_url = data['response']['picture']['data']['url']
-            user.settings = None
-            user.oauth_id = data['response']['id']
-            user.oauth_type = 'FACEBOOK'
-            self.flaskserver.db.session.add(user)
-            self.flaskserver.db.session.commit()
-
-    # def handle_user_status(self, data):
-        # TODO
-        # for user in db.session.query(tables.Users).all():
-        #     if user.username == data['username'] and user.password == data['password']:
-        #         print('existing_user')
-        #         socketio.emit('existing_user', {'status' : True , 'username': data['username']} )
-        #         socketio.emit
-        #         db.session.commit()
-        #         break
-        #     else:
-        #         if user.username == data['username'] and user.password != data['password']:
-        #             print('wrong_password')
-        #             socketio.emit('wrong_password', { 'status' : False })
-        #             break
-        #         if user.username != data['username'] and user.password != data['password']:
-        #             print('new_user')
-        #             newUserHandler(data)
-        #             socketio.emit('existing_user',  { 'status' : True })
-        #             break
-        # self.flaskserver.db.session.commit()
-
-    def on_chat_loaded(self):
-        print('\n\n\nCHAT_LOADED\n\n\n')
-        self.flaskserver.emit_all_messages()
-
-    def add_to_db(self, message_to_add):
-        if not self.flaskserver.db_enabled():
-            return
-
-        self.flaskserver.db.session.add(message_to_add)
-        self.flaskserver.db.session.commit()
-        self.flaskserver.emit_all_messages()
-
-    def on_message_send(self, data):
-        user_request = flask.request
-        user_from_request = \
-        self.flaskserver.get_user_by_request(user_request)
-
-        if self.flaskserver.db_enabled():
-            self.flaskserver.db.session.add(user_from_request)
-
-        user_oauth_id = user_from_request.oauth_id
-        text = data['text']
-        message_id = \
-        random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
-        user_id = user_oauth_id
-        timestamp = \
-        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        room_id = 'room_id_here' # TODO use actual room id
-        message_to_add = \
-        Message(message_id, text, timestamp, room_id, user_id)
-        return self.add_to_db(message_to_add)
 
     def on_yt_load(self, data):
         self.handle_yt_load(flask.request, data)
@@ -151,7 +54,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
         print(
             json.dumps(data).encode(
-                "ascii", errors="backslashreplace").decode("ascii")
+                "ascii", errors="backslashreplace"
+            ).decode("ascii")
         )
 
         def getval(key, fnc_chk, fnc_fix, default=None):
