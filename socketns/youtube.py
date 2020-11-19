@@ -99,6 +99,18 @@ class YoutubeNamespace(flask_socketio.Namespace):
             'timestamp': timestamp
         }, include_self=False)
 
+    def on_yt_sphereupdate(self, data):
+        self.handle_yt_sphereupdate(flask.request, data)
+
+    def handle_yt_sphereupdate(self, request, data):
+        user = self.flaskserver.get_user_by_request(request)
+
+        print('sphereupdate')
+
+        self.flaskserver.socketio.emit('yt_sphereupdate', {
+            'properties': data['properties']
+        }, include_self=False)
+
     def unix_timestamp(self, timestamp=None):
         if timestamp is None:
             timestamp = datetime.datetime.utcnow()

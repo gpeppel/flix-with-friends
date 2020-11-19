@@ -66,8 +66,6 @@ export function YoutubeContainer()
 				case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
 					ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
 					break;
-				case 'sync':
-					break;
 				}
 			}
 
@@ -85,6 +83,14 @@ export function YoutubeContainer()
 				doState(data);
 			}
 			*/
+		});
+
+		let passive = false;
+
+		Socket.on('yt_sphereupdate', (data) => {
+			//console.log(data);
+			passive = true;
+			ytPlayerRef.current.player.setSphericalProperties(data.properties);
 		});
 
 		function timeoutLoop(interval)
@@ -109,6 +115,9 @@ export function YoutubeContainer()
 
 		function update()
 		{
+			if(passive)
+				return;
+
 			let sphereProp = ytPlayerRef.current.player.getSphericalProperties();
 			if(sphereProp === undefined)
 				return requestAnimationFrame(update);
@@ -118,7 +127,10 @@ export function YoutubeContainer()
 
 			if(updateCounter++ == 4)
 			{
-				console.log(sphereProp);
+				//console.log(sphereProp);
+				Socket.emit('yt_sphereupdate', {
+					'properties': sphereProp
+				});
 				updateCounter = 0;
 			}
 
