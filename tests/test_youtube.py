@@ -3,7 +3,7 @@ import unittest
 
 import app
 import tests.helpers as helpers
-from tests.helpers import MockRequest, hookSocketEmit
+from tests.helpers import MockRequest, hook_socket_emit
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -34,6 +34,112 @@ YOUTUBE_VIDEO_IDS = [
     }
 ]
 
+INPUT = 'input'
+OUTPUT = 'output'
+
+YT_STATE_NAMES_VALID = [
+    'ready',
+    'rEaDy',
+    'unstarted',
+    'ended',
+    'playing',
+    'paused',
+    'buffering',
+    'cued',
+    'playback'
+]
+
+YT_STATE_NAMES_INVALID = [
+    'invalid'
+]
+
+YT_STATE_CHANGES = {
+    'offset': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'rate': [
+        {
+            INPUT: None,
+            OUTPUT: 1
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 1
+        },
+        {
+            INPUT: 0.5,
+            OUTPUT: 0.5
+        },
+        {
+            INPUT: 2,
+            OUTPUT: 2
+        },
+    ],
+    'runAt': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -5,
+            OUTPUT: -5
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        },
+    ],
+    'timestamp': [
+        {
+            INPUT: None,
+            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+        },
+        {
+            INPUT: 100,
+            OUTPUT: 100
+        },
+    ]
+}
+
 
 class YoutubeTest(unittest.TestCase):
     @classmethod
@@ -43,21 +149,89 @@ class YoutubeTest(unittest.TestCase):
     def test_get_youtube_video_id(self):
         for vobj in YOUTUBE_VIDEO_IDS:
             self.assertEqual(
-                self.flaskserver.youtube_ns.get_youtube_video_id(vobj[URL]), vobj[ID])
+                self.flaskserver.youtube_ns.get_youtube_video_id(vobj[URL]),
+                vobj[ID]
+            )
 
-    def test_handle_yt_state_change(self):
-        test_data = {
-            'state': 'unstarted'
-        }
+    def test_handle_yt_load(self):
+        mock_req = MockRequest(TEST_SID)
+
+        with hook_socket_emit() as emit_list:
+            self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
+
+            self.assertTrue(len(emit_list) == 0)
+
+            for vobj in YOUTUBE_VIDEO_IDS:
+                self.flaskserver.youtube_ns.handle_yt_load(mock_req, {
+                    'url': vobj[URL]
+                })
+
+                if len(emit_list) == 0:
+                    self.assertIsNone(vobj[ID])
+                    continue
+
+                emit = emit_list.pop()
+
+                self.assertEqual(emit['event'], 'yt_load')
+                self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
+
+    def test_handle_yt_state_change_success(self):
+        def get_state_template():
+            return {
+                'state': 'ready',
+                'offset': 0,
+                'rate': 1,
+                'runAt': 0,
+                'timestamp': 0
+            }
 
         mock_req = MockRequest(TEST_SID)
 
-        with hookSocketEmit() as emitList:
-            self.flaskserver.youtube_ns.connect_user(mock_req)
-            self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, test_data)
+        with hook_socket_emit() as emit_list:
+            self.flaskserver.base_ns.connect_user(mock_req)
+            emit_list.clear()
 
-            print(emitList)
+            for key, value_list in YT_STATE_CHANGES.items():
+                state = get_state_template()
 
-            # TODO
+                for val in value_list:
+                    in_val = val[INPUT]
+                    out_val = val[OUTPUT]
 
-            self.flaskserver.youtube_ns.disconnect_user(mock_req)
+                    if in_val is None:
+                        if key in state:
+                            del state[key]
+                    else:
+                        state[key] = in_val
+
+                    self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
+
+                    emit = emit_list.pop()
+
+                    self.assertEqual(emit['event'], 'yt_state_change')
+
+                    if isinstance(out_val, str) and out_val.startswith('eval:'):
+                        out_val = eval(out_val[len('eval:'):])
+
+                    if key == 'timestamp':
+                        self.assertTrue(int(out_val) - emit['args'][0][key] < 5)
+                    else:
+                        self.assertEqual(emit['args'][0][key], out_val)
+
+            self.flaskserver.base_ns.disconnect_user(mock_req)
+
+    def test_handle_yt_state_change_fail(self):
+        mock_req = MockRequest(TEST_SID)
+
+        with hook_socket_emit() as emit_list:
+            self.flaskserver.base_ns.connect_user(mock_req)
+            emit_list.clear()
+
+            for name in YT_STATE_NAMES_INVALID:
+                self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, {
+                    'state': name
+                })
+
+                self.assertTrue(len(emit_list) == 0)
+
+            self.flaskserver.base_ns.disconnect_user(mock_req)

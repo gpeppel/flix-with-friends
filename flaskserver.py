@@ -5,6 +5,10 @@ from db_models.message import Message
 from db_models.room import Room
 from db_models.user import User
 
+import socketns
+import socketns.base
+import socketns.chat
+import socketns.login
 import socketns.youtube
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
@@ -19,8 +23,17 @@ class FlaskServer:
 
         self.db = db
 
+        self.base_ns = socketns.base.BaseNamespace('/', self)
+        self.chat_ns = socketns.chat.ChatNamespace('/', self)
         self.youtube_ns = socketns.youtube.YoutubeNamespace('/', self)
-        self.socketio.on_namespace(self.youtube_ns)
+        self.login_ns = socketns.login.LoginNamespace('/', self)
+
+        self.socketio.on_namespace(socketns.CustomCombinedNamespace('/', self, [
+            self.base_ns,
+            self.chat_ns,
+            self.youtube_ns,
+            self.login_ns
+        ]))
 
         self.rooms = {}
         self.users = {}
@@ -37,6 +50,9 @@ class FlaskServer:
         return flask.render_template('index.html')
 
     def emit_all_messages(self):
+        if not self.db_enabled():
+            return
+
         all_users = self.db.session.query(User).all()
         all_messages = [
             (db_message.id, db_message.text, str(db_message.timestamp), \
@@ -73,3 +89,6 @@ class FlaskServer:
             room.remove_user(user)
 
         del self.rooms[room.id]
+
+    def db_enabled(self):
+        return self.db is not None
