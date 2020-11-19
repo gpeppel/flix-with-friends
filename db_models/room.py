@@ -1,8 +1,11 @@
 # pylint: disable=missing-function-docstring
 import random
-
+from app import db
 
 class Room:
+    id = db.Column(db.BigInteger, primary_key=True)
+    text = db.Column(db.String(280))
+    
     def __init__(self, room_id=None):
         self.id = room_id
         if self.id is None:
