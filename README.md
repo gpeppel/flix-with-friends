@@ -1,7 +1,8 @@
-# Heroku Link:
-[Flix With Friends](https://flix-with-friends.herokuapp.com/)
 # Flix With Friends
 ![travis build](https://travis-ci.com/gpeppel/flix-with-friends.svg?token=yKryxn23AXzDQ7RBndwC&branch=master)
+
+### Heroku Link:
+[Flix With Friends](https://flix-with-friends.herokuapp.com/)
 
 Watch videos with friends at the same time remotely!
 
@@ -53,8 +54,9 @@ Run code:
 ---
 
 # Socketio Events
-### message-new
+### message_new
 *Server-to-Client*
+
 Send new chat messages to clients
 
 Data:
@@ -74,7 +76,7 @@ Data:
 }
 ```
 ---
-### message-send
+### message_send
 *Client-to-Server*
 
 Send a message to the server
@@ -86,7 +88,7 @@ Data:
 }
 ```
 ---
-### user-oauth-login-facebook
+### login_oauth_facebook
 *Client-to-Server*
 
 Login request
@@ -106,7 +108,7 @@ Callback data:
 }
 ```
 ---
-### user-oauth-login-google
+### login_oauth_google
 *Client-to-Server*
 
 Login request
@@ -127,7 +129,7 @@ Callback data:
 }
 ```
 ---
-### user-join
+### user_join
 *Server-to-Client*
 
 New user has joined the room
@@ -142,7 +144,7 @@ Data:
 }
 ```
 ---
-### user-leave
+### user_leave
 *Server-to-Client*
 
 User has left the room
@@ -157,7 +159,7 @@ Data:
 }
 ```
 ---
-### yt-load
+### yt_load
 *Client-to-Server, Server-to-Client*
 
 Load the video info
@@ -172,7 +174,24 @@ Data:
 }
 ```
 ---
-### yt-state-change
+### yt_sphere_update
+*Client-to-Server, Server-to-Client*
+
+Sync the 360 degree video view
+
+Data:
+```
+{
+	"properties": {
+		"yaw": float,
+		"pitch": float,
+		"roll": float,
+		"fov": float
+	}
+}
+```
+---
+### yt_state_change
 *Client-to-Server, Server-to-Client*
 
 Change the video state
