@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 1. Install PostgreSQL:
 ```bash
-sudo yum install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
+sudo apt install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
 ```
 2. Set up PostgreSQL:
 ```bash
@@ -36,14 +36,14 @@ sudo service postgresql start
 sudo -u postgres createuser --superuser <username>
 sudo -u postgres createdb <db name>
 ```
-n a terminal, run `psql` and use these commands (replace username and password):
+In a terminal, run `psql` and use these commands (replace username and password):
 ```
 create user <username> superuser password '<password>';
 \q
 ```
 Create `sql.env` and put the username and password set above.
 ```bash
-DATABASE_URI='postgresql://<username>:<password>@localhost/<db name>'
+DATABASE_URL='postgresql://<username>:<password>@localhost/<db name>'
 ```
 
 ---
@@ -53,7 +53,7 @@ Run code:
 
 ---
 
-# Socketio Events
+# Socket.io Events
 ### message_new
 *Server-to-Client*
 
