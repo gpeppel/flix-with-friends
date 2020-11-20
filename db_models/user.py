@@ -24,3 +24,20 @@ class User:
     def from_request(req):
         user = User(None, sid=req.sid)
         return user
+
+    @staticmethod
+    def create_table(cur):
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS account (
+                user_id BIGSERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                password TEXT,
+                email TEXT,
+                profile_url TEXT,
+                settings TEXT,
+                oauth_id TEXT,
+                oauth_type TEXT,
+                UNIQUE(username),
+                UNIQUE(email)
+            );
+        """)

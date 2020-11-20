@@ -4,6 +4,7 @@ import sys
 import flask
 from dotenv import load_dotenv
 
+import db_models
 from flaskserver import FlaskServer
 from sqldb import SqlDb
 
@@ -25,9 +26,10 @@ if __name__ == '__main__':
     flaskserver = create_flask_server(db)
 
     if flaskserver.db_connected():
-        #flaskserver.db.create_all()
-        #flaskserver.db.session.commit()
-        pass
+        cur = flaskserver.db.cursor()
+        db_models.create_tables(cur)
+        flaskserver.db.commit()
+        cur.close()
     else:
         print('WARNING: database not connected!', file=sys.stderr)
 

@@ -50,3 +50,13 @@ class Room:
         for _ in range(length):
             room_id += charset[random.randint(0, len(charset) - 1)]
         return room_id
+
+    @staticmethod
+    def create_table(cur):
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS room (
+                room_id TEXT PRIMARY KEY,
+                name TEXT,
+                settings TEXT
+            );
+        """)
