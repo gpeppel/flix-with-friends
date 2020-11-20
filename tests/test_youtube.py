@@ -140,6 +140,61 @@ YT_STATE_CHANGES = {
     ]
 }
 
+YT_SPHERE_UPDATES = {
+    'angle': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -6,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'fov': [
+        {
+            INPUT: None,
+            OUTPUT: 100
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 30
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 100
+        },
+        {
+            INPUT: 100,
+            OUTPUT: 100
+        },
+        {
+            INPUT: 80.5421,
+            OUTPUT: 80.5421
+        },
+        {
+            INPUT: 150,
+            OUTPUT: 120
+        },
+    ]
+}
+
 
 class YoutubeTest(unittest.TestCase):
     @classmethod
@@ -233,5 +288,65 @@ class YoutubeTest(unittest.TestCase):
                 })
 
                 self.assertTrue(len(emit_list) == 0)
+
+            self.flaskserver.base_ns.disconnect_user(mock_req)
+
+    def test_handle_yt_sphere_update(self):
+        def get_sphere_update_template():
+            return {
+                'properties': {
+                    'yaw': 0,
+                    'pitch': 0,
+                    'roll': 0,
+                    'fov': 100
+                }
+            }
+
+        mock_req = MockRequest(TEST_SID)
+
+        with hook_socket_emit() as emit_list:
+            self.flaskserver.base_ns.connect_user(mock_req)
+            emit_list.clear()
+
+            for key, value_list in YT_SPHERE_UPDATES.items():
+                state = get_sphere_update_template()
+
+                for val in value_list:
+                    in_val = val[INPUT]
+                    out_val = val[OUTPUT]
+
+                    if in_val is None:
+                        if key == 'angle':
+                            if 'yaw' in state:
+                                del state['properties']['yaw']
+                            if 'pitch' in state:
+                                del state['properties']['pitch']
+                            if 'roll' in state:
+                                del state['properties']['roll']
+                        else:
+                            if key in state:
+                                del state['properties'][key]
+                    else:
+                        if key == 'angle':
+                            state['properties']['yaw'] = in_val
+                            state['properties']['pitch'] = in_val
+                            state['properties']['roll'] = in_val
+                        else:
+                            state['properties'][key] = in_val
+
+                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, state)
+
+                    emit = emit_list.pop()
+
+                    self.assertEqual(emit['event'], 'yt_sphere_update')
+
+                    print(emit['args'])
+
+                    if key == 'angle':
+                        self.assertEqual(emit['args'][0]['properties']['yaw'], out_val)
+                        self.assertEqual(emit['args'][0]['properties']['pitch'], out_val)
+                        self.assertEqual(emit['args'][0]['properties']['roll'], out_val)
+                    else:
+                        self.assertEqual(emit['args'][0]['properties'][key], out_val)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)

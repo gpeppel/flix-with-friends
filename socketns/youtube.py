@@ -112,18 +112,18 @@ class YoutubeNamespace(flask_socketio.Namespace):
             return max(min(val, maxval), minval)
 
         yaw = self.getval(data, 'properties.yaw',
-            lambda x: isinstance(x, float),
-            lambda x: float(x),
+            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: clamp(float(x), 0, 360),
             0
         )
         pitch = self.getval(data, 'properties.pitch',
-            lambda x: isinstance(x, float),
-            lambda x: float(x),
+            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: clamp(float(x), 0, 360),
             0
         )
         roll = self.getval(data, 'properties.roll',
-            lambda x: isinstance(x, float),
-            lambda x: float(x),
+            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: clamp(float(x), 0, 360),
             0
         )
         fov = self.getval(data, 'properties.fov',
