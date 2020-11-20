@@ -57,7 +57,7 @@ Run code:
 ### message_new
 *Server-to-Client*
 
-Send new chat messages to clients
+Send new chat messages to clients.
 
 Data:
 ```
@@ -79,7 +79,7 @@ Data:
 ### message_send
 *Client-to-Server*
 
-Send a message to the server
+Send a message to the server.
 
 Data:
 ```
@@ -91,19 +91,29 @@ Data:
 ### login_oauth_facebook
 *Client-to-Server*
 
-Login request
+Login request using Facebook OAuth.
 
 Data:
 ```
 {
-
+	"response": {
+		"accessToken": string,
+		"name": string,
+		"email": string,
+		"picture": {
+			"data": {
+				"url": string
+			}
+		},
+		"id": int
+	}
 }
 ```
 
 Callback data:
 ```
 {
-	"status": "ok" | "fail".
+	"status": "ok" | "fail",
 	"userId": string
 }
 ```
@@ -111,7 +121,7 @@ Callback data:
 ### login_oauth_google
 *Client-to-Server*
 
-Login request
+Login request using Google OAuth.
 
 Data:
 ```
@@ -129,10 +139,51 @@ Callback data:
 }
 ```
 ---
+### room_create
+*Client-to-Server*
+
+User request to create a new room.
+
+Data:
+```
+{
+	"roomName": string
+}
+```
+
+Callback data:
+```
+{
+	"status": "ok" | "fail",
+	"roomId": string,
+	"roomName": string
+}
+```
+---
+### room_join
+*Client-to-Server*
+
+User request to join an existing room.
+
+Data:
+```
+{
+	"roomId": string
+}
+```
+
+Callback data:
+```
+{
+	"status": "ok" | "fail",
+	"error": "noexist" | undefined
+}
+```
+---
 ### user_join
 *Server-to-Client*
 
-New user has joined the room
+New user has joined the room.
 
 Data:
 ```
@@ -147,7 +198,7 @@ Data:
 ### user_leave
 *Server-to-Client*
 
-User has left the room
+User has left the room.
 
 Data:
 ```
@@ -162,7 +213,7 @@ Data:
 ### yt_load
 *Client-to-Server, Server-to-Client*
 
-Load the video info
+Load the video info.
 
 Data:
 ```
@@ -177,7 +228,7 @@ Data:
 ### yt_sphere_update
 *Client-to-Server, Server-to-Client*
 
-Sync the 360 degree video view
+Sync the 360 degree video view.
 
 Data:
 ```
@@ -194,7 +245,7 @@ Data:
 ### yt_state_change
 *Client-to-Server, Server-to-Client*
 
-Change the video state
+Change the video state.
 
 Data:
 ```

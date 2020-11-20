@@ -20,8 +20,7 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok',
             'roomId': room.room_id,
-            'roomName': data['roomName'],
-            'user': user.json()
+            'roomName': data['roomName']
         }
 
     def on_room_join(self, data):
