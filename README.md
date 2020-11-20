@@ -1,7 +1,7 @@
 # Flix With Friends
 ![travis build](https://travis-ci.com/gpeppel/flix-with-friends.svg?token=yKryxn23AXzDQ7RBndwC&branch=master)
 
-### Heroku Link:
+# Heroku Link:
 [Flix With Friends](https://flix-with-friends.herokuapp.com/)
 
 Watch videos with friends at the same time remotely!
