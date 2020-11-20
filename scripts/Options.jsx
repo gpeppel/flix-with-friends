@@ -11,19 +11,39 @@ export function Options()
 	function onRoomNewClick()
 	{
 		Socket.emit('room_create', {
-			name: 'test room'
+			roomName: 'test room'
 		}, (data) =>
 		{
 			console.log(data);
+			if(data.status == 'ok')
+			{
+				document.body.style.backgroundColor = '#00c9c8';
+				setFlag(true);
+			}
 		});
-
-		document.body.style.backgroundColor = '#00c9c8';
-		setFlag(true);
 	}
 
 	function onRoomJoinClick()
 	{
+		console.log('acb');
 
+		Socket.emit('room_join', {
+			roomId: document.getElementById('roomCode').value
+		}, (data) =>
+		{
+			console.log(data);
+			if(data.status == 'ok')
+			{
+				document.body.style.backgroundColor = '#00c9c8';
+				setFlag(true);
+			}
+		});
+	}
+
+	function onKeyUp(event)
+	{
+		if(event.key == 'Enter')
+			onRoomJoinClick();
 	}
 
 	if(userFlag)
@@ -45,8 +65,7 @@ export function Options()
 				</div>
 
 				<div>
-					<label>Room Code:</label>
-					<input />
+					<input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code'/>
 					<button className="button" onClick={onRoomJoinClick}>Join Viewing Room</button>
 				</div>
 			</div>

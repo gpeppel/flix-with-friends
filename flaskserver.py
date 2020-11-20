@@ -98,6 +98,9 @@ class FlaskServer:
 
         del self.rooms[room.room_id]
 
+    def get_room(self, room_id):
+        return self.rooms.get(room_id)
+
     def db_connected(self):
         return self.db is not None and self.db.is_connected()
 
