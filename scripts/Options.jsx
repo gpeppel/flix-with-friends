@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Content } from './Content';
+import { Socket } from './Socket';
 import './options.css';
 
 
@@ -7,22 +8,25 @@ export function Options()
 {
 	const [userFlag, setFlag] = useState(false);
 
-	function handleSubmit(event)
+	function onRoomNewClick()
 	{
-		React.useEffect(() =>
+		Socket.emit('room_create', {
+			name: 'test room'
+		}, (data) =>
 		{
-			Socket.emit('get_room_id', (data) =>
-			{
-				// TODO may have to set message scrollbar to bottom or something later
-			});
+			console.log(data);
 		});
+
 		document.body.style.backgroundColor = '#00c9c8';
 		setFlag(true);
-		event.preventDefault();
 	}
 
+	function onRoomJoinClick()
+	{
 
-	if (userFlag)
+	}
+
+	if(userFlag)
 	{
 		return (<Content />);
 	}
@@ -36,7 +40,15 @@ export function Options()
 			<div className="centered">
 				<img className="popcorn_button" src="static/images/popcorn_button.png" alt="popcorn_button" />
 
-				<button className="button" onClick={handleSubmit}>Enter viewing room!</button>
+				<div>
+					<button className="button" onClick={onRoomNewClick}>Create New Viewing Room</button>
+				</div>
+
+				<div>
+					<label>Room Code:</label>
+					<input />
+					<button className="button" onClick={onRoomJoinClick}>Join Viewing Room</button>
+				</div>
 			</div>
 
 		</body>

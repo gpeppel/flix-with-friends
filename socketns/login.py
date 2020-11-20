@@ -14,20 +14,23 @@ class LoginNamespace(flask_socketio.Namespace):
         print("Got an event for new temp user input with data:", data)
 
     def on_new_facebook_user(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request)
+
         key = 'status'
         if key in data['response'].keys():
             self.flaskserver.socketio.emit('unverified_user')
         else:
             self.flaskserver.socketio.emit('verified_user')
-            user = self.flaskserver.create_user_from_request(flask.request)
 
-            if self.flaskserver.db_enabled():
+            """
+            if self.flaskserver.db_connected():
                 self.flaskserver.db.session.add(user)
                 self.flaskserver.db.session.commit()
+            """
 
-            user.name = data['response']['name']
-            user.image_url = data['response']['picture']['data']['url']
-            user.settings = None
+            user.user_id = 0
+            user.username = data['response']['name']
+            user.profile_url = data['response']['picture']['data']['url']
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
 

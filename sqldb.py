@@ -1,33 +1,56 @@
-import os
+import re
 
-from dotenv import load_dotenv
-import flask_sqlalchemy
-
-
-dotenv_path = os.path.join(os.path.dirname(__file__), 'sql.env')
-load_dotenv(dotenv_path)
+import psycopg2
+import psycopg2.extras
 
 
-def get_database_uri():
-    uri = os.environ.get('DATABASE_URL')
-    if uri is not None and len(uri) != 0:
-        return uri
+class SqlDb:
+    def __init__(self):
+        self.connection = None
 
-    try:
-        sql_user = os.environ['SQL_USER']
-        sql_pwd = os.environ['SQL_PASSWORD']
-        sql_db = os.environ['SQL_DATABASE']
-    except KeyError:
-        return None
+    def connect(self, dsn):
+        self.connection = psycopg2.connect(dsn)
 
-    return 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
+    def disconnect(self):
+        self.connection.close()
+        self.connection = None
 
+    def cursor(self):
+        return self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-db_singleton = None
+    def commit(self):
+        self.connection.commit()
 
-def SQLAlchemy():
-    global db_singleton
-    if db_singleton is None:
-        db_singleton = flask_sqlalchemy.SQLAlchemy()
+    def is_connected(self):
+        return self.connection is not None
 
-    return db_singleton
+    @staticmethod
+    def uri_to_dsn(uri):
+        match = re.match(
+            r'postgresql://(?:(?P<user>[^:]+)(?::(?P<password>[^@]+))?@)?(?P<host>[^/:]+)(?::(?P<port>[0-9]+))?(?:/(?P<dbname>[^?]+))?(?:\?(?P<query>.*))?',
+            uri
+        )
+        if match is None:
+            return None
+
+        groups = match.groupdict()
+
+        def sanitize(val):
+            if len(val) == 0:
+                return "''"
+
+            val = val.replace('\\', '\\\\')
+            val = val.replace("'", "\\'")
+
+            if ' ' in val:
+                return "'%s'" % val
+            return val
+
+        dsn = ""
+        for key, val in groups.items():
+            if val is None:
+                continue
+            dsn += " %s=%s" % (key, sanitize(val))
+        dsn = dsn[1:]
+
+        return dsn

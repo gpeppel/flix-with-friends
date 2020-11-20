@@ -1,28 +1,25 @@
 import * as React from 'react';
 import { Socket } from './Socket';
-import './chat.css'
+import './chat.css';
 
 
 export function Chat()
 {
 	const [messages, setMessages] = React.useState([]);
 
-	function getNewMessages()
+	React.useEffect(() =>
 	{
-		React.useEffect(() =>
+		Socket.on('messages_received', (data) =>
 		{
-			Socket.on('messages_received', (data) =>
-			{
-				console.log('Message feed updated.');
-				setMessages(data);
-                console.log(data);
-                
-                const messageBox = document.getElementById('chatBox');
-                messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;
-				// TODO may have to set message scrollbar to bottom or something later
-			});
+			console.log('Message feed updated.');
+			setMessages(data);
+			console.log(data);
+
+			const messageBox = document.getElementById('chatBox');
+			messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;
+			// TODO may have to set message scrollbar to bottom or something later
 		});
-	}
+	}, []);
 
 	function handleSubmit()
 	{
@@ -43,36 +40,17 @@ export function Chat()
 		}
 	}
 
-	function getFbName(message)
-	{
-		if (message[4] != null)
-		{
-			return message[4][0];
-		}
-	}
-
-	function getFbImageUrl(message)
-	{
-		if (message[4] != null)
-		{
-			return message[4][1];
-		}
-
-	}
-
-	getNewMessages();
-
 	return (
 		<>
 			<div id='chatBox'>
 				<ul id='messageFeed' style={{ paddingLeft: '0' }}>
 					{messages.map((message, index) => (
 						<li key={index} style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
-							<img id='profilePic' alt="Profile" src={getFbImageUrl(message)}></img>
+							<img id='profilePic' alt="Profile" src={message.profile_url}></img>
 							<span>
-                                <p id='timestamp'> ({message[2]}) </p>
-                                <p id='name'>{getFbName(message)}: </p>
-                                <p id='message'>{message[1]}</p>
+								<p id='timestamp'> ({message.timestamp}) </p>
+								<p id='name'>{message.username}: </p>
+								<p id='message'>{message.text}</p>
 								<br />
 							</span>
 						</li>
