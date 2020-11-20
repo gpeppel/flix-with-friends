@@ -145,7 +145,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def getval(self, data, key, fnc_chk, fnc_fix, default=None):
         val = utils.getval(data, key, default)
-
         if not fnc_chk(val):
             try:
                 val = fnc_fix(val)

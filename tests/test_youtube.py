@@ -140,18 +140,36 @@ YT_STATE_CHANGES = {
 }
 
 YT_SPHERE_UPDATES = {
-    'properties.yaw|properties.pitch|properties.roll': [
+    'properties.yaw|properties.roll': [
         {
             INPUT: None,
             OUTPUT: 0
         },
         {
-            INPUT: 0,
+            INPUT: -6,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'properties.pitch': [
+        {
+            INPUT: None,
             OUTPUT: 0
         },
         {
             INPUT: -6,
-            OUTPUT: 0
+            OUTPUT: -6
         },
         {
             INPUT: 6,
@@ -172,12 +190,12 @@ YT_SPHERE_UPDATES = {
             OUTPUT: 100
         },
         {
-            INPUT: 0,
-            OUTPUT: 30
-        },
-        {
             INPUT: 'asdf',
             OUTPUT: 100
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 30
         },
         {
             INPUT: 100,
@@ -300,23 +318,19 @@ class YoutubeTest(unittest.TestCase):
                     self.assertEqual(emit['event'], 'yt_sphere_update')
 
                     data = emit['args'][0]
-                    if key == 'properties.yaw|properties.pitch|properties.roll':
-                        self.assertEqual(utils.getval(data, 'properties.yaw'), outval)
-                        self.assertEqual(utils.getval(data, 'properties.pitch'), outval)
-                        self.assertEqual(utils.getval(data, 'properties.roll'), outval)
-                    else:
-                        self.assertEqual(utils.getval(data, 'properties.fov'), outval)
+                    for k in key.split('|'):
+                        self.assertEqual(utils.getval(data, k), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
 
     def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):
-            obj, s = utils.getdict(data, k)
+            obj, last = utils.getdict(data, k)
 
             if inval is None:
-                del obj[s]
+                del obj[last]
             else:
-                obj[s] = inval
+                obj[last] = inval
 
         if isinstance(outval, str) and outval.startswith('eval:'):
             return eval(outval[len('eval:'):])
