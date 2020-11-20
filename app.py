@@ -13,16 +13,10 @@ dotenv_path = os.path.join(os.path.dirname(__file__), 'sql.env')
 load_dotenv(dotenv_path)
 
 db = SqlDb()
-db.connect(SqlDb.uri_to_dsn(os.environ['DATABASE_URL']))
+if 'DATABASE_URL' in os.environ:
+    db.connect(SqlDb.uri_to_dsn(os.environ['DATABASE_URL']))
 
-def create_flask_server(db_obj):
-    return FlaskServer(
-        flask.Flask(__name__),
-        db_obj
-    )
-
-
-if __name__ == '__main__':
+def main():
     flaskserver = create_flask_server(db)
 
     if flaskserver.db_connected():
@@ -38,3 +32,12 @@ if __name__ == '__main__':
         int(os.environ.get('PORT', 8080)),
         debug=True
     )
+
+def create_flask_server(db_obj):
+    return FlaskServer(
+        flask.Flask(__name__),
+        db_obj
+    )
+
+if __name__ == '__main__':
+    main()
