@@ -173,6 +173,12 @@ export function YoutubeContainer()
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYBACK_STR);
 	}
 
+	function truncateFloat(val, places)
+	{
+		const mult = Math.pow(10, places);
+		return Math.round(val * mult) / mult;
+	}
+
 	function emitStateChange(player, state, offset, rate, timestamp)
 	{
 		offset = offset || player.getCurrentTime();
@@ -181,7 +187,7 @@ export function YoutubeContainer()
 
 		Socket.emit(EVENT_YT_STATE_CHANGE, {
 			'state': state,
-			'offset': Math.round(offset * 10000) / 10000,
+			'offset': truncateFloat(offset, 4),
 			'rate': rate,
 			'timestamp': timestamp.toString()
 		});
