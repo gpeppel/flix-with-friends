@@ -4,6 +4,7 @@ import { Socket } from './Socket';
 
 import YoutubePlayer from './youtube/youtube-player.js';
 import Lerp from './youtube/lerp.js';
+import FrameUpdate from './youtube/frame-update.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
