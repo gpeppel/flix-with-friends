@@ -9,6 +9,8 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_room_create(self, data):
+        print(data)
+
         user = self.flaskserver.get_user_by_request(flask.request)
         room = self.flaskserver.create_room()
 
@@ -18,7 +20,8 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok',
             'roomId': room.room_id,
-            'roomName': data['roomName']
+            'roomName': data['roomName'],
+            'user': user.json()
         }
 
     def on_room_join(self, data):

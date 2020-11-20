@@ -10,13 +10,15 @@ export function Login()
 
 	React.useEffect(() =>
 	{
-		Socket.on('unverified_user', () =>
+		Socket.on('unverified_user', (data) =>
 		{
+			console.log(data);
 			setFlag(false);
 		});
 
-		Socket.on('verified_user', () =>
+		Socket.on('verified_user', (data) =>
 		{
+			console.log(data);
 			setFlag(true);
 		});
 	}, []);

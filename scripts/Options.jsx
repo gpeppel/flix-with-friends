@@ -30,8 +30,6 @@ export function Options()
 
 	function onRoomJoinClick()
 	{
-		console.log('acb');
-
 		Socket.emit('room_join', {
 			roomId: document.getElementById('roomCode').value
 		}, (data) =>
