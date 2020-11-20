@@ -2,6 +2,7 @@ import unittest
 
 import app
 from tests.helpers import MockRequest, hook_socket_emit
+import utils
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -229,15 +230,6 @@ class YoutubeTest(unittest.TestCase):
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
     def test_handle_yt_state_change_success(self):
-        def get_state_template():
-            return {
-                'state': 'ready',
-                'offset': 0,
-                'rate': 1,
-                'runAt': 0,
-                'timestamp': 0
-            }
-
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
@@ -245,22 +237,25 @@ class YoutubeTest(unittest.TestCase):
             emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():
-                state = get_state_template()
+                state = {
+                    'state': 'ready',
+                    'offset': 0,
+                    'rate': 1,
+                    'runAt': 0,
+                    'timestamp': 0
+                }
 
                 for val in value_list:
-                    outvals = self.f(state, key, val[INPUT], val[OUTPUT])
-
+                    outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
                     self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
-
                     emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_state_change')
 
-                    for outval in outvals:
-                        if key == 'timestamp':
-                            self.assertTrue(int(outval) - self.getval(emit['args'][0], key) < 5)
-                        else:
-                            self.assertEqual(self.getval(emit['args'][0], key), outval)
+                    if key == 'timestamp':
+                        self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
+                    else:
+                        self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
 
@@ -281,16 +276,6 @@ class YoutubeTest(unittest.TestCase):
             self.flaskserver.base_ns.disconnect_user(mock_req)
 
     def test_handle_yt_sphere_update(self):
-        def get_sphere_update_template():
-            return {
-                'properties': {
-                    'yaw': 0,
-                    'pitch': 0,
-                    'roll': 0,
-                    'fov': 100
-                }
-            }
-
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
@@ -298,52 +283,41 @@ class YoutubeTest(unittest.TestCase):
             emit_list.clear()
 
             for key, value_list in YT_SPHERE_UPDATES.items():
-                state = get_sphere_update_template()
+                props = {
+                    'properties': {
+                        'yaw': 0,
+                        'pitch': 0,
+                        'roll': 0,
+                        'fov': 100
+                    }
+                }
 
                 for val in value_list:
-                    outvals = self.f(state, key, val[INPUT], val[OUTPUT])
-
-                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, state)
-
+                    outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
+                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, props)
                     emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_sphere_update')
 
                     data = emit['args'][0]
                     if key == 'properties.yaw|properties.pitch|properties.roll':
-                        self.assertEqual(self.getval(data, 'properties.yaw'), outvals[0])
-                        self.assertEqual(self.getval(data, 'properties.pitch'), outvals[0])
-                        self.assertEqual(self.getval(data, 'properties.roll'), outvals[0])
+                        self.assertEqual(utils.getval(data, 'properties.yaw'), outval)
+                        self.assertEqual(utils.getval(data, 'properties.pitch'), outval)
+                        self.assertEqual(utils.getval(data, 'properties.roll'), outval)
                     else:
-                        self.assertEqual(self.getval(data, 'properties.fov'), outvals[0])
+                        self.assertEqual(utils.getval(data, 'properties.fov'), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
 
-    def getval(self, data, key, default=None):
-        obj = data
-        spl = key.split('.')
-        for i in range(0, len(spl) - 1):
-            if spl[i] not in obj:
-                return default
-            obj = obj[spl[i]]
-
-        return obj.get(spl[-1], default)
-
-    def f(self, data, key, inval, outval):
-        values = []
-
+    def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):
-            obj = data
-            spl = k.split('.')
-            for i in range(0, len(spl) - 1):
-                obj = obj[spl[i]]
+            obj, s = utils.getdict(data, k)
 
             if inval is None:
-                del obj[spl[-1]]
+                del obj[s]
             else:
-                obj[spl[-1]] = inval
+                obj[s] = inval
 
-            if isinstance(outval, str) and outval.startswith('eval:'):
-                outval = eval(outval[len('eval:'):])
-            values.append(outval)
-        return values
+        if isinstance(outval, str) and outval.startswith('eval:'):
+            return eval(outval[len('eval:'):])
+        return outval

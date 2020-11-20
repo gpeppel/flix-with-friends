@@ -5,6 +5,8 @@ import re
 import flask
 import flask_socketio
 
+import utils
+
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
 EVENT_YT_LOAD = 'yt_load'
@@ -142,14 +144,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
         }, include_self=False)
 
     def getval(self, data, key, fnc_chk, fnc_fix, default=None):
-        obj = data
-        spl = key.split('.')
-        for i in range(0, len(spl) - 1):
-            if spl[i] not in obj:
-                return default
-            obj = obj[spl[i]]
+        val = utils.getval(data, key, default)
 
-        val = obj.get(spl[-1], default)
         if not fnc_chk(val):
             try:
                 val = fnc_fix(val)
