@@ -13,7 +13,7 @@ class LoginNamespace(flask_socketio.Namespace):
         # db.session.commit()
         print("Got an event for new temp user input with data:", data)
 
-    def on_new_facebook_user(self, data):
+    def on_login_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
 
         key = 'status'
