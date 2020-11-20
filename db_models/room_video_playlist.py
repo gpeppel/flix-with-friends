@@ -9,6 +9,6 @@ class RoomVideoPlaylist(db.Model):
     room_id = db.Column(db.Text)
     videos = relationship('Video') 
 
-    def init(self, playlist_id, room_id=None):
+    def __init__(self, playlist_id, room_id=None):
         self.playlist_id = playlist_id
         self.room_id = room_id

@@ -6,6 +6,7 @@ from db_models.room import Room
 from db_models.user import User
 from db_models.video import Video
 from db_models.room_video_playlist import RoomVideoPlaylist
+from db_models.room_allowed_users import RoomAllowedUsers
 
 import socketns
 import socketns.base
