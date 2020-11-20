@@ -122,53 +122,37 @@ export function YoutubeContainer()
 			lastRotation = data.properties;
 		});
 
-		function timeoutLoop(interval)
+		const stateEmitter = new FrameUpdate(() =>
 		{
-			setTimeout(() =>
+			switch(ytPlayerRef.current.player.getPlayerState())
 			{
-				switch(ytPlayerRef.current.player.getPlayerState())
-				{
-				case YoutubePlayer.prototype.PLAYER_PLAYING:
-					emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYING_STR);
-					break;
-				case YoutubePlayer.prototype.PLAYER_PAUSED:
-					emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
-					break;
-				}
+			case YoutubePlayer.prototype.PLAYER_PLAYING:
+				emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYING_STR);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PAUSED:
+				emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
+				break;
+			}
+		}, 5000);
+		stateEmitter.start();
 
-				timeoutLoop(interval);
-			}, interval - ((new Date()).getTime() % interval));
-		}
-
-		let updateCounter = 0;
-
-		function update()
+		const rotationEmitter = new FrameUpdate(() =>
 		{
 			if(passive)
 				return;
 
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
 			if(sphereProp === undefined)
-				return requestAnimationFrame(update);
+				return;
 
 			if(Object.keys(sphereProp).length == 0)
-				return requestAnimationFrame(update);
+				return;
 
-			if(updateCounter++ == 6)
-			{
-				//console.log(sphereProp);
-				Socket.emit('yt_sphereupdate', {
-					'properties': sphereProp
-				});
-				updateCounter = 0;
-			}
-
-			return requestAnimationFrame(update);
-		}
-
-		update();
-
-		timeoutLoop(5000);
+			Socket.emit('yt_sphereupdate', {
+				'properties': sphereProp
+			});
+		}, 1000 / 10);
+		rotationEmitter.start();
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
 	}
