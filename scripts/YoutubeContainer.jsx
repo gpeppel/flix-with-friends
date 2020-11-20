@@ -89,18 +89,15 @@ export function YoutubeContainer()
 
 		let passive = false;
 		let lastRotation = undefined;
-		let lastFrame = undefined;
 
-		function lerp(timestamp)
+		const lerpRotation = new FrameUpdate((timestamp, deltaTime) =>
 		{
 			if(lastRotation === undefined)
-			{
-				lastFrame = timestamp;
-				requestAnimationFrame(lerp);
 				return;
-			}
 
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
+			const speed = 5;
+
 			const [yaw, pitch, roll] = Lerp.rotation(
 				sphereProp.yaw,
 				sphereProp.pitch,
@@ -108,7 +105,7 @@ export function YoutubeContainer()
 				lastRotation.yaw,
 				lastRotation.pitch,
 				lastRotation.roll,
-				(timestamp - lastFrame) / 1000 * 5
+				deltaTime / 1000 * speed
 			);
 
 			ytPlayerRef.current.player.setSphericalProperties({
@@ -116,19 +113,13 @@ export function YoutubeContainer()
 				pitch: pitch,
 				roll: roll
 			});
-
-			lastFrame = timestamp;
-			requestAnimationFrame(lerp);
-		}
-		lerp();
+		});
+		lerpRotation.start();
 
 		Socket.on('yt_sphereupdate', (data) =>
 		{
-			//console.log(data);
 			passive = true;
 			lastRotation = data.properties;
-
-			//ytPlayerRef.current.player.setSphericalProperties(data.properties);
 		});
 
 		function timeoutLoop(interval)
