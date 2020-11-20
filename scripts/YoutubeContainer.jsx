@@ -12,7 +12,7 @@ const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
 
 const UPDATE_STATE_EMIT_DELAY = 3000;
-const UPDATE_SPHERE_EMIT_DELAY = 1000 / 10;
+const UPDATE_SPHERE_EMIT_DELAY = 10;
 
 
 export function YoutubeContainer()
@@ -155,7 +155,7 @@ export function YoutubeContainer()
 			Socket.emit(EVENT_YT_SPHERE_UPDATE, {
 				'properties': sphereProp
 			});
-		}, UPDATE_SPHERE_EMIT_DELAY);
+		}, UPDATE_SPHERE_EMIT_DELAY, true);
 		rotationEmitter.start();
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);

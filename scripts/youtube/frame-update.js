@@ -1,9 +1,10 @@
 export default class FrameUpdate
 {
-	constructor(fncUpdate, runDelay)
+	constructor(fncUpdate, runDelay, delayAsFrames)
 	{
 		this.updateFunction = fncUpdate;
 		this.runDelay = runDelay;
+		this.delayAsFrames = delayAsFrames || false;
 
 		this.running = false;
 
@@ -23,7 +24,15 @@ export default class FrameUpdate
 			const deltaTime = timestamp - lastTime;
 			lastTime = timestamp;
 
-			timer += deltaTime;
+			if(this.delayAsFrames)
+			{
+				timer++;
+			}
+			else
+			{
+				timer += deltaTime;
+			}
+
 			if(timer >= this.runDelay)
 			{
 				this.updateFunction(timestamp, deltaTime);
