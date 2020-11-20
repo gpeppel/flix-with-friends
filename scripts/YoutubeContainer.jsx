@@ -9,6 +9,10 @@ import FrameUpdate from './youtube/frame-update.js';
 
 const EVENT_YT_LOAD = 'yt_load';
 const EVENT_YT_STATE_CHANGE = 'yt_state_change';
+const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
+
+const UPDATE_STATE_EMIT_DELAY = 3000;
+const UPDATE_SPHERE_EMIT_DELAY = 1000 / 10;
 
 
 export function YoutubeContainer()
@@ -116,7 +120,7 @@ export function YoutubeContainer()
 		});
 		lerpRotation.start();
 
-		Socket.on('yt_sphereupdate', (data) =>
+		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
 		{
 			passive = true;
 			lastRotation = data.properties;
@@ -133,7 +137,7 @@ export function YoutubeContainer()
 				emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
 				break;
 			}
-		}, 5000);
+		}, UPDATE_STATE_EMIT_DELAY);
 		stateEmitter.start();
 
 		const rotationEmitter = new FrameUpdate(() =>
@@ -148,10 +152,10 @@ export function YoutubeContainer()
 			if(Object.keys(sphereProp).length == 0)
 				return;
 
-			Socket.emit('yt_sphereupdate', {
+			Socket.emit(EVENT_YT_SPHERE_UPDATE, {
 				'properties': sphereProp
 			});
-		}, 1000 / 10);
+		}, UPDATE_SPHERE_EMIT_DELAY);
 		rotationEmitter.start();
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);

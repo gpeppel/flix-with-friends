@@ -7,7 +7,8 @@ import flask_socketio
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
-MESSAGES_EMIT_CHANNEL = 'messages_received'
+EVENT_YT_LOAD = 'yt_load'
+EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
@@ -42,7 +43,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if video_id is None:
             return
 
-        self.flaskserver.socketio.emit('yt_load', {
+        self.flaskserver.socketio.emit(EVENT_YT_LOAD, {
             'videoId': video_id
         })
 
@@ -58,12 +59,22 @@ class YoutubeNamespace(flask_socketio.Namespace):
             ).decode("ascii")
         )
 
-        offset = self.getval(data, 'offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
-        rate = self.getval(data, 'rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
-        run_at = self.getval(data, 'runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
-        timestamp = self.getval(
-            data,
-            'timestamp',
+        offset = self.getval(data, 'offset',
+            lambda x: isinstance(x, float),
+            lambda x: abs(float(x)),
+            0
+        )
+        rate = self.getval(data, 'rate',
+            lambda x: isinstance(x, float),
+            lambda x: abs(float(x)),
+            1
+        )
+        run_at = self.getval(data, 'runAt',
+            lambda x: isinstance(x, int),
+            lambda x: max(0, int(x)),
+            0
+        )
+        timestamp = self.getval(data, 'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
             self.unix_timestamp()
@@ -91,27 +102,37 @@ class YoutubeNamespace(flask_socketio.Namespace):
             'timestamp': timestamp
         }, include_self=False)
 
-    def on_yt_sphereupdate(self, data):
-        self.handle_yt_sphereupdate(flask.request, data)
+    def on_yt_sphere_update(self, data):
+        self.handle_yt_sphere_update(flask.request, data)
 
-    def handle_yt_sphereupdate(self, request, data):
+    def handle_yt_sphere_update(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
 
-        def clamp(n, minval, maxval):
-            return max(min(n, maxval), minval)
+        def clamp(val, minval, maxval):
+            return max(min(val, maxval), minval)
 
-        yaw = self.getval(data, 'properties.yaw', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        pitch = self.getval(data, 'properties.pitch', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        roll = self.getval(data, 'properties.roll', lambda x: isinstance(x, float), lambda x: float(x), 0)
-        fov = self.getval(
-            data,
-            'properties.fov',
+        yaw = self.getval(data, 'properties.yaw',
+            lambda x: isinstance(x, float),
+            lambda x: float(x),
+            0
+        )
+        pitch = self.getval(data, 'properties.pitch',
+            lambda x: isinstance(x, float),
+            lambda x: float(x),
+            0
+        )
+        roll = self.getval(data, 'properties.roll',
+            lambda x: isinstance(x, float),
+            lambda x: float(x),
+            0
+        )
+        fov = self.getval(data, 'properties.fov',
             lambda x: isinstance(x, float) and x >= 30 and x <= 120,
-            lambda x: clamp(float(x)),
+            lambda x: clamp(float(x), 30, 120),
             100
         )
 
-        self.flaskserver.socketio.emit('yt_sphereupdate', {
+        self.flaskserver.socketio.emit(EVENT_YT_SPHERE_UPDATE, {
             'properties': {
                 'yaw': yaw,
                 'pitch': pitch,
