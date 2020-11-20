@@ -53,42 +53,24 @@ export function YoutubeContainer()
 
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
 		{
-			function doState(data)
+			data.timestamp = parseInt(data.timestamp, 10);
+
+			const ts = (new Date()).getTime();
+			const tsdiff = Math.max(0, ts - data.timestamp);
+			const adjustedOffset = data.offset + (tsdiff / 1000);
+
+			switch(data.state)
 			{
-				data.timestamp = parseInt(data.timestamp, 10);
-
-				const ts = (new Date()).getTime();
-				const tsdiff = Math.max(0, ts - data.timestamp);
-				const adjustedOffset = data.offset + (tsdiff / 1000);
-
-				switch(data.state)
-				{
-				case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
-					ytPlayerRef.current.player.play(adjustedOffset);
-					break;
-				case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
-					ytPlayerRef.current.player.pause(adjustedOffset);
-					break;
-				case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
-					ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
-					break;
-				}
+			case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
+				ytPlayerRef.current.player.play(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
+				ytPlayerRef.current.player.pause(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
+				ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
+				break;
 			}
-
-			doState(data);
-
-			/*
-			let secdiff = Math.max(0, data.runAt - Math.floor((new Date()).getTime() / 1000));
-			if(secdiff > 0)
-			{
-				setTimeout(() => {
-					doState(data);
-				}, secdiff * 1000);
-			}else
-			{
-				doState(data);
-			}
-			*/
 		});
 
 		let passive = false;
