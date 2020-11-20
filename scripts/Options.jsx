@@ -9,6 +9,13 @@ export function Options()
 
 	function handleSubmit(event)
 	{
+		React.useEffect(() =>
+		{
+			Socket.emit('get_room_id', (data) =>
+			{
+				// TODO may have to set message scrollbar to bottom or something later
+			});
+		});
 		document.body.style.backgroundColor = '#00c9c8';
 		setFlag(true);
 		event.preventDefault();

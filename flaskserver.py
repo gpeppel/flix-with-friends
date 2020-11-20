@@ -10,6 +10,7 @@ import socketns.base
 import socketns.chat
 import socketns.login
 import socketns.youtube
+import socketns.room
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
@@ -27,11 +28,13 @@ class FlaskServer:
         self.chat_ns = socketns.chat.ChatNamespace('/', self)
         self.youtube_ns = socketns.youtube.YoutubeNamespace('/', self)
         self.login_ns = socketns.login.LoginNamespace('/', self)
-
+        self.room_ns = socketns.room.RoomNamespace('/', self)
+        
         self.socketio.on_namespace(socketns.CustomCombinedNamespace('/', self, [
             self.base_ns,
             self.chat_ns,
             self.youtube_ns,
+            self.room_ns,
             self.login_ns
         ]))
 
