@@ -8,6 +8,12 @@ export function Options()
 {
 	const [userFlag, setFlag] = useState(false);
 
+	function enterRoom()
+	{
+		document.body.style.backgroundColor = '#00c9c8';
+		setFlag(true);
+	}
+
 	function onRoomNewClick()
 	{
 		Socket.emit('room_create', {
@@ -17,8 +23,7 @@ export function Options()
 			console.log(data);
 			if(data.status == 'ok')
 			{
-				document.body.style.backgroundColor = '#00c9c8';
-				setFlag(true);
+				enterRoom();
 			}
 		});
 	}
@@ -34,8 +39,7 @@ export function Options()
 			console.log(data);
 			if(data.status == 'ok')
 			{
-				document.body.style.backgroundColor = '#00c9c8';
-				setFlag(true);
+				enterRoom();
 			}
 		});
 	}
@@ -51,7 +55,6 @@ export function Options()
 		return (<Content />);
 	}
 
-
 	return (
 		<body>
 			<div className="header">
@@ -64,8 +67,16 @@ export function Options()
 					<button className="button" onClick={onRoomNewClick}>Create New Viewing Room</button>
 				</div>
 
-				<div>
-					<input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code'/>
+				<div style={{
+					borderTop: '3px solid #ffc341',
+					marginTop: '20px'
+				}}>
+					<input id='roomCode' style={{
+						display: 'block',
+						fontSize: '24px',
+						margin: '15px 0px',
+						padding: '12px 5px'
+					}} onKeyUp={onKeyUp} placeholder='Room Code'/>
 					<button className="button" onClick={onRoomJoinClick}>Join Viewing Room</button>
 				</div>
 			</div>
