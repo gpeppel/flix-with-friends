@@ -12,10 +12,10 @@ const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
 
 const UPDATE_STATE_EMIT_DELAY = 3000;
-const UPDATE_SPHERE_EMIT_DELAY = FrameUpdate.fps(10);
+const UPDATE_SPHERE_EMIT_DELAY = FrameUpdate.fps(15);
 
 const LERP_ENABLED = true;
-const LERP_SPEED = 20;
+const LERP_SPEED = 32;
 
 
 export function YoutubeContainer()
@@ -30,7 +30,7 @@ export function YoutubeContainer()
 	{
 		const [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
 			playerVars: {
-				autoplay: 1,
+				autoplay: 0,
 				controls: 1,
 				disablekb: 1
 			}
