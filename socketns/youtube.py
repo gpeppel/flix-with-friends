@@ -1,4 +1,3 @@
-import datetime
 import json
 import re
 
@@ -79,7 +78,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         timestamp = self.getval(data, 'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
-            self.unix_timestamp()
+            self.flaskserver.unix_timestamp()
         )
 
         if data.get('state') not in [
@@ -97,7 +96,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
         self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
             'state': data['state'],
-            'sender': user.id,
+            'sender': user.username,
             'offset': offset,
             'rate': rate,
             'runAt': run_at,
@@ -151,8 +150,3 @@ class YoutubeNamespace(flask_socketio.Namespace):
             except Exception:
                 val = default
         return val
-
-    def unix_timestamp(self, timestamp=None):
-        if timestamp is None:
-            timestamp = datetime.datetime.utcnow()
-        return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)

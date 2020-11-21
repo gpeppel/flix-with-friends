@@ -6,9 +6,9 @@ from db_models.user import User
 
 
 USERS = [
-    User('01234567890'),
-    User('abcdef'),
-    User('a1b2c3d4e5f6'),
+    User(None, sid='01234567890'),
+    User(None, sid='abcdef'),
+    User(None, sid='a1b2c3d4e5f6'),
 ]
 
 
@@ -64,4 +64,4 @@ class RoomTest(unittest.TestCase):
 
     def test_generateRoomId(self):
         random.seed(7883)
-        self.assertEqual(Room().id, 'Zp5s_mMGCaTy')
+        self.assertEqual(Room().room_id, 'Zp5s_mMGCaTy')

@@ -1,7 +1,8 @@
-# Heroku Link:
-[Flix With Friends](https://flix-with-friends.herokuapp.com/)
 # Flix With Friends
 ![travis build](https://travis-ci.com/gpeppel/flix-with-friends.svg?token=yKryxn23AXzDQ7RBndwC&branch=master)
+
+# Heroku Link:
+[Flix With Friends](https://flix-with-friends.herokuapp.com/)
 
 Watch videos with friends at the same time remotely!
 
@@ -26,7 +27,7 @@ pip install -r requirements.txt
 
 1. Install PostgreSQL:
 ```bash
-sudo yum install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
+sudo apt install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
 ```
 2. Set up PostgreSQL:
 ```bash
@@ -35,14 +36,14 @@ sudo service postgresql start
 sudo -u postgres createuser --superuser <username>
 sudo -u postgres createdb <db name>
 ```
-n a terminal, run `psql` and use these commands (replace username and password):
+In a terminal, run `psql` and use these commands (replace username and password):
 ```
 create user <username> superuser password '<password>';
 \q
 ```
 Create `sql.env` and put the username and password set above.
 ```bash
-DATABASE_URI='postgresql://<username>:<password>@localhost/<db name>'
+DATABASE_URL='postgresql://<username>:<password>@localhost/<db name>'
 ```
 
 ---
@@ -52,10 +53,11 @@ Run code:
 
 ---
 
-# Socketio Events
-### message-new
+# Socket.io Events
+### message_new
 *Server-to-Client*
-Send new chat messages to clients
+
+Send new chat messages to clients.
 
 Data:
 ```
@@ -74,10 +76,10 @@ Data:
 }
 ```
 ---
-### message-send
+### message_send
 *Client-to-Server*
 
-Send a message to the server
+Send a message to the server.
 
 Data:
 ```
@@ -86,30 +88,40 @@ Data:
 }
 ```
 ---
-### user-oauth-login-facebook
+### login_oauth_facebook
 *Client-to-Server*
 
-Login request
+Login request using Facebook OAuth.
 
 Data:
 ```
 {
-
+	"response": {
+		"accessToken": string,
+		"name": string,
+		"email": string,
+		"picture": {
+			"data": {
+				"url": string
+			}
+		},
+		"id": int
+	}
 }
 ```
 
 Callback data:
 ```
 {
-	"status": "ok" | "fail".
+	"status": "ok" | "fail",
 	"userId": string
 }
 ```
 ---
-### user-oauth-login-google
+### login_oauth_google
 *Client-to-Server*
 
-Login request
+Login request using Google OAuth.
 
 Data:
 ```
@@ -127,10 +139,51 @@ Callback data:
 }
 ```
 ---
-### user-join
+### room_create
+*Client-to-Server*
+
+User request to create a new room.
+
+Data:
+```
+{
+	"roomName": string
+}
+```
+
+Callback data:
+```
+{
+	"status": "ok" | "fail",
+	"roomId": string,
+	"roomName": string
+}
+```
+---
+### room_join
+*Client-to-Server*
+
+User request to join an existing room.
+
+Data:
+```
+{
+	"roomId": string
+}
+```
+
+Callback data:
+```
+{
+	"status": "ok" | "fail",
+	"error": "noexist" | undefined
+}
+```
+---
+### user_join
 *Server-to-Client*
 
-New user has joined the room
+New user has joined the room.
 
 Data:
 ```
@@ -142,10 +195,10 @@ Data:
 }
 ```
 ---
-### user-leave
+### user_leave
 *Server-to-Client*
 
-User has left the room
+User has left the room.
 
 Data:
 ```
@@ -157,10 +210,10 @@ Data:
 }
 ```
 ---
-### yt-load
+### yt_load
 *Client-to-Server, Server-to-Client*
 
-Load the video info
+Load the video info.
 
 Data:
 ```
@@ -172,10 +225,27 @@ Data:
 }
 ```
 ---
-### yt-state-change
+### yt_sphere_update
 *Client-to-Server, Server-to-Client*
 
-Change the video state
+Sync the 360 degree video view.
+
+Data:
+```
+{
+	"properties": {
+		"yaw": float,
+		"pitch": float,
+		"roll": float,
+		"fov": float
+	}
+}
+```
+---
+### yt_state_change
+*Client-to-Server, Server-to-Client*
+
+Change the video state.
 
 Data:
 ```

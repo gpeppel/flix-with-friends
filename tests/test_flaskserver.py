@@ -18,7 +18,7 @@ class FlaskServerTest(unittest.TestCase):
         mock_req = MockRequest(TEST_SID)
         user = self.flaskserver.create_user_from_request(mock_req)
 
-        self.assertEqual(user.id, TEST_SID)
+        self.assertEqual(user.sid, TEST_SID)
         self.assertEqual(self.flaskserver.users[TEST_SID], user)
 
         self.flaskserver.delete_user(user)
@@ -26,12 +26,12 @@ class FlaskServerTest(unittest.TestCase):
 
     def test_create_delete_room(self):
         room_abc = self.flaskserver.create_room('abc')
-        self.assertEqual(room_abc.id, 'abc')
+        self.assertEqual(room_abc.room_id, 'abc')
         self.assertEqual(self.flaskserver.rooms['abc'], room_abc)
 
         random.seed(376)
         room_rand = self.flaskserver.create_room()
-        self.assertEqual(room_rand.id, 'z8lUM2xXA5pV')
+        self.assertEqual(room_rand.room_id, 'z8lUM2xXA5pV')
         self.assertEqual(self.flaskserver.rooms['z8lUM2xXA5pV'], room_rand)
 
         self.flaskserver.delete_room(room_rand)

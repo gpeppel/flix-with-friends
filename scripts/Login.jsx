@@ -10,25 +10,18 @@ export function Login()
 
 	React.useEffect(() =>
 	{
-		Socket.on('unverified_user', () =>
+		Socket.on('unverified_user', (data) =>
 		{
+			console.log(data);
 			setFlag(false);
 		});
-	});
 
-	function authUser()
-	{
-		React.useEffect(() =>
+		Socket.on('verified_user', (data) =>
 		{
-			Socket.on('verified_user', () =>
-			{
-				setFlag(true);
-			});
+			console.log(data);
+			setFlag(true);
 		});
-	}
-
-	authUser();
-
+	}, []);
 
 	if (userFlag)
 	{
@@ -42,10 +35,8 @@ export function Login()
 			</div>
 			<div className="login">
 				<div className="centered">
-
 					<img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
 					<FacebookButton />
-
 				</div>
 			</div>
 

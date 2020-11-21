@@ -122,7 +122,7 @@ YT_STATE_CHANGES = {
     'timestamp': [
         {
             INPUT: None,
-            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+            OUTPUT: 'eval:self.flaskserver.unix_timestamp()'
         },
         {
             INPUT: 0,
@@ -130,7 +130,7 @@ YT_STATE_CHANGES = {
         },
         {
             INPUT: 'asdf',
-            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+            OUTPUT: 'eval:self.flaskserver.unix_timestamp()'
         },
         {
             INPUT: 100,
