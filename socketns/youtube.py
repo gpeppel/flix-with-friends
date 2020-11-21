@@ -54,12 +54,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_state_change(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
 
-        print(
-            json.dumps(data).encode(
-                "ascii", errors="backslashreplace"
-            ).decode("ascii")
-        )
-
         offset = self.getval(data, 'offset',
             lambda x: isinstance(x, float),
             lambda x: abs(float(x)),
@@ -118,7 +112,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
             0
         )
         pitch = self.getval(data, 'properties.pitch',
-            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: isinstance(x, float) and x > -360 and x < 360,
             lambda x: clamp(float(x), -360, 360),
             0
         )
