@@ -2,7 +2,8 @@ export default class Lerp
 {
 	static float(a, b, t)
 	{
-		return a + (b - a) * t;
+		//return a + (b - a) * t;
+		return (1 - t) * a + t * b;
 	}
 
 	static floatAngle(a, b, t)
@@ -17,7 +18,7 @@ export default class Lerp
 			a -= 360;
 		}
 
-		return a + (b - a) * t;
+		return Lerp.float(a, b, t);
 	}
 
 	static rotation(aYaw, aPitch, aRoll, bYaw, bPitch, bRoll, t)

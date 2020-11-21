@@ -1,15 +1,14 @@
 export default class FrameUpdate
 {
-	constructor(fncUpdate, runDelay, delayAsFrames)
+	constructor(fncUpdate, delayMs)
 	{
 		this.updateFunction = fncUpdate;
-		this.runDelay = runDelay;
-		this.delayAsFrames = delayAsFrames || false;
+		this.delayMs = delayMs;
 
 		this.running = false;
 
-		if(this.runDelay === undefined)
-			this.runDelay = 0;
+		if(this.delayMs === undefined)
+			this.delayMs = 0;
 	}
 
 	start()
@@ -17,26 +16,19 @@ export default class FrameUpdate
 		this.running = true;
 
 		let lastTime = 0;
-		let timer = 0;
+		let timerMs = 0;
 
 		const update = (timestamp) =>
 		{
 			const deltaTime = timestamp - lastTime;
 			lastTime = timestamp;
 
-			if(this.delayAsFrames)
-			{
-				timer++;
-			}
-			else
-			{
-				timer += deltaTime;
-			}
+			timerMs += deltaTime;
 
-			if(timer >= this.runDelay)
+			if(timerMs >= this.delayMs)
 			{
 				this.updateFunction(timestamp, deltaTime);
-				timer = 0;
+				timerMs = 0;
 			}
 
 			if(this.running)
@@ -49,4 +41,12 @@ export default class FrameUpdate
 	{
 		this.running = false;
 	}
+
+	static fps(frames)
+	{
+		return 1000 / frames;
+	}
 }
+
+FrameUpdate.prototype.FRAMES_PER_SECOND = 60;
+FrameUpdate.prototype.MILLISECONDS_PER_FRAME = 1000 / FrameUpdate.prototype.FRAMES_PER_SECOND;

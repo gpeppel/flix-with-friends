@@ -12,7 +12,10 @@ const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
 
 const UPDATE_STATE_EMIT_DELAY = 3000;
-const UPDATE_SPHERE_EMIT_DELAY = 10;
+const UPDATE_SPHERE_EMIT_DELAY = FrameUpdate.fps(10);
+
+const LERP_ENABLED = true;
+const LERP_SPEED = 20;
 
 
 export function YoutubeContainer()
@@ -82,17 +85,24 @@ export function YoutubeContainer()
 				return;
 
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
-			const speed = 5;
+			let yaw, pitch, roll;
 
-			const [yaw, pitch, roll] = Lerp.rotation(
-				sphereProp.yaw,
-				sphereProp.pitch,
-				sphereProp.roll,
-				lastRotation.yaw,
-				lastRotation.pitch,
-				lastRotation.roll,
-				deltaTime / 1000 * speed
-			);
+			if(LERP_ENABLED)
+			{
+				[yaw, pitch, roll] = Lerp.rotation(
+					sphereProp.yaw,
+					sphereProp.pitch,
+					sphereProp.roll,
+					lastRotation.yaw,
+					lastRotation.pitch,
+					lastRotation.roll,
+					deltaTime / 1000 * LERP_SPEED
+				);
+			}
+			else
+			{
+				[yaw, pitch, roll] = [lastRotation.yaw, lastRotation.pitch, lastRotation.roll];
+			}
 
 			ytPlayerRef.current.player.setSphericalProperties({
 				yaw: yaw,
@@ -137,7 +147,7 @@ export function YoutubeContainer()
 			Socket.emit(EVENT_YT_SPHERE_UPDATE, {
 				'properties': sphereProp
 			});
-		}, UPDATE_SPHERE_EMIT_DELAY, true);
+		}, UPDATE_SPHERE_EMIT_DELAY);
 		rotationEmitter.start();
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
