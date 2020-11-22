@@ -39,24 +39,24 @@ class User:
     @staticmethod
     def get_from_db(cur, user, username=None, email=None, oauth=None):
         query = 'SELECT * FROM account WHERE '
-        value = None
+        values = None
 
         if username is not None:
             query += 'account.username = %s'
-            value = (username)
+            values = (username)
         elif email is not None:
             query += 'account.email = %s'
-            value = (email)
+            values = (email)
         elif oauth is not None:
             query += 'account.oauth_id = %s AND account.oauth_type = %s'
-            value = (oauth['id'], oauth['type'])
+            values = (oauth['id'], oauth['type'])
 
-        if value is None:
+        if values is None:
             return None
 
         query += ';'
+        cur.execute(query, values)
 
-        cur.execute(query, value)
         result = cur.fetchone()
         if result is None:
             return None

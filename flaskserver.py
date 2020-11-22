@@ -59,17 +59,7 @@ class FlaskServer:
             return
 
         cur = self.db.cursor()
-        cur.execute("""
-            SELECT m.text, m.timestamp, m.room_id, m.user_id, a.username, a.profile_url
-            FROM message m INNER JOIN account a ON m.user_id = a.user_id;
-        """)
-
-        messages = []
-
-        for msg in cur:
-            msg['timestamp'] = self.unix_timestamp(timestamp=msg['timestamp'])
-            messages.append(msg)
-
+        messages = Message.get_messages(cur, room_id=None)
         cur.close()
 
         self.socketio.emit(MESSAGES_EMIT_CHANNEL, messages)

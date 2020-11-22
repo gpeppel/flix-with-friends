@@ -23,9 +23,7 @@ class ChatNamespace(flask_socketio.Namespace):
             return
 
         cur = self.flaskserver.db.cursor()
-        cur.execute("""
-            INSERT INTO message VALUES (DEFAULT, %s, %s, %s, %s)
-        """, (msg.text, msg.timestamp, msg.room_id, msg.user_id))
+        Message.insert_to_db(cur, msg)
         self.flaskserver.db.commit()
         cur.close()
 
