@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
+import { GoogleButton } from './GoogleButton';
 import { Socket } from './Socket';
 import './login.css';
 
@@ -10,17 +11,16 @@ export function Login()
 
 	React.useEffect(() =>
 	{
-		Socket.on('unverified_user', (data) =>
+		Socket.on('login_response', (data) =>
 		{
 			console.log(data);
-			setFlag(false);
-		});
 
-		Socket.on('verified_user', (data) =>
-		{
-			console.log(data);
+			if(data.status != 'ok')
+				return;
+
 			setFlag(true);
 		});
+
 	}, []);
 
 	if (userFlag)
@@ -37,6 +37,9 @@ export function Login()
 				<div className="centered">
 					<img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
 					<FacebookButton />
+				</div>
+				<div>
+					<GoogleButton />
 				</div>
 			</div>
 
