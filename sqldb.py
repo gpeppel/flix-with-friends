@@ -25,7 +25,7 @@ class SqlDb:
         return self.connection is not None
 
     @staticmethod
-    def uri_to_dsn(uri):
+    def uri_to_dict(uri):
         match = re.match(
             r'postgres(?:ql)?://(?:(?P<user>[^:]+)(?::(?P<password>[^@]+))?@)?(?P<host>[^/:]+)(?::(?P<port>[0-9]+))?(?:/(?P<dbname>[^?]+))?(?:\?(?P<query>.*))?',
             uri
@@ -55,6 +55,14 @@ class SqlDb:
                 groups[match[1]] = match[2]
                 query = query[match.end():]
 
+        return groups
+
+    @staticmethod
+    def uri_to_dsn(uri, sortkeys=False):
+        groups = SqlDb.uri_to_dict(uri)
+        if groups is None:
+            return None
+
         def sanitize(val):
             if len(val) == 0:
                 return "''"
@@ -67,7 +75,13 @@ class SqlDb:
             return val
 
         dsn = ""
-        for key, val in groups.items():
+
+        if sortkeys:
+            items = sorted(groups.items(), key=lambda x: x[0])
+        else:
+            items = groups.items()
+
+        for key, val in items:
             if val is None:
                 continue
             dsn += " %s=%s" % (key, sanitize(val))
