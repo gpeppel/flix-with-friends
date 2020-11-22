@@ -27,13 +27,33 @@ class SqlDb:
     @staticmethod
     def uri_to_dsn(uri):
         match = re.match(
-            r'postgresql://(?:(?P<user>[^:]+)(?::(?P<password>[^@]+))?@)?(?P<host>[^/:]+)(?::(?P<port>[0-9]+))?(?:/(?P<dbname>[^?]+))?(?:\?(?P<query>.*))?',
+            r'postgres(?:ql)?://(?:(?P<user>[^:]+)(?::(?P<password>[^@]+))?@)?(?P<host>[^/:]+)(?::(?P<port>[0-9]+))?(?:/(?P<dbname>[^?]+))?(?:\?(?P<query>.*))?',
             uri
         )
         if match is None:
             return None
 
         groups = match.groupdict()
+
+        if groups['port'] is not None:
+            port = int(groups['port'])
+            if port < 0 or port > 65536:
+                return None
+
+        query = groups['query']
+        del groups['query']
+
+        if query is not None:
+            while True:
+                match = re.match(
+                    r'([A-Za-z0-9_]+)=([^&]*)&?',
+                    query
+                )
+                if match is None:
+                    break
+
+                groups[match[1]] = match[2]
+                query = query[match.end():]
 
         def sanitize(val):
             if len(val) == 0:
