@@ -1,3 +1,5 @@
+/* global process */
+
 import * as React from 'react';
 import { Socket } from './Socket';
 import FacebookLogin from 'react-facebook-login';
@@ -16,9 +18,9 @@ export function FacebookButton()
 
 	return (
 		<FacebookLogin
-			appId="2775898756021193"
+			appId={process.env.FACEBOOK_CLIENT_ID}
 			autoLoad={false}
-			fields="name,email,picture"
+			fields='name,email,picture'
 			callback={responseFacebook}
 		/>
 	);

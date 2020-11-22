@@ -9,7 +9,7 @@ import google.auth.transport.requests
 from db_models.user import User
 
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '../google.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '../react.env')
 load_dotenv(dotenv_path)
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')

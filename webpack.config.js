@@ -2,9 +2,8 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const dotenv = require('dotenv').config({
-    path: path.join(__dirname, 'google.env')
-});
+
+const dotenv = require('dotenv').config({path: path.join(__dirname, 'react.env')});
 
 module.exports = {
     entry: './scripts/Main.jsx',
