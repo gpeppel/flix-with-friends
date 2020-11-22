@@ -23,7 +23,7 @@ class LoginNamespace(flask_socketio.Namespace):
             # TODO verify access token
 
             cur = self.flaskserver.db.cursor()
-            result = User.get_from_db(cur, user, oauth={
+            User.get_from_db(cur, user, oauth={
                 'id': data['response']['id'],
                 'type': 'FACEBOOK'
             })
@@ -34,10 +34,8 @@ class LoginNamespace(flask_socketio.Namespace):
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
 
-            if result is None:
-                User.insert_to_db(cur, user, password=None)
-                self.flaskserver.db.commit()
-
+            User.insert_to_db(cur, user, password=None)
+            self.flaskserver.db.commit()
             cur.close()
 
             self.flaskserver.socketio.emit('verified_user', user.json())

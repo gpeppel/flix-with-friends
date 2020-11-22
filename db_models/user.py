@@ -74,7 +74,9 @@ class User:
     @staticmethod
     def insert_to_db(cur, user, password=None):
         cur.execute("""
-            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s) RETURNING user_id
+            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (oauth_id, oauth_type) DO UPDATE SET username = %s, email = %s, profile_url = %s
+            RETURNING user_id;
         """, (
             user.username,
             password,
@@ -82,7 +84,11 @@ class User:
             user.profile_url,
             user.settings,
             user.oauth_id,
-            user.oauth_type
+            user.oauth_type,
+
+            user.username,
+            user.email,
+            user.profile_url
         ))
 
         result = cur.fetchone()
@@ -103,6 +109,7 @@ class User:
                 oauth_id TEXT,
                 oauth_type TEXT,
                 UNIQUE(username),
-                UNIQUE(email)
+                UNIQUE(email),
+                UNIQUE(oauth_id, oauth_type)
             );
         """)
