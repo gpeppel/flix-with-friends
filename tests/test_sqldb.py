@@ -8,8 +8,8 @@ OUTPUT = 'output'
 
 URI_TO_DSN_SUCCESS = [
     {
-        INPUT: 'postgresql://username:password@localhost:5432/dbname?connect_timeout=10',
-        OUTPUT: 'connect_timeout=10 dbname=dbname host=localhost password=password port=5432 user=username'
+        INPUT: 'postgresql://username:password@localhost:5432/dbname?connect_timeout=10&keepalives=1',
+        OUTPUT: 'connect_timeout=10 dbname=dbname host=localhost keepalives=1 password=password port=5432 user=username'
     },
     {
         INPUT: 'postgresql://username@localhost/dbname',
@@ -27,13 +27,30 @@ URI_TO_DSN_SUCCESS = [
         INPUT: 'postgresql:///dbname?host=localhost',
         OUTPUT: 'dbname=dbname host=localhost'
     },
+    {
+        INPUT: 'postgres://',
+        OUTPUT: ''
+    },
+    {
+        INPUT: 'postgresql:///db name?host=localhost',
+        OUTPUT: "dbname='db name' host=localhost"
+    },
+    {
+        INPUT: 'postgresql:///db\\name?host=localhost',
+        OUTPUT: "dbname=db\\\\name host=localhost"
+    },
+    {
+        INPUT: "postgresql:///db'name'?host=localhost",
+        OUTPUT: "dbname=db\\'name\\' host=localhost"
+    },
 ]
 
 URI_TO_DSN_FAIL = [
     'user=username password=password host=localhost port=5432 dbname=dbname',
     'username:password@localhost:5432/dbname?param=abc',
-    'postgresql://2user:password@localhost:5432/dbname?connect_timeout=10',
+    'postgresql://2user:password@localhost/dbname',
     'postgresql://localhost:54a32',
+    'postgresql://2user:pass/word@localhost/dbname',
     'postgresql://localhost:65536',
 ]
 
