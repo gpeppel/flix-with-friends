@@ -42,7 +42,7 @@ class SqlDb:
 
         if groups['port'] is not None:
             port = int(groups['port'])
-            if port < 0 or port > 65536:
+            if port < 0 or port > 65535:
                 return None
 
         query = groups['query']
