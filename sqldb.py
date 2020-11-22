@@ -26,8 +26,13 @@ class SqlDb:
 
     @staticmethod
     def uri_to_dict(uri):
-        match = re.match(
-            r'postgres(?:ql)?://(?:(?P<user>[^:]+)(?::(?P<password>[^@]+))?@)?(?P<host>[^/:]+)(?::(?P<port>[0-9]+))?(?:/(?P<dbname>[^?]+))?(?:\?(?P<query>.*))?',
+        match = re.fullmatch(
+            r'postgres(?:ql)?://'
+            r'(?:(?P<user>(?:[A-Za-z_]|%[0-9A-Fa-f]{2})(?:[A-Za-z0-9_]|%[0-9A-Fa-f]{2})*)'
+            r'(?::(?P<password>[^:@,/?=&]+))?@)?'
+            r'(?P<host>[^:@,/?=&]+)?(?::(?P<port>[0-9]+))?'
+            r'(?:/(?P<dbname>[^:@,/?=&]+))?'
+            r'(?:\?(?P<query>.*))?',
             uri
         )
         if match is None:
