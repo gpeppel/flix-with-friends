@@ -4,6 +4,8 @@ import re
 import flask
 import flask_socketio
 
+import utils
+
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
 MESSAGES_EMIT_CHANNEL = 'messages_received'
@@ -73,7 +75,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
             'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
-            self.flaskserver.unix_timestamp()
+            utils.unix_timestamp()
         )
 
         if data.get('state') not in [

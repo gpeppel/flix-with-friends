@@ -1,5 +1,3 @@
-import datetime
-
 import flask
 import flask_socketio
 
@@ -62,7 +60,10 @@ class FlaskServer:
         messages = Message.get_messages(cur, room_id=None)
         cur.close()
 
-        self.socketio.emit(MESSAGES_EMIT_CHANNEL, messages)
+        self.socketio.emit(MESSAGES_EMIT_CHANNEL, list(map(
+            lambda msg: msg.json(),
+            messages
+        )))
 
     def create_user_from_request(self, request):
         user = User.from_request(request)
@@ -93,8 +94,3 @@ class FlaskServer:
 
     def db_connected(self):
         return self.db is not None and self.db.is_connected()
-
-    def unix_timestamp(self, timestamp=None):
-        if timestamp is None:
-            timestamp = datetime.datetime.utcnow()
-        return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)

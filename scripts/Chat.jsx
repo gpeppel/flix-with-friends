@@ -46,10 +46,10 @@ export function Chat()
 				<ul id='messageFeed' style={{ paddingLeft: '0' }}>
 					{messages.map((message, index) => (
 						<li key={index} style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
-							<img id='profilePic' alt="Profile" src={message.profile_url}></img>
+							<img id='profilePic' alt="Profile" src={message.user.profile_url}></img>
 							<span>
 								<p id='timestamp'> ({message.timestamp}) </p>
-								<p id='name'>{message.username}: </p>
+								<p id='name'>{message.user.username}: </p>
 								<p id='message'>{message.text}</p>
 								<br />
 							</span>

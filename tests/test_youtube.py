@@ -4,6 +4,7 @@ import unittest
 import app
 import tests.helpers as helpers
 from tests.helpers import MockRequest, hook_socket_emit
+import utils
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -123,7 +124,7 @@ YT_STATE_CHANGES = {
     'timestamp': [
         {
             INPUT: None,
-            OUTPUT: 'eval:self.flaskserver.unix_timestamp()'
+            OUTPUT: 'eval:utils.unix_timestamp()'
         },
         {
             INPUT: 0,
@@ -131,7 +132,7 @@ YT_STATE_CHANGES = {
         },
         {
             INPUT: 'asdf',
-            OUTPUT: 'eval:self.flaskserver.unix_timestamp()'
+            OUTPUT: 'eval:utils.unix_timestamp()'
         },
         {
             INPUT: 100,

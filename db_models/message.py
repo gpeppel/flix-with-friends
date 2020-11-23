@@ -1,10 +1,24 @@
+import utils
+
+
 class Message:
-    def __init__(self, message_id, text, timestamp, room_id, user_id):
+    def __init__(self, message_id, text, timestamp, room_id, user_id, userdata=None):
         self.message_id = message_id
         self.text = text
         self.timestamp = timestamp
         self.room_id = room_id
         self.user_id = user_id
+        self.userdata = userdata
+
+    def json(self):
+        return {
+            'message_id': self.message_id,
+            'text': self.text,
+            'timestamp': utils.unix_timestamp(self.timestamp),
+            'room_id': self.room_id,
+            'user_id': self.user_id,
+            'user': self.userdata
+        }
 
     @staticmethod
     def get_messages(cur, room_id=None):
@@ -28,7 +42,11 @@ class Message:
                 result['text'],
                 result['timestamp'],
                 result['room_id'],
-                result['user_id']
+                result['user_id'],
+                userdata={
+                    'username': result['username'],
+                    'profile_url': result['profile_url']
+                }
             ))
 
         return messages
