@@ -26,9 +26,12 @@ export function Chat()
 		var messageInput = document.getElementById('messageInput');
 		var messageText = messageInput.value;
 
-		Socket.emit('message_send', {
-			'text': messageText,
-		});
+		if(messageText.length > 0)
+		{
+			Socket.emit('message_send', {
+				'text': messageText,
+			});
+		}
 		messageInput.value = '';
 	}
 
