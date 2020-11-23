@@ -10,7 +10,6 @@ export function Options()
 
 	function enterRoom()
 	{
-		document.body.style.backgroundColor = '#00c9c8';
 		setFlag(true);
 	}
 
@@ -54,31 +53,20 @@ export function Options()
 	}
 
 	return (
-		<body>
-			<div className="header">
-				<img src="static/images/logo.png" alt="logo" />
-			</div>
-			<div className="centered">
-				<img className="popcorn_button" src="static/images/popcorn_button.png" alt="popcorn_button" />
+		<div className='options'>
+			<img className='popcorn-img' src='static/images/popcorn_button.png' alt='popcorn_button' />
 
-				<div>
-					<button className="button" onClick={onRoomNewClick}>Create New Viewing Room</button>
-				</div>
-
-				<div style={{
-					borderTop: '3px solid #ffc341',
-					marginTop: '20px'
-				}}>
-					<input id='roomCode' style={{
-						display: 'block',
-						fontSize: '24px',
-						margin: '15px 0px',
-						padding: '12px 5px'
-					}} onKeyUp={onKeyUp} placeholder='Room Code'/>
-					<button className="button" onClick={onRoomJoinClick}>Join Viewing Room</button>
-				</div>
+			<div className='section'>
+				<button className='button' onClick={onRoomNewClick}>Create New Viewing Room</button>
 			</div>
 
-		</body>
+			<div className='section room' style={{
+				display: 'flex',
+				flexDirection: 'column'
+			}}>
+				<input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code'/>
+				<button className='button' onClick={onRoomJoinClick}>Join Viewing Room</button>
+			</div>
+		</div>
 	);
 }
