@@ -29,20 +29,14 @@ export function Login()
 	}
 
 	return (
-		<body>
-			<div className="header">
-				<img src="static/images/logo.png" alt="logo" />
+		<div className='login'>
+			<div className='section'>
+				<img className='fb-img' src='static/images/fb_button.png' alt='fb_button' />
+				<FacebookButton />
 			</div>
-			<div className="login">
-				<div className="centered">
-					<img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
-					<FacebookButton />
-				</div>
-				<div>
-					<GoogleButton />
-				</div>
+			<div className='section'>
+				<GoogleButton />
 			</div>
-
-		</body>
+		</div>
 	);
 }

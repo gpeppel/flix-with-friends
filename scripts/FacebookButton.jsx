@@ -13,7 +13,6 @@ export function FacebookButton()
 		Socket.emit('login_oauth_facebook', {
 			'response': response
 		});
-		document.body.style.backgroundColor = '#eea1b8';
 	}
 
 	return (

@@ -25,10 +25,10 @@ export function GoogleButton()
 	return (
 		<GoogleLogin
 			clientId={process.env.GOOGLE_CLIENT_ID}
-			buttonText='Login'
 			onSuccess={responseGoogle}
 			onFailure={responseGoogle}
 			cookiePolicy={'single_host_origin'}
+			className='google-button'
 		/>
 	);
 }
