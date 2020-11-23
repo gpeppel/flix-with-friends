@@ -27,35 +27,34 @@ class LoginNamespace(flask_socketio.Namespace):
     def on_login_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
 
-        key = 'status'
-        if key in data['response'].keys():
+        # TODO verify access token
+        if 'status' in data['response'].keys():
             self.flaskserver.socketio.emit('login_response', {
                 'status': 'fail',
                 'userId': None
             }, room=user.sid)
-        else:
-            # TODO verify access token
+            return
 
-            cur = self.flaskserver.db.cursor()
-            User.get_from_db(cur, user, oauth={
-                'id': data['response']['id'],
-                'type': 'FACEBOOK'
-            })
+        cur = self.flaskserver.db.cursor()
+        User.get_from_db(cur, user, oauth={
+            'id': data['response']['id'],
+            'type': 'FACEBOOK'
+        })
 
-            user.username = data['response']['name']
-            user.email = data['response']['email']
-            user.profile_url = data['response']['picture']['data']['url']
-            user.oauth_id = data['response']['id']
-            user.oauth_type = 'FACEBOOK'
+        user.username = data['response']['name']
+        user.email = data['response']['email']
+        user.profile_url = data['response']['picture']['data']['url']
+        user.oauth_id = data['response']['id']
+        user.oauth_type = 'FACEBOOK'
 
-            User.insert_to_db(cur, user, password=None)
-            self.flaskserver.db.commit()
-            cur.close()
+        User.insert_to_db(cur, user, password=None)
+        self.flaskserver.db.commit()
+        cur.close()
 
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'ok',
-                'userId': user.user_id
-            }, room=user.sid)
+        self.flaskserver.socketio.emit('login_response', {
+            'status': 'ok',
+            'userId': user.user_id
+        }, room=user.sid)
 
     def on_login_oauth_google(self, data):
         print(data)

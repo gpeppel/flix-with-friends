@@ -1,3 +1,6 @@
+COOKIE_SESSION_ID = 'session_id'
+
+
 class User:
     def __init__(self,
         user_id,
@@ -7,7 +10,8 @@ class User:
         settings=None,
         oauth_id=None,
         oauth_type=None,
-        sid=None
+        sid=None,
+        session_id=None
     ):
         self.user_id = user_id
         self.username = username
@@ -16,9 +20,19 @@ class User:
         self.settings = settings
         self.oauth_id = oauth_id
         self.oauth_type = oauth_type
+
         self.sid = sid
+        self.session_id = session_id
+
+        self.socket_connected = False
+        self.last_socket_connect = None
 
         self.room = None
+
+    def get_session_id(self):
+        if self.session_id is not None:
+            return self.session_id
+        return self.sid
 
     def serialize(self):
         return {
@@ -28,12 +42,22 @@ class User:
             'profile_url': self.profile_url,
             'settings': self.settings,
             'oauth_id': self.oauth_id,
-            'oauth_type': self.oauth_type
+            'oauth_type': self.oauth_type,
+
+            'sid': self.sid,
+            'session_id': self.session_id,
+
+            'socket_connected': self.socket_connected,
+            'last_socket_connect': self.last_socket_connect
         }
 
     @staticmethod
     def from_request(req):
-        user = User(None, sid=req.sid)
+        user = User(
+            None,
+            sid=req.sid,
+            session_id=req.cookies.get(COOKIE_SESSION_ID)
+        )
         return user
 
     @staticmethod
