@@ -10,7 +10,7 @@ class Message:
         self.user_id = user_id
         self.userdata = userdata
 
-    def json(self):
+    def serialize(self):
         return {
             'message_id': self.message_id,
             'text': self.text,

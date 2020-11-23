@@ -30,7 +30,7 @@ class ChatNamespace(flask_socketio.Namespace):
     def on_message_send(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
 
-        print(user.json())
+        print(user.serialize())
 
         text = data['text']
         user_id = user.user_id

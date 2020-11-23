@@ -61,7 +61,7 @@ class FlaskServer:
         cur.close()
 
         self.socketio.emit(MESSAGES_EMIT_CHANNEL, list(map(
-            lambda msg: msg.json(),
+            lambda msg: msg.serialize(),
             messages
         )))
 

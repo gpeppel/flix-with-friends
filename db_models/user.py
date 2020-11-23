@@ -20,7 +20,7 @@ class User:
 
         self.room = None
 
-    def json(self):
+    def serialize(self):
         return {
             'user_id': self.user_id,
             'username': self.username,
