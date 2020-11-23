@@ -1,7 +1,10 @@
+from db_models.base import Base
+
+
 COOKIE_SESSION_ID = 'session_id'
 
 
-class User:
+class User(Base):
     def __init__(self,
         user_id,
         username=None,
@@ -24,6 +27,8 @@ class User:
         self.sid = sid
         self.session_id = session_id
 
+        self.password = None
+
         self.socket_connected = False
         self.last_socket_connect = None
 
@@ -33,6 +38,28 @@ class User:
         if self.session_id is not None:
             return self.session_id
         return self.sid
+
+    def insert_to_db(self, cur):
+        cur.execute("""
+            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (oauth_id, oauth_type) DO UPDATE SET username = %s, email = %s, profile_url = %s
+            RETURNING user_id;
+        """, (
+            self.username,
+            self.password,
+            self.email,
+            self.profile_url,
+            self.settings,
+            self.oauth_id,
+            self.oauth_type,
+
+            self.username,
+            self.email,
+            self.profile_url
+        ))
+
+        result = cur.fetchone()
+        self.user_id = result['user_id']
 
     def serialize(self):
         return {
@@ -92,31 +119,6 @@ class User:
         user.settings = result['settings']
         user.oauth_id = result['oauth_id']
         user.oauth_type = result['oauth_type']
-
-        return user
-
-    @staticmethod
-    def insert_to_db(cur, user, password=None):
-        cur.execute("""
-            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (oauth_id, oauth_type) DO UPDATE SET username = %s, email = %s, profile_url = %s
-            RETURNING user_id;
-        """, (
-            user.username,
-            password,
-            user.email,
-            user.profile_url,
-            user.settings,
-            user.oauth_id,
-            user.oauth_type,
-
-            user.username,
-            user.email,
-            user.profile_url
-        ))
-
-        result = cur.fetchone()
-        user.user_id = result['user_id']
 
         return user
 

@@ -21,7 +21,7 @@ class ChatNamespace(flask_socketio.Namespace):
             return
 
         cur = self.flaskserver.db.cursor()
-        Message.insert_to_db(cur, msg)
+        msg.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 

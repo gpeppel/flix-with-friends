@@ -47,7 +47,7 @@ class LoginNamespace(flask_socketio.Namespace):
         user.oauth_id = data['response']['id']
         user.oauth_type = 'FACEBOOK'
 
-        User.insert_to_db(cur, user, password=None)
+        user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
@@ -95,7 +95,7 @@ class LoginNamespace(flask_socketio.Namespace):
         user.oauth_id = data['googleId']
         user.oauth_type = 'GOOGLE'
 
-        User.insert_to_db(cur, user, password=None)
+        user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 

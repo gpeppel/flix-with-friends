@@ -1,10 +1,17 @@
 import random
 
-class Room:
-    def __init__(self, room_id=None):
+from db_models.base import Base
+
+
+class Room(Base):
+    def __init__(self, room_id=None, name=None):
         self.room_id = room_id
         if self.room_id is None:
             self.room_id = Room.generate_room_id(12)
+
+        self.name = name
+
+        self.settings = None
 
         self.users = {}
         self.creator = None
@@ -41,6 +48,27 @@ class Room:
 
     def __len__(self):
         return len(self.users)
+
+    def insert_to_db(self, cur):
+        cur.execute("""
+            INSERT INTO room VALUES (%s, %s, %s);
+        """, (
+            self.room_id,
+            self.name,
+            self.settings
+        ))
+
+    def serialize(self):
+        obj = {
+            'room_id': self.room_id,
+            'creator': self.creator,
+            'users': {}
+        }
+
+        for user in self.users:
+            obj['users'][user.get_session_id()] = user.serialize()
+
+        return obj
 
     @staticmethod
     def generate_room_id(length=12):
