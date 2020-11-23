@@ -1,53 +1,22 @@
 body {
-  background-color: #ffc341;
+	background-color: #ffc341;
+	height: 100%;
+	margin: 0px;
 }
 
-.header {
-  padding: 20px;
-  background: #333333;
-  display: flex;
-
+.main-header {
+	padding: 20px;
+	background: #333333;
 }
 
-.header img {
-  float: left;
+.main-header .logo {
+	height: 40px;
 }
 
-.Content
-{
-    position: relative;
-    z-index: 1;
+.main-content {
+	display: flex;
 }
-    .Content:after
-    {
-        content: '';
-        clear: both;
-        display: block;
-    }
 
-.Wrapper
-{
-    /*position: absolute;*/
-    width: 80%;
-    height: 60%;
-}
-    .Wrapper > div
-    {
-        height: 100%;
-    }
-
-.LeftContent
-{
-    /*background-color: purple;*/
-    overflow: hidden;
-}
-.LeftContent:hover
-{
-    overflow: auto;
-}
-.RightContent
-{
-    background-color: orange;
-    float: right;
-    margin-left: 10px;
+.media-area {
+	margin: 5px 20px;
 }

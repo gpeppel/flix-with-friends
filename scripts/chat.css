@@ -1,35 +1,45 @@
-#name
-{
-    font-weight:bold;
-    align-items:center;
-    display:inline;
-    position: relative;
-    bottom: .5em;
-    line-height:2em;
+.message {
+	border-bottom: 1px solid #aaaaaa;
+	padding: 8px;
 }
 
-#message
-{
-    align-items:center;
-    display:inline;
-    position: relative;
-    bottom: .5em;
-    line-height:2em;
+.message .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
-#timestamp
-{
-    align-items:center;
-    display:inline;
-    position: relative;
-    bottom: .5em;
-    line-height:2em;
-    opacity:.5;
+.message .header .left {
+	display: flex;
+	align-items: center;
 }
 
-#profilePic
-{
-    width:30px;
-    height:30px;
-    padding-right:5px;
+.message .username {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.message .text {
+	font-size: 14px;
+	margin: 5px 0px 0px 0px;
+}
+
+.message .timestamp {
+	font-size: 12px;
+	opacity: 0.5;
+}
+
+.message .profileImg {
+	width: 32px;
+	height: 32px;
+	padding-right: 5px;
+}
+
+#chatArea {
+	width: 360px;
+	height: 100%;
+}
+
+#messageFeed {
+	overflow: auto;
 }
