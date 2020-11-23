@@ -15,7 +15,7 @@ export function ChatMessage(props)
 					<span>:</span>
 				</span>
 				<span className='right'>
-					<span className='timestamp'>{props.message.timestamp}</span>
+					<span className='timestamp'>{timestampToStr(props.message.timestamp)}</span>
 				</span>
 			</div>
 			<div className='content'>
@@ -23,4 +23,15 @@ export function ChatMessage(props)
 			</div>
 		</div>
 	);
+}
+
+function timestampToStr(timestamp)
+{
+	function lp0(x)
+	{
+		return x.toString().padStart(2, '0');
+	}
+
+	const date = new Date(timestamp);
+	return `${lp0(date.getHours())}:${lp0(date.getMinutes())}`;
 }
