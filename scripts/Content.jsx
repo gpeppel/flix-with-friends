@@ -37,12 +37,19 @@ export function Content()
 
 	return (
 		<div className='main-content'>
-			<div>
+			<div style={{
+				display: 'flex',
+				flex: 1
+			}}>
 				<Chat />
 			</div>
 			<div className='media-area'>
 				<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
 				<YoutubeContainer />
+			</div>
+			<div style={{
+				flex: 1
+			}}>
 			</div>
 		</div>
 	);

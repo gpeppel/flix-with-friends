@@ -15,8 +15,10 @@ body {
 
 .main-content {
 	display: flex;
+	flex: 1;
 }
 
 .media-area {
+	flex: 2;
 	margin: 5px 20px;
 }
