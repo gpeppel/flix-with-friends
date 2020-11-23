@@ -13,7 +13,6 @@ export default class YoutubePlayer
 		this.onPlaybackRateChange = onPlaybackRateChange;
 
 		this.player = undefined;
-		this.lastStates = [null, null, null];
 	}
 
 	isPlayerInState(state)
@@ -39,7 +38,7 @@ export default class YoutubePlayer
 				&& YoutubePlayer.checkSyncIgnore(this.player, t)
 			)
 			{
-				console.log('play cancel', this.lastStates, this.player.getPlayerState());
+				console.log('play cancel', this.player.getPlayerState());
 				return;
 			}
 
@@ -56,7 +55,7 @@ export default class YoutubePlayer
 				&& YoutubePlayer.checkSyncIgnore(this.player, t)
 			)
 			{
-				console.log('pause cancel', this.lastStates, this.player.getPlayerState());
+				console.log('pause cancel', this.player.getPlayerState());
 				return;
 			}
 
@@ -83,10 +82,6 @@ export default class YoutubePlayer
 
 	static onStateChangeWrapper(player, event)
 	{
-		player.lastStates[0] = player.lastStates[1];
-		player.lastStates[1] = player.lastStates[2];
-		player.lastStates[2] = event.data;
-
 		player.onStateChange(event);
 	}
 
@@ -126,14 +121,6 @@ export default class YoutubePlayer
 			'',
 			'cued'       // 5
 		][state + 1];
-	}
-
-	static isStateContinuation(lastStates, state)
-	{
-		const len = lastStates.length;
-		return lastStates[len - 3] == state
-			&& lastStates[len - 1] == state
-			&& lastStates[len - 2] == YoutubePlayer.prototype.PLAYER_BUFFERING;
 	}
 }
 
