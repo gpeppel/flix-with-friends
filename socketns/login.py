@@ -56,7 +56,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 room=user.sid,
             )
 
-    def on_logout_oauth_facebook(self):
+    def on_logout_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
 
         cur = self.flaskserver.db.cursor()

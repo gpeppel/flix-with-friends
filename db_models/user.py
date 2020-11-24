@@ -109,7 +109,6 @@ class User:
         result = cur.fetchone()
         user.user_id = result['user_id']
         return user
-        # TODO write remove user SQL
 
     @staticmethod
     def create_table(cur):
