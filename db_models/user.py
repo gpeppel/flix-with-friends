@@ -114,6 +114,7 @@ class User(Base):
 
         user.user_id = result['user_id']
         user.username = result['username']
+        user.password = result['password']
         user.email = result['email']
         user.profile_url = result['profile_url']
         user.settings = result['settings']
