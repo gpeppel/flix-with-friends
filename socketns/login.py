@@ -56,19 +56,23 @@ class LoginNamespace(flask_socketio.Namespace):
                 room=user.sid,
             )
 
-    def on_logout_oauth_facebook(self, data):
+    def on_logout_oauth_facebook(self):
         user = self.flaskserver.get_user_by_request(flask.request)
-        
+
         cur = self.flaskserver.db.cursor()
-        User.get_from_db(
-            cur, user, oauth={"id": user.sid, "type": "FACEBOOK"}
-        )
+        User.get_from_db(cur, user, oauth={"id": user.sid, "type": "FACEBOOK"})
 
         print("\nNew Logout:")
-        print('sid: ' + user.sid)
-        print('oauth_id: ' + user.oauth_id)
-        print('name: ' + user.username)
-        # TODO remove user from database
+        print("sid: " + user.sid)
+        print("oauth_id: " + user.oauth_id)
+        print("name: " + user.username)
+
+        removed_user = User.remove_from_db(cur, user, password=None)
+        self.flaskserver.db.commit()
+        cur.close()
+
+        print('\nRemoved user:')
+        print(removed_user.username)
 
     def on_login_oauth_google(self, data):
         print(data)

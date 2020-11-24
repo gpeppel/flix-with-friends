@@ -98,7 +98,17 @@ class User:
 
     @staticmethod
     def remove_from_db(cur, user, password=None):
-        pass
+        cur.execute("""
+            DELETE FROM account
+            WHERE oauth_id = %s
+            RETURNING user_id;
+        """, (
+            user.oauth_id,
+        ))
+
+        result = cur.fetchone()
+        user.user_id = result['user_id']
+        return user
         # TODO write remove user SQL
 
     @staticmethod
