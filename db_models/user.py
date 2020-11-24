@@ -97,6 +97,11 @@ class User:
         return user
 
     @staticmethod
+    def remove_from_db(cur, user, password=None):
+        pass
+        # TODO write remove user SQL
+
+    @staticmethod
     def create_table(cur):
         cur.execute("""
             CREATE TABLE IF NOT EXISTS account (
