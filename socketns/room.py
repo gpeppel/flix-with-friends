@@ -12,7 +12,7 @@ class RoomNamespace(flask_socketio.Namespace):
         print(data)
 
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.create_room()
+        room = self.flaskserver.create_room(user.get_session_id())
 
         room.add_user(user)
         room.set_creator(user)

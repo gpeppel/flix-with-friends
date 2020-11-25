@@ -18,6 +18,7 @@ class Room(Base):
 
     def add_user(self, user):
         self.users[user.sid] = user
+        user.room = self
 
         if self.creator is None:
             self.creator = user
@@ -26,6 +27,7 @@ class Room(Base):
         if user.sid not in self.users:
             return False
 
+        user.room = None
         del self.users[user.sid]
 
         if self.is_creator(user):
