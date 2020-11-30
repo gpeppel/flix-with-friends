@@ -13,6 +13,14 @@ export default class YoutubePlayer
 		this.onPlaybackRateChange = onPlaybackRateChange;
 
 		this.player = undefined;
+
+		this._loadCallback = undefined;
+	}
+
+	loadVideoById(videoId, callback)
+	{
+		this.player.loadVideoById(videoId);
+		this._loadCallback = callback;
 	}
 
 	isPlayerInState(state)
@@ -31,14 +39,11 @@ export default class YoutubePlayer
 
 		player.player.play = function(t)
 		{
-			console.log('play', t);
-
 			if(
 				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING)
 				&& YoutubePlayer.checkSyncIgnore(this.player, t)
 			)
 			{
-				console.log('play cancel', this.player.getPlayerState());
 				return;
 			}
 
@@ -48,14 +53,11 @@ export default class YoutubePlayer
 
 		player.player.pause = function(t)
 		{
-			console.log('pause', t);
-
 			if(
 				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED)
 				&& YoutubePlayer.checkSyncIgnore(this.player, t)
 			)
 			{
-				console.log('pause cancel', this.player.getPlayerState());
 				return;
 			}
 
@@ -65,11 +67,8 @@ export default class YoutubePlayer
 
 		player.player.setPlayback = function(t, s)
 		{
-			console.log('playback', s);
-
 			if(this.player.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this.player, t))
 			{
-				console.log('playback cancel');
 				return;
 			}
 
@@ -82,6 +81,12 @@ export default class YoutubePlayer
 
 	static onStateChangeWrapper(player, event)
 	{
+		if(player._loadCallback && event.data != YoutubePlayer.prototype.PLAYER_UNSTARTED)
+		{
+			player._loadCallback(event);
+			player._loadCallback = undefined;
+		}
+
 		player.onStateChange(event);
 	}
 
