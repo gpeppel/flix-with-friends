@@ -140,7 +140,7 @@ YT_STATE_CHANGES = {
 }
 
 YT_SPHERE_UPDATES = {
-    'properties.yaw|properties.roll': [
+    'properties.yaw': [
         {
             INPUT: None,
             OUTPUT: 0
@@ -162,7 +162,7 @@ YT_SPHERE_UPDATES = {
             OUTPUT: 0
         }
     ],
-    'properties.pitch': [
+    'properties.pitch|properties.roll': [
         {
             INPUT: None,
             OUTPUT: 0

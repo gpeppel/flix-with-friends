@@ -119,13 +119,13 @@ class YoutubeNamespace(flask_socketio.Namespace):
             0
         )
         pitch = self.getval(data, 'properties.pitch',
-            lambda x: isinstance(x, float) and x > -360 and x < 360,
-            lambda x: clamp(float(x), -360, 360),
+            lambda x: isinstance(x, float) and x >= -90 and x <= 90,
+            lambda x: clamp(float(x), -90, 90),
             0
         )
         roll = self.getval(data, 'properties.roll',
-            lambda x: isinstance(x, float) and x >= 0 and x < 360,
-            lambda x: clamp(float(x), 0, 360),
+            lambda x: isinstance(x, float) and x >= -180 and x <= 180,
+            lambda x: clamp(float(x), -180, 180),
             0
         )
         fov = self.getval(data, 'properties.fov',
