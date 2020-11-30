@@ -12,6 +12,9 @@ export default class YoutubePlayer
 		this.onStateChange = onStateChange;
 		this.onPlaybackRateChange = onPlaybackRateChange;
 
+		this.onFirstPlay = undefined;
+		this.hasPlayed = false;
+
 		this.player = undefined;
 
 		this._loadCallback = undefined;
@@ -83,8 +86,16 @@ export default class YoutubePlayer
 	{
 		if(player._loadCallback && event.data != YoutubePlayer.prototype.PLAYER_UNSTARTED)
 		{
+			player.hasPlayed = false;
 			player._loadCallback(event);
 			player._loadCallback = undefined;
+		}
+
+		if(!player.hasPlayed && event.data == YoutubePlayer.prototype.PLAYER_PLAYING)
+		{
+			if(player.onFirstPlay)
+				player.onFirstPlay(event);
+			player.hasPlayed = true;
 		}
 
 		player.onStateChange(event);

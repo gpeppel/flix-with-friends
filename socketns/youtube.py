@@ -47,6 +47,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if video_id is None:
             return
 
+        user.room.current_video_code = video_id
+
         user.room.emit(EVENT_YT_LOAD, {
             'videoId': video_id
         })

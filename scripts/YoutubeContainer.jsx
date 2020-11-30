@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Socket } from './Socket';
-import { UserContext } from './UserProvider';
+import { UserContext, UserDispatchContext } from './UserProvider';
 
 import YoutubePlayer from './youtube/youtube-player.js';
 import Lerp from './youtube/lerp.js';
@@ -22,6 +22,7 @@ const LERP_SPEED = 32;
 export function YoutubeContainer()
 {
 	const userDetails = React.useContext(UserContext);
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [ytPlayer, setYtPlayer] = React.useState(null);
 	const [ytComponent, setYtComponent] = React.useState(null);
 
@@ -51,6 +52,10 @@ export function YoutubeContainer()
 		console.log('ready', event);
 
 		ytPlayerRef.current.player.pauseVideo();
+
+		ytPlayerRef.current.onFirstPlay = (event) => {
+			rotationEmitter.start();
+		};
 
 		const lerpRotation = new FrameUpdate((timestamp, deltaTime) =>
 		{
@@ -106,7 +111,10 @@ export function YoutubeContainer()
 				return;
 
 			if(Object.keys(sphereProp).length == 0)
+			{
+				rotationEmitter.stop();
 				return;
+			}
 
 			Socket.emit(EVENT_YT_SPHERE_UPDATE, {
 				'properties': sphereProp
@@ -119,7 +127,11 @@ export function YoutubeContainer()
 			console.log('loading video...', data);
 			ytPlayerRef.current.loadVideoById(data.videoId, (event) => {
 				console.log('video loaded', event);
-				rotationEmitter.start();
+				updateUserDetails({
+					room: {
+						currentVideoCode: data.videoId
+					}
+				})
 			});
 		});
 
@@ -160,8 +172,6 @@ export function YoutubeContainer()
 
 	function onYtPlaybackRateChange(event)
 	{
-		console.log('playback change', event);
-
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYBACK_STR);
 	}
 
