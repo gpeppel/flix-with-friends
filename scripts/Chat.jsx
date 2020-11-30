@@ -16,9 +16,8 @@ export function Chat()
 			setMessages(data);
 			console.log(data);
 
-			const messageBox = document.getElementById('chatArea');
+			const messageBox = document.getElementById('messageFeed');
 			messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;
-			// TODO may have to set message scrollbar to bottom or something later
 		});
 	}, []);
 

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Content } from './Content';
 import { Socket } from './Socket';
+import { UserDispatchContext } from './UserProvider';
 import './options.css';
 
 
 export function Options()
 {
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = useState(false);
 
 	function enterRoom()
@@ -20,10 +22,14 @@ export function Options()
 		}, (data) =>
 		{
 			console.log(data);
-			if(data.status == 'ok')
-			{
-				enterRoom();
-			}
+			if(data.status != 'ok')
+				return;
+
+			updateUserDetails({
+				roomId: data.room_id,
+				roomName: data.room_name
+			});
+			enterRoom();
 		});
 	}
 
@@ -34,10 +40,10 @@ export function Options()
 		}, (data) =>
 		{
 			console.log(data);
-			if(data.status == 'ok')
-			{
-				enterRoom();
-			}
+			if(data.status != 'ok')
+				return;
+
+			enterRoom();
 		});
 	}
 

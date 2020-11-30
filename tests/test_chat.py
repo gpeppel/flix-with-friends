@@ -1,8 +1,6 @@
 from datetime import datetime
 import unittest
 import unittest.mock as mock
-import sys
-import time
 
 import app
 from tests.helpers import MockRequest
@@ -46,17 +44,21 @@ class ChatTest(unittest.TestCase):
     def test_parse_chat_message_success(self, mocked_id_generator):
         mock_req = MockRequest(TEST_SID)
         user = self.flaskserver.create_user_from_request(mock_req)
+        room = self.flaskserver.create_room(user.get_session_id())
+        room.add_user(user)
 
-        with mock.patch('flask.request', mock_req):
-            with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
-                for test in self.success_tests:
-                    mocked_id_generator.return_value = 1
-                    response = self.flaskserver.chat_ns.on_message_send(
-                        test[INPUT_MESSAGE])
-                    expected = test[MESSAGE_EXPECTED]
+        with mock.patch('flask.request', mock_req),\
+             mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
+            for test in self.success_tests:
+                mocked_id_generator.return_value = 1
+                response = self.flaskserver.chat_ns.on_message_send(
+                    test[INPUT_MESSAGE]
+                )
+                expected = test[MESSAGE_EXPECTED]
 
-                    for key, val in expected.items():
-                        if key == 'timestamp':
-                            self.assertTrue((response[key] - val).total_seconds() < 3)
-                        else:
-                            self.assertEqual(response[key], val)
+                for key, val in expected.items():
+                    if key == 'timestamp':
+                        self.assertTrue((response[key] - val).total_seconds() < 3)
+                    else:
+                        self.assertEqual(response[key], val)
+        self.flaskserver.delete_room(room)

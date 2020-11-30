@@ -12,6 +12,11 @@ import socketns.login
 import socketns.youtube
 import socketns.room
 
+import utils
+
+
+COOKIE_SESSION_ID = 'session_id'
+
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
 
@@ -52,7 +57,13 @@ class FlaskServer:
         )
 
     def index(self):
-        return flask.render_template('index.html')
+        resp = flask.make_response(flask.render_template('index.html'))
+
+        session_id = flask.request.cookies.get(COOKIE_SESSION_ID)
+        if session_id is None:
+            resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
+
+        return resp
 
     def debug(self):
         rooms = {}
@@ -82,16 +93,26 @@ class FlaskServer:
         )))
 
     def create_user_from_request(self, request):
-        user = User.from_request(request)
-        self.users[user.sid] = user
+        session_id = request.cookies.get(COOKIE_SESSION_ID)
+
+        if session_id is not None and session_id in self.users:
+            user = self.get_user_by_request(request)
+            user.sid = request.sid
+        else:
+            user = User.from_request(request)
+            self.users[user.get_session_id()] = user
 
         return user
 
     def delete_user(self, user):
-        del self.users[user.sid]
+        del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request):
-        return self.users[request.sid]
+        session_id = request.cookies.get(COOKIE_SESSION_ID)
+        if session_id is None:
+            session_id = request.sid
+
+        return self.users[session_id]
 
     def create_room(self, room_id=None):
         room = Room(room_id)

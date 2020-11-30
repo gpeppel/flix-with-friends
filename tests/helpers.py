@@ -6,6 +6,10 @@ class MockRequest:
     def __init__(self, sid):
         self.sid = sid
 
+        self.cookies = {}
+
+    def set_cookie(self, key, val):
+        self.cookies[key] = val
 
 # https://docs.python.org/2.5/whatsnew/pep-343.html
 @contextmanager

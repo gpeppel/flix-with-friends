@@ -21,7 +21,7 @@ class ChatNamespace(flask_socketio.Namespace):
             return
 
         cur = self.flaskserver.db.cursor()
-        Message.insert_to_db(cur, msg)
+        msg.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
@@ -35,7 +35,8 @@ class ChatNamespace(flask_socketio.Namespace):
         text = data['text']
         user_id = user.user_id
         timestamp = datetime.datetime.now()
-        room_id = 'testroom' # TODO use actual room id
+        room_id = 'testroom'
+        #room_id = user.room.room_id
 
         msg = Message(None, text, timestamp, room_id, user_id)
         return self.add_to_db(msg)

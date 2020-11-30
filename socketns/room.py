@@ -12,15 +12,15 @@ class RoomNamespace(flask_socketio.Namespace):
         print(data)
 
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.create_room()
+        room = self.flaskserver.create_room('testroom')
 
         room.add_user(user)
         room.set_creator(user)
 
         return {
             'status': 'ok',
-            'roomId': room.room_id,
-            'roomName': data['roomName']
+            'room_id': room.room_id,
+            'room_name': data['roomName']
         }
 
     def on_room_join(self, data):
