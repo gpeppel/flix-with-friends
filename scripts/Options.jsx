@@ -26,8 +26,10 @@ export function Options()
 				return;
 
 			updateUserDetails({
-				roomId: data.room_id,
-				roomName: data.room_name
+				room: {
+					id: data.room_id,
+					description: data.room_name
+				}
 			});
 			enterRoom();
 		});
@@ -63,7 +65,7 @@ export function Options()
 			<img className='popcorn-img' src='static/images/popcorn_button.png' alt='popcorn_button' />
 
 			<div className='section'>
-				<button className='button' onClick={onRoomNewClick}>Create New Viewing Room</button>
+				<button className='button' onClick={onRoomNewClick}>Host Viewing Room</button>
 			</div>
 
 			<div className='section room' style={{

@@ -4,10 +4,10 @@ from db_models.base import Base
 
 
 class Room(Base):
-    def __init__(self, socketio, room_id, name=None):
+    def __init__(self, socketio, room_id, description=None):
         self.socketio = socketio
         self.room_id = room_id
-        self.name = name
+        self.description = description
 
         self.room_code = Room.generate_room_id(length=16)
         self.settings = None
@@ -56,13 +56,14 @@ class Room(Base):
             ON CONFLICT (room_id) DO NOTHING;
         """, (
             self.room_id,
-            self.name,
+            self.description,
             self.settings
         ))
 
     def serialize(self):
         obj = {
             'room_id': self.room_id,
+            'description': self.description,
             'creator': self.creator.serialize(),
             'users': {}
         }
@@ -74,8 +75,8 @@ class Room(Base):
 
     @staticmethod
     def generate_room_id(length=16):
-        charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-        room_id = ""
+        charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+        room_id = ''
 
         for _ in range(length):
             room_id += charset[random.randint(0, len(charset) - 1)]
@@ -86,7 +87,7 @@ class Room(Base):
         cur.execute("""
             CREATE TABLE IF NOT EXISTS room (
                 room_id TEXT PRIMARY KEY,
-                name TEXT,
+                description TEXT,
                 settings TEXT
             );
         """)
