@@ -51,10 +51,7 @@ class LoginNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
-        self.flaskserver.socketio.emit('login_response', {
-            'status': 'ok',
-            'userId': user.user_id
-        }, room=user.sid)
+        self.emit_login_ok(user)
 
     def on_login_oauth_google(self, data):
         print(data)
@@ -99,7 +96,20 @@ class LoginNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
+        self.emit_login_ok(user)
+
+    def emit_login_ok(self, user):
         self.flaskserver.socketio.emit('login_response', {
             'status': 'ok',
-            'userId': user.user_id
+            'user': {
+                'id': user.user_id,
+                'username': user.username,
+                'email': user.email,
+                'profile_url': user.profile_url,
+                'settings': user.settings,
+                'oauth_id': user.oauth_id,
+                'oauth_type': user.oauth_type,
+                'sid': user.sid,
+                'session_id': user.session_id
+            }
         }, room=user.sid)
