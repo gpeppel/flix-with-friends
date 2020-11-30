@@ -12,14 +12,16 @@ function updateRoomTable(rooms)
 		function createUsersTd(users)
 		{
 			const td = document.createElement('td');
+			const pre = document.createElement('pre');
 
 			let str = '';
 			for (const user of users)
 			{
 				str += `${user.user_id}, ${user.username}\n`;
 			}
-			td.innerHTML = str;
+			pre.innerHTML = str;
 
+			td.appendChild(pre);
 			return td;
 		}
 
