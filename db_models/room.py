@@ -25,18 +25,12 @@ class Room(Base):
         self.users[user.sid] = user
         user.room = self
 
-        if self.creator is None:
-            self.creator = user
-
     def remove_user(self, user):
         if user.sid not in self.users:
             return False
 
         user.room = None
         del self.users[user.sid]
-
-        if self.is_creator(user):
-            self.creator = None
         return True
 
     def has_user(self, user):

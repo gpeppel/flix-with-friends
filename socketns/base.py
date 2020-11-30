@@ -27,5 +27,5 @@ class BaseNamespace(flask_socketio.Namespace):
         user = self.flaskserver.get_user_by_request(request)
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
-        # delete on logout
-        #self.flaskserver.delete_user(user)
+
+        user.room.remove_user(user)
