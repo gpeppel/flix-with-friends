@@ -44,7 +44,7 @@ class Message(Base):
 
         if room_id is not None:
             query += ' WHERE m.room_id = %s'
-            values = (room_id)
+            values = (room_id,)
 
         query += ';'
         cur.execute(query, values)
