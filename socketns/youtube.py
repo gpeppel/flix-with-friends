@@ -1,13 +1,14 @@
-import datetime
-import json
 import re
 
 import flask
 import flask_socketio
 
+import utils
+
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
-MESSAGES_EMIT_CHANNEL = 'messages_received'
+EVENT_YT_LOAD = 'yt_load'
+EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update'
 
 
 class YoutubeNamespace(flask_socketio.Namespace):
@@ -42,7 +43,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if video_id is None:
             return
 
-        self.flaskserver.socketio.emit('yt_load', {
+        self.flaskserver.socketio.emit(EVENT_YT_LOAD, {
             'videoId': video_id
         })
 
@@ -52,29 +53,25 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_state_change(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
 
-        print(
-            json.dumps(data).encode(
-                "ascii", errors="backslashreplace"
-            ).decode("ascii")
+        offset = self.getval(data, 'offset',
+            lambda x: isinstance(x, float),
+            lambda x: abs(float(x)),
+            0
         )
-
-        def getval(key, fnc_chk, fnc_fix, default=None):
-            val = data.get(key, default)
-            if not fnc_chk(val):
-                try:
-                    val = fnc_fix(val)
-                except Exception:
-                    val = default
-            return val
-
-        offset = getval('offset', lambda x: isinstance(x, float), lambda x: abs(float(x)), 0)
-        rate = getval('rate', lambda x: isinstance(x, float), lambda x: abs(float(x)), 1)
-        run_at = getval('runAt', lambda x: isinstance(x, int), lambda x: max(0, int(x)), 0)
-        timestamp = getval(
-            'timestamp',
+        rate = self.getval(data, 'rate',
+            lambda x: isinstance(x, float),
+            lambda x: abs(float(x)),
+            1
+        )
+        run_at = self.getval(data, 'runAt',
+            lambda x: isinstance(x, int),
+            lambda x: max(0, int(x)),
+            0
+        )
+        timestamp = self.getval(data, 'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
-            self.unix_timestamp()
+            utils.unix_timestamp()
         )
 
         if data.get('state') not in [
@@ -92,14 +89,57 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
         self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
             'state': data['state'],
-            'sender': user.id,
+            'sender': user.username,
             'offset': offset,
             'rate': rate,
             'runAt': run_at,
             'timestamp': timestamp
         }, include_self=False)
 
-    def unix_timestamp(self, timestamp=None):
-        if timestamp is None:
-            timestamp = datetime.datetime.utcnow()
-        return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
+    def on_yt_sphere_update(self, data):
+        self.handle_yt_sphere_update(flask.request, data)
+
+    def handle_yt_sphere_update(self, request, data):
+        user = self.flaskserver.get_user_by_request(request)
+
+        def clamp(val, minval, maxval):
+            return max(min(val, maxval), minval)
+
+        yaw = self.getval(data, 'properties.yaw',
+            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: clamp(float(x), 0, 360),
+            0
+        )
+        pitch = self.getval(data, 'properties.pitch',
+            lambda x: isinstance(x, float) and x > -360 and x < 360,
+            lambda x: clamp(float(x), -360, 360),
+            0
+        )
+        roll = self.getval(data, 'properties.roll',
+            lambda x: isinstance(x, float) and x >= 0 and x < 360,
+            lambda x: clamp(float(x), 0, 360),
+            0
+        )
+        fov = self.getval(data, 'properties.fov',
+            lambda x: isinstance(x, float) and x >= 30 and x <= 120,
+            lambda x: clamp(float(x), 30, 120),
+            100
+        )
+
+        self.flaskserver.socketio.emit(EVENT_YT_SPHERE_UPDATE, {
+            'properties': {
+                'yaw': yaw,
+                'pitch': pitch,
+                'roll': roll,
+                'fov': fov
+            }
+        }, include_self=False)
+
+    def getval(self, data, key, fnc_chk, fnc_fix, default=None):
+        val = utils.getval(data, key, default)
+        if not fnc_chk(val):
+            try:
+                val = fnc_fix(val)
+            except Exception:
+                val = default
+        return val
