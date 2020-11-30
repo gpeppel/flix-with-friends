@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import FrameUpdate from './youtube/frame-update.js';
+import FrameUpdate from './utils/frame-update.js';
 
 
 const SPEED = 4;

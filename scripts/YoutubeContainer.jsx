@@ -4,9 +4,9 @@ import { Socket } from './Socket';
 import { UserContext, UserDispatchContext } from './UserProvider';
 
 import { Youtube360Controller } from './Youtube360Controller';
-import YoutubePlayer from './youtube/youtube-player.js';
-import Lerp from './youtube/lerp.js';
-import FrameUpdate from './youtube/frame-update.js';
+import YoutubePlayer from './utils/youtube-player.js';
+import FrameUpdate from './utils/frame-update.js';
+import Lerp from './utils/lerp.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
