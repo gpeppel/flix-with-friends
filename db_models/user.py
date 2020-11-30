@@ -62,7 +62,7 @@ class User(Base):
         self.user_id = result['user_id']
 
     def serialize(self):
-        return {
+        obj = {
             'user_id': self.user_id,
             'username': self.username,
             'email': self.email,
@@ -74,9 +74,15 @@ class User(Base):
             'sid': self.sid,
             'session_id': self.session_id,
 
-            'socket_connected': self.socket_connected,
-            'last_socket_connect': self.last_socket_connect
+            'socket_connected': self.socket_connected
         }
+
+        if self.last_socket_connect is not None:
+            obj['last_socket_connect'] = self.last_socket_connect.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            obj['last_socket_connect'] = None
+
+        return obj
 
     @staticmethod
     def from_request(req):
