@@ -7,7 +7,35 @@ const usertable = document.getElementById('usertable');
 
 function updateRoomTable(rooms)
 {
+	function createRow(room)
+	{
+		function createUsersTd(users)
+		{
+			const td = document.createElement('td');
 
+			let str = '';
+			for (const user of users)
+			{
+				str += `${user.user_id}, ${user.username}\n`;
+			}
+			td.innerHTML = str;
+
+			return td;
+		}
+
+		const row = document.createElement('tr');
+
+		row.appendChild(createTd(room.room_id));
+		row.appendChild(createUsersTd([room.creator]));
+		row.appendChild(createUsersTd(Object.values(room.users)));
+		return row;
+	}
+
+	while(roomtable.children.length > 1)
+		roomtable.removeChild(roomtable.children[1]);
+
+	for (const roomId in rooms)
+		roomtable.appendChild(createRow(rooms[roomId]));
 }
 
 function updateUserTable(users)
