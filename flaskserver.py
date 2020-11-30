@@ -1,3 +1,5 @@
+import json
+
 import flask
 import flask_socketio
 
@@ -25,6 +27,7 @@ class FlaskServer:
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
         self.app.add_url_rule('/debug', 'debug', self.debug)
+        self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
 
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
@@ -66,18 +69,28 @@ class FlaskServer:
         return resp
 
     def debug(self):
-        rooms = {}
-        users = {}
+        return flask.render_template('debug.html')
+
+    def debug_json(self):
+        return flask.Response(
+            json.dumps(self.get_debug_data()),
+            mimetype='application/json'
+        )
+
+    def get_debug_data(self):
+        data = {
+            'rooms': {},
+            'users': {}
+        }
+        rooms = data['rooms']
+        users = data['users']
 
         for room_id, room in self.rooms.items():
             rooms[room_id] = room.serialize()
         for sid, user in self.users.items():
             users[sid] = user.serialize()
 
-        return flask.render_template('debug.html',
-            rooms=rooms,
-            users=users
-        )
+        return data
 
     def emit_all_messages(self):
         if not self.db_connected():
