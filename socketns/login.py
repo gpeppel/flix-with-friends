@@ -43,7 +43,10 @@ class LoginNamespace(flask_socketio.Namespace):
             })
 
             user.username = data['response']['name']
-            user.email = data['response']['email']
+            if user.email:
+                user.email = data['response']['email']
+            else:
+                user.email = data['response']['id']
             user.profile_url = data['response']['picture']['data']['url']
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
