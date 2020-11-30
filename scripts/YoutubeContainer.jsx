@@ -46,40 +46,12 @@ export function YoutubeContainer()
 
 	function onYtReady(event)
 	{
+		let passive = false;
+		let lastRotation = undefined;
+
 		console.log('ready', event);
 
 		ytPlayerRef.current.player.pauseVideo();
-
-		Socket.on(EVENT_YT_LOAD, (data) =>
-		{
-			console.log('load video', data);
-			ytPlayerRef.current.player.loadVideoById(data.videoId);
-		});
-
-		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
-		{
-			data.timestamp = parseInt(data.timestamp, 10);
-
-			const ts = (new Date()).getTime();
-			const tsdiff = Math.max(0, ts - data.timestamp);
-			const adjustedOffset = data.offset + (tsdiff / 1000);
-
-			switch(data.state)
-			{
-			case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
-				ytPlayerRef.current.player.play(adjustedOffset);
-				break;
-			case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
-				ytPlayerRef.current.player.pause(adjustedOffset);
-				break;
-			case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
-				ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
-				break;
-			}
-		});
-
-		let passive = false;
-		let lastRotation = undefined;
 
 		const lerpRotation = new FrameUpdate((timestamp, deltaTime) =>
 		{
@@ -114,12 +86,6 @@ export function YoutubeContainer()
 		});
 		lerpRotation.start();
 
-		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
-		{
-			passive = true;
-			lastRotation = data.properties;
-		});
-
 		const stateEmitter = new FrameUpdate(() =>
 		{
 			switch(ytPlayerRef.current.player.getPlayerState())
@@ -151,6 +117,43 @@ export function YoutubeContainer()
 			});
 		}, UPDATE_SPHERE_EMIT_DELAY);
 		rotationEmitter.start();
+
+		Socket.on(EVENT_YT_LOAD, (data) =>
+		{
+			console.log('loading video...', data);
+			ytPlayerRef.current.loadVideoById(data.videoId, (event) => {
+				console.log('video loaded', event);
+				rotationEmitter.start();
+			});
+		});
+
+		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
+		{
+			data.timestamp = parseInt(data.timestamp, 10);
+
+			const ts = (new Date()).getTime();
+			const tsdiff = Math.max(0, ts - data.timestamp);
+			const adjustedOffset = data.offset + (tsdiff / 1000);
+
+			switch(data.state)
+			{
+			case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
+				ytPlayerRef.current.player.play(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
+				ytPlayerRef.current.player.pause(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
+				ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
+				break;
+			}
+		});
+
+		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
+		{
+			passive = true;
+			lastRotation = data.properties;
+		});
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
 	}
