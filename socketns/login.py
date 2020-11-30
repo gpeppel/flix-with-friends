@@ -29,10 +29,7 @@ class LoginNamespace(flask_socketio.Namespace):
 
         # TODO verify access token
         if 'status' in data['response'].keys():
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
+            self.emit_login_fail(user)
             return
 
         cur = self.flaskserver.db.cursor()
@@ -74,10 +71,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 req.session.close()
 
         if failed:
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
+            self.emit_login_fail(user)
             return
 
         cur = self.flaskserver.db.cursor()
@@ -112,4 +106,10 @@ class LoginNamespace(flask_socketio.Namespace):
                 'sid': user.sid,
                 'session_id': user.session_id
             }
+        }, room=user.sid)
+
+    def emit_login_fail(self, user):
+        self.flaskserver.socketio.emit('login_response', {
+            'status': 'fail',
+            'user': {}
         }, room=user.sid)
