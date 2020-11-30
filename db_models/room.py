@@ -63,11 +63,11 @@ class Room(Base):
     def serialize(self):
         obj = {
             'room_id': self.room_id,
-            'creator': self.creator,
+            'creator': self.creator.serialize(),
             'users': {}
         }
 
-        for user in self.users:
+        for user in self.users.values():
             obj['users'][user.get_session_id()] = user.serialize()
 
         return obj
