@@ -12,7 +12,7 @@ class RoomNamespace(flask_socketio.Namespace):
         print(data)
 
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.create_room('testroom')
+        room = self.flaskserver.create_room(user.get_session_id())
 
         room.add_user(user)
         room.set_creator(user)
@@ -37,14 +37,13 @@ class RoomNamespace(flask_socketio.Namespace):
 
         room.add_user(user)
 
-        self.flaskserver.emit_all_messages()
-
-        for member in room.users:
-            self.flaskserver.socketio.emit('user_join', {
-                'user_id': user.user_id,
-                'username': user.username
-            }, room=member.sid)
+        room.emit('user_join', {
+            'user_id': user.user_id,
+            'username': user.username
+        })
 
         return {
             'status': 'ok',
+            'room_id': room.room_id,
+            'room_name': room.name
         }

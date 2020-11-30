@@ -26,7 +26,7 @@ class ChatTest(unittest.TestCase):
                     'message_id': None,
                     'text': 'test_message_text',
                     'timestamp': datetime.now(),
-                    'room_id': 'testroom',
+                    'room_id': '69cbaae81f874b36ae9e24be92f79006',
                     'user_id': None,
                 }
             }
@@ -44,7 +44,7 @@ class ChatTest(unittest.TestCase):
     def test_parse_chat_message_success(self, mocked_id_generator):
         mock_req = MockRequest(TEST_SID)
         user = self.flaskserver.create_user_from_request(mock_req)
-        room = self.flaskserver.create_room(user.get_session_id())
+        room = self.flaskserver.create_room(user.sid)
         room.add_user(user)
 
         with mock.patch('flask.request', mock_req),\

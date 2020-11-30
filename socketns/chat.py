@@ -13,8 +13,8 @@ class ChatNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_chat_loaded(self):
-        print('\n\n\nCHAT_LOADED\n\n\n')
-        self.flaskserver.emit_all_messages()
+        user = self.flaskserver.get_user_by_request(flask.request)
+        self.flaskserver.emit_all_messages(user.room)
 
     def add_to_db(self, msg):
         if not self.flaskserver.db_connected():
@@ -25,7 +25,9 @@ class ChatNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
-        self.flaskserver.emit_all_messages()
+        print(msg.serialize())
+
+        self.flaskserver.emit_all_messages(self.flaskserver.rooms[msg.room_id])
 
     def on_message_send(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
@@ -35,8 +37,7 @@ class ChatNamespace(flask_socketio.Namespace):
         text = data['text']
         user_id = user.user_id
         timestamp = datetime.datetime.now()
-        room_id = 'testroom'
-        #room_id = user.room.room_id
+        room_id = user.room.room_id
 
         msg = Message(None, text, timestamp, room_id, user_id)
         return self.add_to_db(msg)

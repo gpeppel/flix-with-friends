@@ -35,9 +35,9 @@ class User(Base):
         self.room = None
 
     def get_session_id(self):
-        if self.session_id is not None:
-            return self.session_id
-        return self.sid
+        if self.session_id is None:
+            return self.sid
+        return self.session_id
 
     def insert_to_db(self, cur):
         cur.execute("""

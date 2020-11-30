@@ -92,23 +92,22 @@ class FlaskServer:
 
         return data
 
-    def emit_all_messages(self):
+    def emit_all_messages(self, room):
         if not self.db_connected():
             return
 
         cur = self.db.cursor()
-        messages = Message.get_messages(cur, room_id=None)
+        messages = Message.get_messages(cur, room_id=room.room_id)
         cur.close()
 
-        self.socketio.emit(MESSAGES_EMIT_CHANNEL, list(map(
+        room.emit(MESSAGES_EMIT_CHANNEL, list(map(
             lambda msg: msg.serialize(),
             messages
         )))
 
     def create_user_from_request(self, request):
         session_id = request.cookies.get(COOKIE_SESSION_ID)
-
-        if session_id is not None and session_id in self.users:
+        if session_id in self.users:
             user = self.get_user_by_request(request)
             user.sid = request.sid
         else:
@@ -127,9 +126,17 @@ class FlaskServer:
 
         return self.users[session_id]
 
-    def create_room(self, room_id=None):
-        room = Room(room_id)
-        self.rooms[room.room_id] = room
+    def create_room(self, room_id):
+        if room_id in self.rooms:
+            room = self.rooms[room_id]
+        else:
+            room = Room(self.socketio, room_id)
+            self.rooms[room.room_id] = room
+
+            cur = self.db.cursor()
+            room.insert_to_db(cur)
+            self.db.commit()
+            cur.close()
 
         return room
 

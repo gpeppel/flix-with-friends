@@ -4,17 +4,22 @@ from db_models.base import Base
 
 
 class Room(Base):
-    def __init__(self, room_id=None, name=None):
+    def __init__(self, socketio, room_id, name=None):
+        self.socketio = socketio
         self.room_id = room_id
-        if self.room_id is None:
-            self.room_id = Room.generate_room_id(12)
-
         self.name = name
 
+        self.room_code = Room.generate_room_id(length=16)
         self.settings = None
 
         self.users = {}
         self.creator = None
+
+    def emit(self, event, *args, sender=None):
+        for sid, user in self.users.items():
+            if sender is not None and sender.sid == sid:
+                continue
+            self.socketio.emit(event, *args, room=sid)
 
     def add_user(self, user):
         self.users[user.sid] = user
@@ -53,7 +58,8 @@ class Room(Base):
 
     def insert_to_db(self, cur):
         cur.execute("""
-            INSERT INTO room VALUES (%s, %s, %s);
+            INSERT INTO room VALUES (%s, %s, %s)
+            ON CONFLICT (room_id) DO NOTHING;
         """, (
             self.room_id,
             self.name,
@@ -73,7 +79,7 @@ class Room(Base):
         return obj
 
     @staticmethod
-    def generate_room_id(length=12):
+    def generate_room_id(length=16):
         charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
         room_id = ""
 
