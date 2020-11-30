@@ -140,7 +140,7 @@ YT_STATE_CHANGES = {
 }
 
 YT_SPHERE_UPDATES = {
-    'properties.yaw|properties.roll': [
+    'properties.yaw': [
         {
             INPUT: None,
             OUTPUT: 0
@@ -162,7 +162,7 @@ YT_SPHERE_UPDATES = {
             OUTPUT: 0
         }
     ],
-    'properties.pitch': [
+    'properties.pitch|properties.roll': [
         {
             INPUT: None,
             OUTPUT: 0
@@ -229,6 +229,12 @@ class YoutubeTest(unittest.TestCase):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
+            self.flaskserver.base_ns.connect_user(mock_req)
+            user = self.flaskserver.get_user_by_request(mock_req)
+            room = self.flaskserver.create_room(TEST_SID)
+            room.add_user(user)
+            emit_list.clear()
+
             self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
 
             self.assertTrue(len(emit_list) == 0)
@@ -247,11 +253,17 @@ class YoutubeTest(unittest.TestCase):
                 self.assertEqual(emit['event'], 'yt_load')
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
+            self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.delete_room(room)
+
     def test_handle_yt_state_change_success(self):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
             self.flaskserver.base_ns.connect_user(mock_req)
+            user = self.flaskserver.get_user_by_request(mock_req)
+            room = self.flaskserver.create_room(TEST_SID)
+            room.add_user(user)
             emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():
@@ -276,12 +288,16 @@ class YoutubeTest(unittest.TestCase):
                         self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.delete_room(room)
 
     def test_handle_yt_state_change_fail(self):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
             self.flaskserver.base_ns.connect_user(mock_req)
+            user = self.flaskserver.get_user_by_request(mock_req)
+            room = self.flaskserver.create_room(TEST_SID)
+            room.add_user(user)
             emit_list.clear()
 
             for name in YT_STATE_NAMES_INVALID:
@@ -292,12 +308,16 @@ class YoutubeTest(unittest.TestCase):
                 self.assertTrue(len(emit_list) == 0)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.delete_room(room)
 
     def test_handle_yt_sphere_update(self):
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
             self.flaskserver.base_ns.connect_user(mock_req)
+            user = self.flaskserver.get_user_by_request(mock_req)
+            room = self.flaskserver.create_room(TEST_SID)
+            room.add_user(user)
             emit_list.clear()
 
             for key, value_list in YT_SPHERE_UPDATES.items():
@@ -322,6 +342,7 @@ class YoutubeTest(unittest.TestCase):
                         self.assertEqual(utils.getval(data, k), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.delete_room(room)
 
     def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):

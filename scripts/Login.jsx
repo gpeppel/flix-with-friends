@@ -3,10 +3,12 @@ import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { GoogleButton } from './GoogleButton';
 import { Socket } from './Socket';
+import { UserDispatchContext } from './UserProvider';
 import './login.css';
 
 export function Login()
 {
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = React.useState(false);
 
 	React.useEffect(() =>
@@ -17,6 +19,20 @@ export function Login()
 
 			if(data.status != 'ok')
 				return;
+
+			const user = data.user;
+
+			updateUserDetails({
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				profileUrl: user.profile_url,
+				settings: user.settings,
+				oauthId: user.oauth_id,
+				oauthType: user.oauth_type,
+				sid: user.sid,
+				sessionId: user.session_id
+			});
 
 			setFlag(true);
 		});

@@ -27,35 +27,28 @@ class LoginNamespace(flask_socketio.Namespace):
     def on_login_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
 
-        key = 'status'
-        if key in data['response'].keys():
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
-        else:
-            # TODO verify access token
+        # TODO verify access token
+        if 'status' in data['response'].keys():
+            self.emit_login_fail(user)
+            return
 
-            cur = self.flaskserver.db.cursor()
-            User.get_from_db(cur, user, oauth={
-                'id': data['response']['id'],
-                'type': 'FACEBOOK'
-            })
+        cur = self.flaskserver.db.cursor()
+        User.get_from_db(cur, user, oauth={
+            'id': data['response']['id'],
+            'type': 'FACEBOOK'
+        })
 
-            user.username = data['response']['name']
-            user.email = data['response']['email']
-            user.profile_url = data['response']['picture']['data']['url']
-            user.oauth_id = data['response']['id']
-            user.oauth_type = 'FACEBOOK'
+        user.username = data['response']['name']
+        user.email = data['response']['email']
+        user.profile_url = data['response']['picture']['data']['url']
+        user.oauth_id = data['response']['id']
+        user.oauth_type = 'FACEBOOK'
 
-            User.insert_to_db(cur, user, password=None)
-            self.flaskserver.db.commit()
-            cur.close()
+        user.insert_to_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
 
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'ok',
-                'userId': user.user_id
-            }, room=user.sid)
+        self.emit_login_ok(user)
 
     def on_login_oauth_google(self, data):
         print(data)
@@ -78,10 +71,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 req.session.close()
 
         if failed:
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
+            self.emit_login_fail(user)
             return
 
         cur = self.flaskserver.db.cursor()
@@ -96,11 +86,30 @@ class LoginNamespace(flask_socketio.Namespace):
         user.oauth_id = data['googleId']
         user.oauth_type = 'GOOGLE'
 
-        User.insert_to_db(cur, user, password=None)
+        user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
+        self.emit_login_ok(user)
+
+    def emit_login_ok(self, user):
         self.flaskserver.socketio.emit('login_response', {
             'status': 'ok',
-            'userId': user.user_id
+            'user': {
+                'id': user.user_id,
+                'username': user.username,
+                'email': user.email,
+                'profile_url': user.profile_url,
+                'settings': user.settings,
+                'oauth_id': user.oauth_id,
+                'oauth_type': user.oauth_type,
+                'sid': user.sid,
+                'session_id': user.session_id
+            }
+        }, room=user.sid)
+
+    def emit_login_fail(self, user):
+        self.flaskserver.socketio.emit('login_response', {
+            'status': 'fail',
+            'user': {}
         }, room=user.sid)

@@ -1,21 +1,14 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { Login } from './Login';
+import { App } from './App';
+import { UserProvider } from './UserProvider';
 
 ReactDOM.render(
 	(
-		<div style={{
-			display: 'flex',
-			flexDirection: 'column',
-			height: '100%'
-		}}>
-			<div className='main-header'>
-				<img className='logo' src="static/images/logo.png" alt="logo" />
-			</div>
-
-			<Login />
-		</div>
-	)
-	, document.getElementById('content')
+		<UserProvider>
+			<App />
+		</UserProvider>
+	),
+	document.getElementById('content')
 );

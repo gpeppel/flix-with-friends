@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Socket } from './Socket';
+import { UserContext } from './UserProvider';
 
 import YoutubePlayer from './youtube/youtube-player.js';
 import Lerp from './youtube/lerp.js';
@@ -20,6 +21,7 @@ const LERP_SPEED = 32;
 
 export function YoutubeContainer()
 {
+	const userDetails = React.useContext(UserContext);
 	const [ytPlayer, setYtPlayer] = React.useState(null);
 	const [ytComponent, setYtComponent] = React.useState(null);
 
@@ -28,7 +30,7 @@ export function YoutubeContainer()
 
 	React.useEffect(() =>
 	{
-		const [player, component] = YoutubePlayer.createYoutubePlayer('dQw4w9WgXcQ', {
+		const [player, component] = YoutubePlayer.createYoutubePlayer(userDetails.room.currentVideoCode, {
 			playerVars: {
 				autoplay: 0,
 				controls: 1,

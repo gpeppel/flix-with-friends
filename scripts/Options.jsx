@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Content } from './Content';
 import { Socket } from './Socket';
+import { UserDispatchContext } from './UserProvider';
 import './options.css';
 
 
 export function Options()
 {
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = useState(false);
 
 	function enterRoom()
@@ -16,14 +18,22 @@ export function Options()
 	function onRoomNewClick()
 	{
 		Socket.emit('room_create', {
-			roomName: 'test room'
+			description: 'test room',
+			playlist: document.getElementById('playlist').value.split('\n')
 		}, (data) =>
 		{
 			console.log(data);
-			if(data.status == 'ok')
-			{
-				enterRoom();
-			}
+			if(data.status != 'ok')
+				return;
+
+			updateUserDetails({
+				room: {
+					id: data.room_id,
+					description: data.room_name,
+					currentVideoCode: data.current_video_code
+				}
+			});
+			enterRoom();
 		});
 	}
 
@@ -34,10 +44,17 @@ export function Options()
 		}, (data) =>
 		{
 			console.log(data);
-			if(data.status == 'ok')
-			{
-				enterRoom();
-			}
+			if(data.status != 'ok')
+				return;
+
+			updateUserDetails({
+				room: {
+					id: data.room_id,
+					description: data.room_name,
+					currentVideoCode: data.current_video_code
+				}
+			});
+			enterRoom();
 		});
 	}
 
@@ -57,7 +74,10 @@ export function Options()
 			<img className='popcorn-img' src='static/images/popcorn_button.png' alt='popcorn_button' />
 
 			<div className='section'>
-				<button className='button' onClick={onRoomNewClick}>Create New Viewing Room</button>
+				<div>
+					<textarea id='playlist' placeholder='Youtube Videos (one per line)'></textarea>
+				</div>
+				<button className='button' onClick={onRoomNewClick}>Host Viewing Room</button>
 			</div>
 
 			<div className='section room' style={{

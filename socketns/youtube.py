@@ -35,6 +35,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
         return None
 
     def handle_yt_load(self, request, data):
+        user = self.flaskserver.get_user_by_request(request)
+        if user.room is None:
+            return
+
         url = data.get('url')
         if url is None:
             return
@@ -43,7 +47,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if video_id is None:
             return
 
-        self.flaskserver.socketio.emit(EVENT_YT_LOAD, {
+        user.room.emit(EVENT_YT_LOAD, {
             'videoId': video_id
         })
 
@@ -52,6 +56,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
     def handle_yt_state_change(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
+        if user.room is None:
+            return
 
         offset = self.getval(data, 'offset',
             lambda x: isinstance(x, float),
@@ -87,20 +93,22 @@ class YoutubeNamespace(flask_socketio.Namespace):
         ]:
             return
 
-        self.flaskserver.socketio.emit(EVENT_YT_STATE_CHANGE, {
+        user.room.emit(EVENT_YT_STATE_CHANGE, {
             'state': data['state'],
             'sender': user.username,
             'offset': offset,
             'rate': rate,
             'runAt': run_at,
             'timestamp': timestamp
-        }, include_self=False)
+        })
 
     def on_yt_sphere_update(self, data):
         self.handle_yt_sphere_update(flask.request, data)
 
     def handle_yt_sphere_update(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
+        if user.room is None:
+            return
 
         def clamp(val, minval, maxval):
             return max(min(val, maxval), minval)
@@ -111,13 +119,13 @@ class YoutubeNamespace(flask_socketio.Namespace):
             0
         )
         pitch = self.getval(data, 'properties.pitch',
-            lambda x: isinstance(x, float) and x > -360 and x < 360,
-            lambda x: clamp(float(x), -360, 360),
+            lambda x: isinstance(x, float) and x >= -90 and x <= 90,
+            lambda x: clamp(float(x), -90, 90),
             0
         )
         roll = self.getval(data, 'properties.roll',
-            lambda x: isinstance(x, float) and x >= 0 and x < 360,
-            lambda x: clamp(float(x), 0, 360),
+            lambda x: isinstance(x, float) and x >= -180 and x <= 180,
+            lambda x: clamp(float(x), -180, 180),
             0
         )
         fov = self.getval(data, 'properties.fov',
@@ -126,14 +134,17 @@ class YoutubeNamespace(flask_socketio.Namespace):
             100
         )
 
-        self.flaskserver.socketio.emit(EVENT_YT_SPHERE_UPDATE, {
+        #if not user.room.is_creator(user):
+        #    return
+
+        user.room.emit(EVENT_YT_SPHERE_UPDATE, {
             'properties': {
                 'yaw': yaw,
                 'pitch': pitch,
                 'roll': roll,
                 'fov': fov
             }
-        }, include_self=False)
+        })
 
     def getval(self, data, key, fnc_chk, fnc_fix, default=None):
         val = utils.getval(data, key, default)

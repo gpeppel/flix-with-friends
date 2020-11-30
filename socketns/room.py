@@ -9,23 +9,24 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_room_create(self, data):
-        print(data)
-
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.create_room()
+        room = self.flaskserver.create_room(user.get_session_id())
 
         room.add_user(user)
         room.set_creator(user)
 
+        room.current_video_code = data['playlist'][0]
+        if len(room.current_video_code) == 0:
+            room.current_video_code = 'dQw4w9WgXcQ'
+
         return {
             'status': 'ok',
-            'roomId': room.room_id,
-            'roomName': data['roomName']
+            'room_id': room.room_id,
+            'description': data['description'],
+            'current_video_code': room.get_current_video_code()
         }
 
     def on_room_join(self, data):
-        print(data)
-
         user = self.flaskserver.get_user_by_request(flask.request)
         room = self.flaskserver.get_room(data['roomId'])
 
@@ -37,14 +38,14 @@ class RoomNamespace(flask_socketio.Namespace):
 
         room.add_user(user)
 
-        self.flaskserver.emit_all_messages()
-
-        for member in room.users:
-            self.flaskserver.socketio.emit('user_join', {
-                'user_id': user.user_id,
-                'username': user.username
-            }, room=member.sid)
+        room.emit('user_join', {
+            'user_id': user.user_id,
+            'username': user.username
+        })
 
         return {
             'status': 'ok',
+            'room_id': room.room_id,
+            'description': room.description,
+            'current_video_code': room.get_current_video_code()
         }

@@ -1,4 +1,16 @@
 import datetime
+import random
+
+
+def random_hex(length, upper=False):
+    hex = '0123456789abcdef'
+    if upper:
+        hex = hex.upper()
+
+    result = ''
+    for _ in range(length):
+        result += hex[random.randint(0, len(hex) - 1)]
+    return result
 
 def unix_timestamp(timestamp=None):
     if timestamp is None:
