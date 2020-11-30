@@ -1,9 +1,8 @@
-import random
 import unittest
 
 import app
-import tests.helpers as helpers
 from tests.helpers import MockRequest, hook_socket_emit
+import utils
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -123,7 +122,7 @@ YT_STATE_CHANGES = {
     'timestamp': [
         {
             INPUT: None,
-            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+            OUTPUT: 'eval:utils.unix_timestamp()'
         },
         {
             INPUT: 0,
@@ -131,11 +130,84 @@ YT_STATE_CHANGES = {
         },
         {
             INPUT: 'asdf',
-            OUTPUT: 'eval:self.flaskserver.youtube_ns.unix_timestamp()'
+            OUTPUT: 'eval:utils.unix_timestamp()'
         },
         {
             INPUT: 100,
             OUTPUT: 100
+        },
+    ]
+}
+
+YT_SPHERE_UPDATES = {
+    'properties.yaw|properties.roll': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -6,
+            OUTPUT: 0
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'properties.pitch': [
+        {
+            INPUT: None,
+            OUTPUT: 0
+        },
+        {
+            INPUT: -6,
+            OUTPUT: -6
+        },
+        {
+            INPUT: 6,
+            OUTPUT: 6
+        },
+        {
+            INPUT: 12.4,
+            OUTPUT: 12.4
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 0
+        }
+    ],
+    'properties.fov': [
+        {
+            INPUT: None,
+            OUTPUT: 100
+        },
+        {
+            INPUT: 'asdf',
+            OUTPUT: 100
+        },
+        {
+            INPUT: 0,
+            OUTPUT: 30
+        },
+        {
+            INPUT: 100,
+            OUTPUT: 100
+        },
+        {
+            INPUT: 80.5421,
+            OUTPUT: 80.5421
+        },
+        {
+            INPUT: 150,
+            OUTPUT: 120
         },
     ]
 }
@@ -176,15 +248,6 @@ class YoutubeTest(unittest.TestCase):
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
     def test_handle_yt_state_change_success(self):
-        def get_state_template():
-            return {
-                'state': 'ready',
-                'offset': 0,
-                'rate': 1,
-                'runAt': 0,
-                'timestamp': 0
-            }
-
         mock_req = MockRequest(TEST_SID)
 
         with hook_socket_emit() as emit_list:
@@ -192,31 +255,25 @@ class YoutubeTest(unittest.TestCase):
             emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():
-                state = get_state_template()
+                state = {
+                    'state': 'ready',
+                    'offset': 0,
+                    'rate': 1,
+                    'runAt': 0,
+                    'timestamp': 0
+                }
 
                 for val in value_list:
-                    in_val = val[INPUT]
-                    out_val = val[OUTPUT]
-
-                    if in_val is None:
-                        if key in state:
-                            del state[key]
-                    else:
-                        state[key] = in_val
-
+                    outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
                     self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
-
                     emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_state_change')
 
-                    if isinstance(out_val, str) and out_val.startswith('eval:'):
-                        out_val = eval(out_val[len('eval:'):])
-
                     if key == 'timestamp':
-                        self.assertTrue(int(out_val) - emit['args'][0][key] < 5)
+                        self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
                     else:
-                        self.assertEqual(emit['args'][0][key], out_val)
+                        self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
 
@@ -235,3 +292,46 @@ class YoutubeTest(unittest.TestCase):
                 self.assertTrue(len(emit_list) == 0)
 
             self.flaskserver.base_ns.disconnect_user(mock_req)
+
+    def test_handle_yt_sphere_update(self):
+        mock_req = MockRequest(TEST_SID)
+
+        with hook_socket_emit() as emit_list:
+            self.flaskserver.base_ns.connect_user(mock_req)
+            emit_list.clear()
+
+            for key, value_list in YT_SPHERE_UPDATES.items():
+                props = {
+                    'properties': {
+                        'yaw': 0,
+                        'pitch': 0,
+                        'roll': 0,
+                        'fov': 100
+                    }
+                }
+
+                for val in value_list:
+                    outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
+                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, props)
+                    emit = emit_list.pop()
+
+                    self.assertEqual(emit['event'], 'yt_sphere_update')
+
+                    data = emit['args'][0]
+                    for k in key.split('|'):
+                        self.assertEqual(utils.getval(data, k), outval)
+
+            self.flaskserver.base_ns.disconnect_user(mock_req)
+
+    def get_outval(self, data, key, inval, outval):
+        for k in key.split('|'):
+            obj, last = utils.getdict(data, k)
+
+            if inval is None:
+                del obj[last]
+            else:
+                obj[last] = inval
+
+        if isinstance(outval, str) and outval.startswith('eval:'):
+            return eval(outval[len('eval:'):])
+        return outval

@@ -25,10 +25,10 @@ class ChatTest(unittest.TestCase):
                     'text': 'test_message_text'
                 },
                 MESSAGE_EXPECTED: {
-                    'id': 1,
+                    'message_id': None,
                     'text': 'test_message_text',
-                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    'room_id': 'room_id_here',
+                    'timestamp': datetime.now(),
+                    'room_id': 'testroom',
                     'user_id': None,
                 }
             }
@@ -55,4 +55,8 @@ class ChatTest(unittest.TestCase):
                         test[INPUT_MESSAGE])
                     expected = test[MESSAGE_EXPECTED]
 
-                    self.assertEqual(response, expected)
+                    for key, val in expected.items():
+                        if key == 'timestamp':
+                            self.assertTrue((response[key] - val).total_seconds() < 3)
+                        else:
+                            self.assertEqual(response[key], val)

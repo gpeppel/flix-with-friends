@@ -14,7 +14,6 @@ class BaseNamespace(flask_socketio.Namespace):
     def connect_user(self, request):
         print("base connect", request.sid)
         self.flaskserver.create_user_from_request(request)
-        self.flaskserver.emit_all_messages()
 
     def on_disconnect(self):
         self.disconnect_user(flask.request)

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
+import { GoogleButton } from './GoogleButton';
 import { Socket } from './Socket';
 import './login.css';
 
@@ -10,25 +11,17 @@ export function Login()
 
 	React.useEffect(() =>
 	{
-		Socket.on('unverified_user', () =>
+		Socket.on('login_response', (data) =>
 		{
-			setFlag(false);
+			console.log(data);
+
+			if(data.status != 'ok')
+				return;
+
+			setFlag(true);
 		});
-	});
 
-	function authUser()
-	{
-		React.useEffect(() =>
-		{
-			Socket.on('verified_user', () =>
-			{
-				setFlag(true);
-			});
-		});
-	}
-
-	authUser();
-
+	}, []);
 
 	if (userFlag)
 	{
@@ -36,19 +29,14 @@ export function Login()
 	}
 
 	return (
-		<body>
-			<div className="header">
-				<img src="static/images/logo.png" alt="logo" />
+		<div className='login'>
+			<div className='section'>
+				<img className='fb-img' src='static/images/fb_button.png' alt='fb_button' />
+				<FacebookButton />
 			</div>
-			<div className="login">
-				<div className="centered">
-
-					<img className="fb_button" src="static/images/fb_button.png" alt="fb_button" />
-					<FacebookButton />
-
-				</div>
+			<div className='section'>
+				<GoogleButton />
 			</div>
-
-		</body>
+		</div>
 	);
 }
