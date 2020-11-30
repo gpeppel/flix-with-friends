@@ -19,6 +19,8 @@ class FlaskServer:
     def __init__(self, app, db):
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
+        self.app.add_url_rule('/debug', 'debug', self.debug)
+
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
 
@@ -51,6 +53,20 @@ class FlaskServer:
 
     def index(self):
         return flask.render_template('index.html')
+
+    def debug(self):
+        rooms = {}
+        users = {}
+
+        for room_id, room in self.rooms.items():
+            rooms[room_id] = room.serialize()
+        for sid, user in self.users.items():
+            users[sid] = user.serialize()
+
+        return flask.render_template('debug.html',
+            rooms=rooms,
+            users=users
+        )
 
     def emit_all_messages(self):
         if not self.db_connected():
