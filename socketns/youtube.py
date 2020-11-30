@@ -110,6 +110,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if user.room is None:
             return
 
+        if not user.room.is_creator(user):
+            return
+
         def clamp(val, minval, maxval):
             return max(min(val, maxval), minval)
 
@@ -134,9 +137,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
             100
         )
 
-        #if not user.room.is_creator(user):
-        #    return
-
         user.room.emit(EVENT_YT_SPHERE_UPDATE, {
             'properties': {
                 'yaw': yaw,
@@ -144,7 +144,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
                 'roll': roll,
                 'fov': fov
             }
-        })
+        }, sender=user)
 
     def getval(self, data, key, fnc_chk, fnc_fix, default=None):
         val = utils.getval(data, key, default)

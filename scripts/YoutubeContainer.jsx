@@ -46,7 +46,6 @@ export function YoutubeContainer()
 
 	function onYtReady(event)
 	{
-		let passive = false;
 		let lastRotation = undefined;
 
 		console.log('ready', event);
@@ -102,9 +101,6 @@ export function YoutubeContainer()
 
 		const rotationEmitter = new FrameUpdate(() =>
 		{
-			if(passive)
-				return;
-
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
 			if(sphereProp === undefined)
 				return;
@@ -151,7 +147,6 @@ export function YoutubeContainer()
 
 		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
 		{
-			passive = true;
 			lastRotation = data.properties;
 		});
 
