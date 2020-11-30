@@ -15,6 +15,8 @@ class Room(Base):
         self.users = {}
         self.creator = None
 
+        self.current_video_code = None
+
     def emit(self, event, *args, sender=None):
         for sid, user in self.users.items():
             if sender is not None and sender.sid == sid:
@@ -32,6 +34,9 @@ class Room(Base):
         user.room = None
         del self.users[user.sid]
         return True
+
+    def get_current_video_code(self):
+        return self.current_video_code
 
     def has_user(self, user):
         return user.sid in self.users

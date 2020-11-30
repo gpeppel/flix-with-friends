@@ -15,10 +15,15 @@ class RoomNamespace(flask_socketio.Namespace):
         room.add_user(user)
         room.set_creator(user)
 
+        room.current_video_code = data['playlist'][0]
+        if len(room.current_video_code) == 0:
+            room.current_video_code = 'dQw4w9WgXcQ'
+
         return {
             'status': 'ok',
             'room_id': room.room_id,
-            'room_name': data['roomName']
+            'description': data['description'],
+            'current_video_code': room.get_current_video_code()
         }
 
     def on_room_join(self, data):
@@ -41,5 +46,6 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok',
             'room_id': room.room_id,
-            'description': room.description
+            'description': room.description,
+            'current_video_code': room.get_current_video_code()
         }

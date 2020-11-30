@@ -18,7 +18,8 @@ export function Options()
 	function onRoomNewClick()
 	{
 		Socket.emit('room_create', {
-			roomName: 'test room'
+			description: 'test room',
+			playlist: document.getElementById('playlist').value.split('\n')
 		}, (data) =>
 		{
 			console.log(data);
@@ -28,7 +29,8 @@ export function Options()
 			updateUserDetails({
 				room: {
 					id: data.room_id,
-					description: data.room_name
+					description: data.room_name,
+					currentVideoCode: data.current_video_code
 				}
 			});
 			enterRoom();
@@ -45,6 +47,13 @@ export function Options()
 			if(data.status != 'ok')
 				return;
 
+			updateUserDetails({
+				room: {
+					id: data.room_id,
+					description: data.room_name,
+					currentVideoCode: data.current_video_code
+				}
+			});
 			enterRoom();
 		});
 	}
@@ -65,6 +74,9 @@ export function Options()
 			<img className='popcorn-img' src='static/images/popcorn_button.png' alt='popcorn_button' />
 
 			<div className='section'>
+				<div>
+					<textarea id='playlist' placeholder='Youtube Videos (one per line)'></textarea>
+				</div>
 				<button className='button' onClick={onRoomNewClick}>Host Viewing Room</button>
 			</div>
 
