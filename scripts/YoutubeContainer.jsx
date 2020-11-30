@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Socket } from './Socket';
 import { UserContext, UserDispatchContext } from './UserProvider';
 
+import { Youtube360Controller } from './Youtube360Controller';
 import YoutubePlayer from './youtube/youtube-player.js';
 import Lerp from './youtube/lerp.js';
 import FrameUpdate from './youtube/frame-update.js';
@@ -53,7 +54,8 @@ export function YoutubeContainer()
 
 		ytPlayerRef.current.player.pauseVideo();
 
-		ytPlayerRef.current.onFirstPlay = (event) => {
+		ytPlayerRef.current.onFirstPlay = () =>
+		{
 			rotationEmitter.start();
 		};
 
@@ -125,13 +127,14 @@ export function YoutubeContainer()
 		Socket.on(EVENT_YT_LOAD, (data) =>
 		{
 			console.log('loading video...', data);
-			ytPlayerRef.current.loadVideoById(data.videoId, (event) => {
+			ytPlayerRef.current.loadVideoById(data.videoId, (event) =>
+			{
 				console.log('video loaded', event);
 				updateUserDetails({
 					room: {
 						currentVideoCode: data.videoId
 					}
-				})
+				});
 			});
 		});
 
@@ -170,7 +173,7 @@ export function YoutubeContainer()
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.playerStateToStr(event.data));
 	}
 
-	function onYtPlaybackRateChange(event)
+	function onYtPlaybackRateChange()
 	{
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYBACK_STR);
 	}
@@ -198,6 +201,8 @@ export function YoutubeContainer()
 	return (
 		<div>
 			{ytComponent}
+
+			<Youtube360Controller player={ytPlayerRef.current} />
 		</div>
 	);
 }
