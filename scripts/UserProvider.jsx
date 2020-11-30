@@ -28,8 +28,7 @@ export function UserProvider({children})
 		oauthType: undefined,
 		sid: undefined,
 		sessionId: undefined,
-		roomId: undefined,
-		roomName: undefined
+		room: undefined
 	});
 
 	function updateUserDetails(user)
@@ -53,18 +52,30 @@ UserProvider.propTypes = {
 
 export function debugElement(user)
 {
+	function propsToElement(obj, prefix)
+	{
+		if(prefix === undefined)
+			prefix = '';
+
+		return Object.keys(obj).map((x) =>
+		{
+			if(obj[x] instanceof Object)
+				return propsToElement(obj[x], `${prefix}${x}.`);
+
+			return (
+				<div key={prefix + x}>
+					<span style={{
+						fontWeight: 'bold'
+					}}>{`${prefix}${x}: `}</span>
+					<span>{`${obj[x]}`}</span>
+				</div>
+			);
+		});
+	}
+
 	return (
 		<div>
-			{
-				Object.keys(user).map((x) =>
-					(
-						<div key={x}>
-							<span>{`${x}: `}</span>
-							<span>{`${user[x]}`}</span>
-						</div>
-					)
-				)
-			}
+			{propsToElement(user)}
 		</div>
 	);
 }
