@@ -33,7 +33,32 @@ export function UserProvider({children})
 
 	function updateUserDetails(user)
 	{
-		setUserDetails(Object.assign({}, userDetails, user));
+		function updateObj(obj, newobj)
+		{
+			for (const key in newobj)
+			{
+				if(newobj[key] instanceof Object)
+				{
+					if(obj[key] instanceof Object)
+					{
+						updateObj(obj[key], newobj[key]);
+					}
+					else
+					{
+						obj[key] = newobj[key];
+					}
+				}
+				else
+				{
+					obj[key] = newobj[key];
+				}
+			}
+		}
+
+		const obj = Object.assign({}, userDetails);
+
+		updateObj(obj, user);
+		setUserDetails(obj);
 	}
 
 	return (
@@ -48,7 +73,6 @@ export function UserProvider({children})
 UserProvider.propTypes = {
 	children: PropTypes.node,
 };
-
 
 export function debugElement(user)
 {
