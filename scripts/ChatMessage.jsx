@@ -1,6 +1,5 @@
-/* eslint-disable react/prop-types */
-
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import './chat.css';
 
 
@@ -24,6 +23,10 @@ export function ChatMessage(props)
 		</div>
 	);
 }
+
+ChatMessage.propTypes = {
+	message: PropTypes.object
+};
 
 function timestampToStr(timestamp)
 {

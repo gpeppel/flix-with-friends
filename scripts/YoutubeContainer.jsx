@@ -1,11 +1,12 @@
 import * as React from 'react';
 
 import { Socket } from './Socket';
-import { UserContext } from './UserProvider';
+import { UserContext, UserDispatchContext } from './UserProvider';
 
-import YoutubePlayer from './youtube/youtube-player.js';
-import Lerp from './youtube/lerp.js';
-import FrameUpdate from './youtube/frame-update.js';
+import { Youtube360Controller } from './Youtube360Controller';
+import YoutubePlayer from './utils/youtube-player.js';
+import FrameUpdate from './utils/frame-update.js';
+import Lerp from './utils/lerp.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
@@ -22,6 +23,7 @@ const LERP_SPEED = 32;
 export function YoutubeContainer()
 {
 	const userDetails = React.useContext(UserContext);
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [ytPlayer, setYtPlayer] = React.useState(null);
 	const [ytComponent, setYtComponent] = React.useState(null);
 
@@ -46,40 +48,16 @@ export function YoutubeContainer()
 
 	function onYtReady(event)
 	{
+		let lastRotation = undefined;
+
 		console.log('ready', event);
 
 		ytPlayerRef.current.player.pauseVideo();
 
-		Socket.on(EVENT_YT_LOAD, (data) =>
+		ytPlayerRef.current.onFirstPlay = () =>
 		{
-			console.log('load video', data);
-			ytPlayerRef.current.player.loadVideoById(data.videoId);
-		});
-
-		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
-		{
-			data.timestamp = parseInt(data.timestamp, 10);
-
-			const ts = (new Date()).getTime();
-			const tsdiff = Math.max(0, ts - data.timestamp);
-			const adjustedOffset = data.offset + (tsdiff / 1000);
-
-			switch(data.state)
-			{
-			case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
-				ytPlayerRef.current.player.play(adjustedOffset);
-				break;
-			case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
-				ytPlayerRef.current.player.pause(adjustedOffset);
-				break;
-			case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
-				ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
-				break;
-			}
-		});
-
-		let passive = false;
-		let lastRotation = undefined;
+			rotationEmitter.start();
+		};
 
 		const lerpRotation = new FrameUpdate((timestamp, deltaTime) =>
 		{
@@ -114,12 +92,6 @@ export function YoutubeContainer()
 		});
 		lerpRotation.start();
 
-		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
-		{
-			passive = true;
-			lastRotation = data.properties;
-		});
-
 		const stateEmitter = new FrameUpdate(() =>
 		{
 			switch(ytPlayerRef.current.player.getPlayerState())
@@ -136,21 +108,62 @@ export function YoutubeContainer()
 
 		const rotationEmitter = new FrameUpdate(() =>
 		{
-			if(passive)
-				return;
-
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
 			if(sphereProp === undefined)
 				return;
 
 			if(Object.keys(sphereProp).length == 0)
+			{
+				rotationEmitter.stop();
 				return;
+			}
 
 			Socket.emit(EVENT_YT_SPHERE_UPDATE, {
 				'properties': sphereProp
 			});
 		}, UPDATE_SPHERE_EMIT_DELAY);
 		rotationEmitter.start();
+
+		Socket.on(EVENT_YT_LOAD, (data) =>
+		{
+			console.log('loading video...', data);
+			ytPlayerRef.current.loadVideoById(data.videoId, (event) =>
+			{
+				console.log('video loaded', event);
+				updateUserDetails({
+					room: {
+						currentVideoCode: data.videoId
+					}
+				});
+			});
+		});
+
+		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
+		{
+			data.timestamp = parseInt(data.timestamp, 10);
+
+			const ts = (new Date()).getTime();
+			const tsdiff = Math.max(0, ts - data.timestamp);
+			const adjustedOffset = data.offset + (tsdiff / 1000);
+
+			switch(data.state)
+			{
+			case YoutubePlayer.prototype.PLAYER_PLAYING_STR:
+				ytPlayerRef.current.player.play(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PAUSED_STR:
+				ytPlayerRef.current.player.pause(adjustedOffset);
+				break;
+			case YoutubePlayer.prototype.PLAYER_PLAYBACK_STR:
+				ytPlayerRef.current.player.setPlayback(adjustedOffset, data.rate);
+				break;
+			}
+		});
+
+		Socket.on(EVENT_YT_SPHERE_UPDATE, (data) =>
+		{
+			lastRotation = data.properties;
+		});
 
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_READY_STR, 0, 1);
 	}
@@ -160,10 +173,8 @@ export function YoutubeContainer()
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.playerStateToStr(event.data));
 	}
 
-	function onYtPlaybackRateChange(event)
+	function onYtPlaybackRateChange()
 	{
-		console.log('playback change', event);
-
 		emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PLAYBACK_STR);
 	}
 
@@ -190,6 +201,8 @@ export function YoutubeContainer()
 	return (
 		<div>
 			{ytComponent}
+
+			<Youtube360Controller player={ytPlayerRef.current} />
 		</div>
 	);
 }
