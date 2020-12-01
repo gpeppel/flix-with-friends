@@ -108,7 +108,6 @@ class User:
                 settings TEXT,
                 oauth_id TEXT,
                 oauth_type TEXT,
-                UNIQUE(username),
                 UNIQUE(email),
                 UNIQUE(oauth_id, oauth_type)
             );

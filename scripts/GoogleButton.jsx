@@ -24,7 +24,7 @@ export function GoogleButton()
 
 	return (
 		<GoogleLogin
-			clientId={process.env.GOOGLE_CLIENT_ID}
+			clientId={process.env.GOOGLE_APP_ID}
 			onSuccess={responseGoogle}
 			onFailure={responseGoogle}
 			cookiePolicy={'single_host_origin'}

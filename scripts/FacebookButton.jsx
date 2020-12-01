@@ -17,7 +17,7 @@ export function FacebookButton()
 
 	return (
 		<FacebookLogin
-			appId="2775898756021193"
+			appId={process.env.FACEBOOK_APP_ID}
 			autoLoad={false}
 			fields='name,email,picture'
 			callback={responseFacebook}

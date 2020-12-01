@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { GoogleButton } from './GoogleButton';
+import { TwitterButton } from './TwitterButton';
 import { Socket } from './Socket';
 import './login.css';
 
@@ -36,6 +37,9 @@ export function Login()
 			</div>
 			<div className='section'>
 				<GoogleButton />
+			</div>
+			<div className='section'>
+				<TwitterButton />
 			</div>
 		</div>
 	);
