@@ -1,8 +1,9 @@
+/* global process */
 
 import * as React from 'react';
 import { Socket } from './Socket';
-
 import TwitterLogin from "react-twitter-login";
+import './button.css';
 
 export function TwitterButton() 
 {
