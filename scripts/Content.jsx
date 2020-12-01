@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Chat } from './Chat';
+import { RoomInfo } from './RoomInfo';
 import { YoutubeContainer } from './YoutubeContainer';
 
 import { Socket } from './Socket';
@@ -31,6 +32,7 @@ export function Content()
 				flex: 1
 			}}>
 				<Chat />
+				<RoomInfo />
 			</div>
 			<div className='media-area'>
 				<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>

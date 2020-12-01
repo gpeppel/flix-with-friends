@@ -1,0 +1,36 @@
+.user {
+	border-bottom: 1px solid #aaaaaa;
+	padding: 8px;
+}
+
+.user .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.user .header .left {
+	display: flex;
+	align-items: center;
+}
+
+.user .username {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.user .text {
+	font-size: 14px;
+	margin: 5px 0px 0px 0px;
+}
+
+.user .timestamp {
+	font-size: 12px;
+	opacity: 0.5;
+}
+
+.user .profileImg {
+	width: 32px;
+	height: 32px;
+	padding-right: 5px;
+}
