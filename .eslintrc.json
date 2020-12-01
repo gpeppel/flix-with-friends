@@ -17,6 +17,20 @@
     "plugins": [
         "react"
     ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+        "propWrapperFunctions": [
+            "forbidExtraProps",
+            {"property": "freeze", "object": "Object"},
+            {"property": "myFavoriteWrapper"}
+        ],
+        "linkComponents": [
+            "Hyperlink",
+            {"name": "Link", "linkAttribute": "to"}
+        ]
+    },
     "rules": {
         "indent": [
             "error",
@@ -39,50 +53,50 @@
             "always"
         ],
         "array-bracket-newline": [
-			"error",
-			"consistent"
+            "error",
+            "consistent"
         ],
         "brace-style": [
-			"error",
-			"allman"
+            "error",
+            "allman"
         ],
         "eol-last": [
-			"error",
-			"always"
+            "error",
+            "always"
         ],
         "max-len": [
-			"error",
-			{
-				"code": 120,
-				"ignoreComments": true,
-				"ignoreUrls": true,
-				"ignoreStrings": true,
-				"ignoreTemplateLiterals": true,
-				"ignoreRegExpLiterals": true
-			}
+            "error",
+            {
+                "code": 120,
+                "ignoreComments": true,
+                "ignoreUrls": true,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true,
+                "ignoreRegExpLiterals": true
+            }
         ],
         "no-trailing-spaces": [
-			"error",
-			{
-				"skipBlankLines": false,
-				"ignoreComments": true
-			}
+            "error",
+            {
+                "skipBlankLines": false,
+                "ignoreComments": true
+            }
         ],
         "prefer-const": [
-			"error",
-			{
-				"destructuring": "all"
-			}
+            "error",
+            {
+                "destructuring": "all"
+            }
         ],
         "arrow-body-style": [
-			"error",
-			"as-needed"
+            "error",
+            "as-needed"
         ],
         "camelcase": [
-			"error",
-			{
-				"properties": "always"
-			}
+            "error",
+            {
+                "properties": "always"
+            }
         ]
     }
 }

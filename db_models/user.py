@@ -1,4 +1,10 @@
-class User:
+from db_models.base import Base
+
+
+COOKIE_SESSION_ID = 'session_id'
+
+
+class User(Base):
     def __init__(self,
         user_id,
         username=None,
@@ -7,7 +13,8 @@ class User:
         settings=None,
         oauth_id=None,
         oauth_type=None,
-        sid=None
+        sid=None,
+        session_id=None
     ):
         self.user_id = user_id
         self.username = username
@@ -16,24 +23,74 @@ class User:
         self.settings = settings
         self.oauth_id = oauth_id
         self.oauth_type = oauth_type
+
         self.sid = sid
+        self.session_id = session_id
+
+        self.password = None
+
+        self.socket_connected = False
+        self.last_socket_connect = None
 
         self.room = None
 
+    def get_session_id(self):
+        if self.session_id is None:
+            return self.sid
+        return self.session_id
+
+    def insert_to_db(self, cur):
+        cur.execute("""
+            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (oauth_id, oauth_type) DO UPDATE SET username = %s, email = %s, profile_url = %s
+            RETURNING user_id;
+        """, (
+            self.username,
+            self.password,
+            self.email,
+            self.profile_url,
+            self.settings,
+            self.oauth_id,
+            self.oauth_type,
+
+            self.username,
+            self.email,
+            self.profile_url
+        ))
+
+        result = cur.fetchone()
+        self.user_id = result['user_id']
+
     def serialize(self):
-        return {
+        obj = {
             'user_id': self.user_id,
             'username': self.username,
             'email': self.email,
             'profile_url': self.profile_url,
             'settings': self.settings,
             'oauth_id': self.oauth_id,
-            'oauth_type': self.oauth_type
+            'oauth_type': self.oauth_type,
+
+            'sid': self.sid,
+            'session_id': self.session_id,
+
+            'socket_connected': self.socket_connected
         }
+
+        if self.last_socket_connect is not None:
+            obj['last_socket_connect'] = self.last_socket_connect.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            obj['last_socket_connect'] = None
+
+        return obj
 
     @staticmethod
     def from_request(req):
-        user = User(None, sid=req.sid)
+        user = User(
+            None,
+            sid=req.sid,
+            session_id=req.cookies.get(COOKIE_SESSION_ID)
+        )
         return user
 
     @staticmethod
@@ -63,36 +120,12 @@ class User:
 
         user.user_id = result['user_id']
         user.username = result['username']
+        user.password = result['password']
         user.email = result['email']
         user.profile_url = result['profile_url']
         user.settings = result['settings']
         user.oauth_id = result['oauth_id']
         user.oauth_type = result['oauth_type']
-
-        return user
-
-    @staticmethod
-    def insert_to_db(cur, user, password=None):
-        cur.execute("""
-            INSERT INTO account VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (oauth_id, oauth_type) DO UPDATE SET username = %s, email = %s, profile_url = %s
-            RETURNING user_id;
-        """, (
-            user.username,
-            password,
-            user.email,
-            user.profile_url,
-            user.settings,
-            user.oauth_id,
-            user.oauth_type,
-
-            user.username,
-            user.email,
-            user.profile_url
-        ))
-
-        result = cur.fetchone()
-        user.user_id = result['user_id']
 
         return user
 
