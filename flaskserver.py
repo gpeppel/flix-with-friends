@@ -133,10 +133,11 @@ class FlaskServer:
             room = Room(self.socketio, room_id)
             self.rooms[room.room_id] = room
 
-            cur = self.db.cursor()
-            room.insert_to_db(cur)
-            self.db.commit()
-            cur.close()
+            if self.db_connected():
+                cur = self.db.cursor()
+                room.insert_to_db(cur)
+                self.db.commit()
+                cur.close()
 
         return room
 
