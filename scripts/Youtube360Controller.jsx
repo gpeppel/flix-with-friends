@@ -21,7 +21,8 @@ export function Youtube360Controller(props)
 
 	//useEffect?
 
-	const keylistener = new KeyListener(undefined, undefined, () =>
+	const keylistener = new KeyListener();
+	keylistener.onUpdate = () =>
 	{
 		if(!player || !player.player)
 			return;
@@ -49,7 +50,7 @@ export function Youtube360Controller(props)
 			sphereProp.fov = Math.min(120, sphereProp.fov + SPEED);
 
 		player.player.setSphericalProperties(sphereProp);
-	});
+	};
 
 	function onChange(event)
 	{
