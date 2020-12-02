@@ -1,6 +1,4 @@
 import datetime
-import random
-import sys
 
 import flask
 import flask_socketio
@@ -13,35 +11,31 @@ class ChatNamespace(flask_socketio.Namespace):
         super().__init__(namespace)
         self.namespace = namespace
         self.flaskserver = server
-        
+
     def on_chat_loaded(self):
         print('\n\n\nCHAT_LOADED\n\n\n')
         self.flaskserver.emit_all_messages()
 
-    def add_to_db(self, message_to_add):
-        if not self.flaskserver.db_enabled():
+    def add_to_db(self, msg):
+        if not self.flaskserver.db_connected():
             return
 
-        self.flaskserver.db.session.add(message_to_add)
-        self.flaskserver.db.session.commit()
+        cur = self.flaskserver.db.cursor()
+        Message.insert_to_db(cur, msg)
+        self.flaskserver.db.commit()
+        cur.close()
+
         self.flaskserver.emit_all_messages()
 
     def on_message_send(self, data):
-        user_request = flask.request
-        user_from_request = \
-        self.flaskserver.get_user_by_request(user_request)
+        user = self.flaskserver.get_user_by_request(flask.request)
 
-        if self.flaskserver.db_enabled():
-            self.flaskserver.db.session.add(user_from_request)
+        print(user.serialize())
 
-        user_oauth_id = user_from_request.oauth_id
         text = data['text']
-        message_id = \
-        random.randint(1 - sys.maxsize, sys.maxsize) # TODO use an agreed upon id scheme
-        user_id = user_oauth_id
-        timestamp = \
-        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        room_id = 'room_id_here' # TODO use actual room id
-        message_to_add = \
-        Message(message_id, text, timestamp, room_id, user_id)
-        return self.add_to_db(message_to_add)
+        user_id = user.user_id
+        timestamp = datetime.datetime.now()
+        room_id = 'testroom' # TODO use actual room id
+
+        msg = Message(None, text, timestamp, room_id, user_id)
+        return self.add_to_db(msg)

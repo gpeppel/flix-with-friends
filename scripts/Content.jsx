@@ -1,16 +1,18 @@
 import * as React from 'react';
+import { Chat } from './Chat';
 import { YoutubeContainer } from './YoutubeContainer';
 
 import { Socket } from './Socket';
-import { Chat } from './Chat';
+
+import './css/content.css';
+
 
 const EVENT_YT_LOAD = 'yt_load';
-import './content.css';
+
+
 export function Content()
 {
-
 	const [roomID, setRoomID] = React.useState([]);
-
 
 	console.log('emitting');
 	Socket.emit('new room');
@@ -34,22 +36,21 @@ export function Content()
 	}
 
 	return (
-		<div>
-			<div className="header">
-				<img src="static/images/logo.png" alt="logo" />
+		<div className='main-content'>
+			<div style={{
+				display: 'flex',
+				flex: 1
+			}}>
+				<Chat />
 			</div>
-			<div className="Content">
-				<div className="Wrapper">
-					<div className="RightContent">
-						<YoutubeContainer />
-					</div>
-					<div className="LeftContent">
-						<Chat />
-					</div>
-				</div>
-
+			<div className='media-area'>
+				<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
+				<YoutubeContainer />
 			</div>
-			<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
+			<div style={{
+				flex: 1
+			}}>
+			</div>
 		</div>
 	);
 }

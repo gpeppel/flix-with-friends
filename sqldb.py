@@ -1,33 +1,95 @@
-import os
+import re
 
-from dotenv import load_dotenv
-import flask_sqlalchemy
-
-
-dotenv_path = os.path.join(os.path.dirname(__file__), 'sql.env')
-load_dotenv(dotenv_path)
+import psycopg2
+import psycopg2.extras
 
 
-def get_database_uri():
-    uri = os.environ.get('DATABASE_URL')
-    if uri is not None and len(uri) != 0:
-        return uri
+class SqlDb:
+    def __init__(self):
+        self.connection = None
 
-    try:
-        sql_user = os.environ['SQL_USER']
-        sql_pwd = os.environ['SQL_PASSWORD']
-        sql_db = os.environ['SQL_DATABASE']
-    except KeyError:
-        return None
+    def connect(self, dsn):
+        self.connection = psycopg2.connect(dsn)
 
-    return 'postgresql://%s:%s@localhost/%s' % (sql_user, sql_pwd, sql_db)
+    def disconnect(self):
+        self.connection.close()
+        self.connection = None
 
+    def cursor(self):
+        return self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-db_singleton = None
+    def commit(self):
+        self.connection.commit()
 
-def SQLAlchemy():
-    global db_singleton
-    if db_singleton is None:
-        db_singleton = flask_sqlalchemy.SQLAlchemy()
+    def is_connected(self):
+        return self.connection is not None
 
-    return db_singleton
+    @staticmethod
+    def uri_to_dict(uri):
+        match = re.fullmatch(
+            r'postgres(?:ql)?://'
+            r'(?:(?P<user>(?:[A-Za-z_]|%[0-9A-Fa-f]{2})(?:[A-Za-z0-9_]|%[0-9A-Fa-f]{2})*)'
+            r'(?::(?P<password>[^:@,/?=&]+))?@)?'
+            r'(?P<host>[^:@,/?=&]+)?(?::(?P<port>[0-9]+))?'
+            r'(?:/(?P<dbname>[^:@,/?=&]+))?'
+            r'(?:\?(?P<query>.*))?',
+            uri
+        )
+        if match is None:
+            return None
+
+        groups = match.groupdict()
+
+        if groups['port'] is not None:
+            port = int(groups['port'])
+            if port < 0 or port > 65535:
+                return None
+
+        query = groups['query']
+        del groups['query']
+
+        if query is not None:
+            while True:
+                match = re.match(
+                    r'([A-Za-z0-9_]+)=([^&]*)&?',
+                    query
+                )
+                if match is None:
+                    break
+
+                groups[match[1]] = match[2]
+                query = query[match.end():]
+
+        return groups
+
+    @staticmethod
+    def uri_to_dsn(uri, sortkeys=False):
+        groups = SqlDb.uri_to_dict(uri)
+        if groups is None:
+            return None
+
+        def sanitize(val):
+            if len(val) == 0:
+                return "''"
+
+            val = val.replace('\\', '\\\\')
+            val = val.replace("'", "\\'")
+
+            if ' ' in val:
+                return "'%s'" % val
+            return val
+
+        dsn = ""
+
+        if sortkeys:
+            items = sorted(groups.items(), key=lambda x: x[0])
+        else:
+            items = groups.items()
+
+        for key, val in items:
+            if val is None:
+                continue
+            dsn += " %s=%s" % (key, sanitize(val))
+        dsn = dsn[1:]
+
+        return dsn
