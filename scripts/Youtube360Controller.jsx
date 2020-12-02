@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import KeyListener from './utils/keylistener.js';
 
 
-const SPEED = 4;
+const SPEED = 3;
+
+const RESET_TIME = 1500;
 
 export function Youtube360Controller(props)
 {
@@ -48,6 +50,23 @@ export function Youtube360Controller(props)
 			sphereProp.fov = Math.max(30, sphereProp.fov - SPEED);
 		if(keylistener.isKeyDown('x'))
 			sphereProp.fov = Math.min(120, sphereProp.fov + SPEED);
+
+		if(keylistener.getKeyDownTime('a') > RESET_TIME && keylistener.getKeyDownTime('d') > RESET_TIME)
+			sphereProp.yaw = 0;
+		if(keylistener.getKeyDownTime('w') > RESET_TIME && keylistener.getKeyDownTime('s') > RESET_TIME)
+			sphereProp.pitch = 0;
+		if(keylistener.getKeyDownTime('q') > RESET_TIME && keylistener.getKeyDownTime('e') > RESET_TIME)
+			sphereProp.roll = 0;
+		if(keylistener.getKeyDownTime('z') > RESET_TIME && keylistener.getKeyDownTime('x') > RESET_TIME)
+			sphereProp.fov = 100;
+
+		if(keylistener.getKeyDownTime('r') > RESET_TIME)
+		{
+			sphereProp.yaw = 0;
+			sphereProp.pitch = 0;
+			sphereProp.roll = 0;
+			sphereProp.fov = 100;
+		}
 
 		player.player.setSphericalProperties(sphereProp);
 	};

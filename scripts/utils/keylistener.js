@@ -8,7 +8,6 @@ export default class KeyListener
 		this.onKeyUp = undefined;
 		this.onUpdate = undefined;
 
-
 		this.keyLifetime = 750;
 
 		this.frameUpdate = new FrameUpdate(this.onUpdateWrapper.bind(this), FrameUpdate.fps(60));
