@@ -27,7 +27,7 @@ export function GoogleButton()
 		<GoogleLogin
 		clientId={process.env.GOOGLE_APP_ID}
 		render={renderProps => (
-			<AwesomeButton type="primary">LOGIN IN WITH GOOGLE</AwesomeButton>
+			<AwesomeButton type="primary" onPress={(event) => {renderProps.onClick()}}>LOGIN IN WITH GOOGLE</AwesomeButton>
 			)}
 		onSuccess={responseGoogle}
 		onFailure={responseGoogle}

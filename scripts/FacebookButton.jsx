@@ -23,7 +23,7 @@ export function FacebookButton()
 			fields='name,email,picture'
 			callback={responseFacebook}
 			render={renderProps => (
-				<AwesomeButton type="secondary" onClick={renderProps.onClick}>LOGIN IN WITH FACEBOOK</AwesomeButton>
+				<AwesomeButton type="secondary" onPress={(event) => {renderProps.onClick()}}>LOGIN IN WITH FACEBOOK</AwesomeButton>
 			)}
 		/>
 	);
