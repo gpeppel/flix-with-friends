@@ -35,7 +35,7 @@
   --loading-transition-end-speed: 0.3s;
   --transform-speed: 0.185s;
   --button-primary-color: #00B8C4;
-  --button-primary-color-dark:#00a0ab;
+  --button-primary-color-dark:#cc8c02;
   --button-primary-color-light: #FFE11D;
   --button-primary-color-hover: #00a0ab;
   --button-primary-color-active: #008891;
@@ -87,7 +87,8 @@
   --button-youtube-color: #cc181e;
   --button-youtube-color-dark: #881014;
   --button-instagram-radial-color: radial-gradient(circle at 25% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
-  --button-instagram-radial-color-dark: radial-gradient(circle at 25% 110%, #b9a800 0%, #938500 5%, #b10f00 45%, #8c0061 60%, #002ca9 90%); }
+  --button-instagram-radial-color-dark: radial-gradient(circle at 25% 110%, #b9a800 0%, #938500 5%, #b10f00 45%, #8c0061 60%, #002ca9 90%); 
+}
 
 /**
   button-color:
@@ -518,7 +519,7 @@ button.aws-btn .aws-btn__wrapper {
     color: #eee;
     /* color: var(--button-primary-color-light); */
     /* border: var(--button-primary-border); } */
-    border: #00a496;
+    /* border: #00a496; */
   }
     .aws-btn--primary .aws-btn__content path {
       fill: var(--button-primary-color-light); }

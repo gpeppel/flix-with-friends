@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { Socket } from './Socket';
+import { AwesomeButton } from "react-awesome-button";
 import TwitterLogin from "react-twitter-login";
-import { CoolButton } from "./CoolButton";
-import './css/button.css';
+import './css/theme-eric.css';
 
 export function TwitterButton() 
 {
@@ -19,14 +19,10 @@ export function TwitterButton()
  
   return (
 	<TwitterLogin
-		className='twitter-btn'
 		authCallback={authHandler}
+		children={<AwesomeButton type="twitter">LOGIN IN WITH TWITTER</AwesomeButton>}
       	consumerKey={process.env.TWITTER_CONSUMER_KEY}
 	  	consumerSecret={process.env.TWITTER_CONSUMER_SECRET} 
 	/>
   );
 }
-
-// render={renderProps => (
-// 	<AwesomeButton type="anchor" onClick={renderProps.onClick}>LOGIN IN WITH FACEBOOK</AwesomeButton>
-// )}

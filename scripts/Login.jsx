@@ -1,10 +1,13 @@
+
 import * as React from 'react';
 import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { GoogleButton } from './GoogleButton';
 import { TwitterButton } from './TwitterButton';
 import { Socket } from './Socket';
+
 import './css/login.css';
+import { Footer } from './Footer';
 
 export function Login()
 {
@@ -53,7 +56,7 @@ export function Login()
 				</li>
 			</ul>
 		</div>
-		<div className='footer'></div>
+		<Footer />
 		</div>
 	);
 }
