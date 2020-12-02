@@ -40,12 +40,12 @@
   --button-primary-color-hover: #00a0ab;
   --button-primary-color-active: #008891;
   --button-primary-border: 1px solid #FFE11D;
-  --button-secondary-color: #EE3253;
-  --button-secondary-color-dark: #d0b400;
+  --button-secondary-color: #eea1b8;
+  --button-secondary-color-dark: #eb6b91;
   --button-secondary-color-light: #FFE11D;
-  --button-secondary-color-hover: #ec1a3f;
+  --button-secondary-color-hover: #eb6b91;
   --button-secondary-color-active: #db1235;
-  --button-secondary-border: 1px solid #FFE11D;
+  --button-secondary-border: 1px solid #eea1b8;
   --button-anchor-color: #293b83;
   --button-anchor-color-dark: #772250;
   --button-anchor-color-light: #b33377;
@@ -544,7 +544,7 @@ button.aws-btn .aws-btn__wrapper {
     background: var(--button-secondary-color-dark); }
   .aws-btn--secondary .aws-btn__content {
     background: var(--button-secondary-color);
-    color: var(--button-secondary-color-light);
+    color: #eee;
     border: var(--button-secondary-border); }
     .aws-btn--secondary .aws-btn__content path {
       fill: var(--button-secondary-color-light); }

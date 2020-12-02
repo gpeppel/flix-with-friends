@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Socket } from './Socket';
 import TwitterLogin from "react-twitter-login";
+import { CoolButton } from "./CoolButton";
 import './css/button.css';
 
 export function TwitterButton() 
@@ -17,10 +18,15 @@ export function TwitterButton()
 	}
  
   return (
-    <TwitterLogin
-      authCallback={authHandler}
-      consumerKey={process.env.TWITTER_CONSUMER_KEY}
-      consumerSecret={process.env.TWITTER_CONSUMER_SECRET}
-    />
+	<TwitterLogin
+		className='twitter-btn'
+		authCallback={authHandler}
+      	consumerKey={process.env.TWITTER_CONSUMER_KEY}
+	  	consumerSecret={process.env.TWITTER_CONSUMER_SECRET} 
+	/>
   );
 }
+
+// render={renderProps => (
+// 	<AwesomeButton type="anchor" onClick={renderProps.onClick}>LOGIN IN WITH FACEBOOK</AwesomeButton>
+// )}

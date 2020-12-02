@@ -2,10 +2,9 @@
 
 import * as React from 'react';
 import { Socket } from './Socket';
-// import FacebookLogin from 'react-facebook-login';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 import { AwesomeButton } from "react-awesome-button";
-import './css/theme-c137.css';
+import './css/theme-eric.css';
 
 export function FacebookButton()
 {
