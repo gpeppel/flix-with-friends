@@ -4,7 +4,7 @@ import { FacebookButton } from './FacebookButton';
 import { GoogleButton } from './GoogleButton';
 import { TwitterButton } from './TwitterButton';
 import { Socket } from './Socket';
-import './login.css';
+import './css/login.css';
 
 export function Login()
 {
@@ -53,20 +53,7 @@ export function Login()
 				</li>
 			</ul>
 		</div>
+		<div className='footer'></div>
 		</div>
 	);
 }
-	// <div className='login'>
-	// 		<div className='section'>
-	// 			<img className='fb-img' src='static/images/fb_button.png' alt='fb_button' />
-	// 			<FacebookButton />
-	// 		</div>
-	// 		<div className='section'>
-	// 			<img className='google-img' src='static/images/google.png' alt='fb_button' />
-	// 			<GoogleButton />
-	// 		</div>
-	// 		<div className='section'>
-	// 			<img className='twitter-img' src='static/images/twitter.png' alt='fb_button' />
-	// 			<TwitterButton />
-	// 		</div>
-	// 	</div>

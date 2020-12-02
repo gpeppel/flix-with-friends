@@ -4,7 +4,7 @@ import { YoutubeContainer } from './YoutubeContainer';
 
 import { Socket } from './Socket';
 
-import './content.css';
+import './css/content.css';
 
 
 const EVENT_YT_LOAD = 'yt_load';

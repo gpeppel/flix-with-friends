@@ -1,0 +1,64 @@
+/* .aws-btn {
+  --button-default-height: 48px;
+  --button-default-font-size: 14px;
+  --button-default-border-radius: 6px;
+  --button-horizontal-padding: 20px;
+  --button-raise-level: 5px;
+  --button-hover-pressure: 2;
+  --transform-speed: 0.185s;
+  --button-primary-color: #00b8c4;
+  --button-primary-color-dark: #d0b400;
+  --button-primary-color-light: #ffe11d;
+  --button-primary-color-hover: #00a0ab;
+  --button-primary-border: 1px solid #ffe11d;
+  --button-secondary-color: #ee3253;
+  --button-secondary-color-dark: #d0b400;
+  --button-secondary-color-light: #ffe11d;
+  --button-secondary-color-hover: #ec1a3f;
+  --button-secondary-border: 1px solid #ffe11d;
+  --button-anchor-color: #293b83;
+  --button-anchor-color-dark: #772250;
+  --button-anchor-color-light: #b33377;
+  --button-anchor-color-hover: #293b83;
+  --button-anchor-border: 1px solid #9f2d6a;
+  } */
+
+.twitter-btn {
+	font-family: Helvetica,sans-serif;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-size: calc(.27548vw + 12.71074px);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background-color .3s,border-color .3s;
+    background-color: #4c69ba;
+    border: calc(.06887vw + .67769px) solid #4c69ba;
+    padding: calc(.34435vw + 13.38843px) calc(.34435vw + 18.38843px);
+}
+.google-btn2 {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
+    height: var(--button-default-height);
+    position: relative;
+    background-color: transparent;
+    font-size: var(--button-default-font-size);
+    line-height: var(--button-default-line-height);
+    font-weight: var(--button-font-weight);
+    font-family: var(--button-font-family);
+    font-style: var(--button-font-style);
+    letter-spacing: var(--button-letter-spacing);
+    text-rendering: auto;
+    text-decoration: none;
+    text-align: center;
+    -webkit-transition: opacity .1s ease-out;
+    transition: opacity .1s ease-out;
+    border: none;
+    opacity: 0;
+    cursor: pointer;
+    -webkit-font-smoothing: antialiased;
+}

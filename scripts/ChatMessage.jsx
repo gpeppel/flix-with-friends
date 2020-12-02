@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import * as React from 'react';
-import './chat.css';
+import './css/chat.css';
 
 
 export function ChatMessage(props)

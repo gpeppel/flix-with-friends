@@ -3,7 +3,8 @@
 import * as React from 'react';
 import { Socket } from './Socket';
 import { GoogleLogin } from 'react-google-login';
-import './button.css';
+import { AwesomeButton } from "react-awesome-button";
+import './css/theme-eric.css';
 
 export function GoogleButton()
 {
@@ -24,14 +25,13 @@ export function GoogleButton()
 
 	return (
 		<GoogleLogin
-			clientId={process.env.GOOGLE_APP_ID}
-			render={renderProps => (
-				<button className='google-btn' onClick={renderProps.onClick} disabled={renderProps.disabled}>LOGIN WITH GOOGLE</button>
-				)}
-			onSuccess={responseGoogle}
-			onFailure={responseGoogle}
-			cookiePolicy={'single_host_origin'}
-			className='google-button'
-		/>
-	);
+		clientId={process.env.GOOGLE_APP_ID}
+		render={renderProps => (
+			<AwesomeButton type="primary">LOGIN IN WITH GOOGLE</AwesomeButton>
+			)}
+		onSuccess={responseGoogle}
+		onFailure={responseGoogle}
+		cookiePolicy={'single_host_origin'}
+		className='google-button'/>
+		);
 }

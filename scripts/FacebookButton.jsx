@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import { Socket } from './Socket';
-import FacebookLogin from 'react-facebook-login';
-
+// import FacebookLogin from 'react-facebook-login';
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
+import { AwesomeButton } from "react-awesome-button";
+import './css/theme-c137.css';
 
 export function FacebookButton()
 {
@@ -21,6 +23,9 @@ export function FacebookButton()
 			autoLoad={false}
 			fields='name,email,picture'
 			callback={responseFacebook}
+			render={renderProps => (
+				<AwesomeButton type="secondary" onClick={renderProps.onClick}>LOGIN IN WITH FACEBOOK</AwesomeButton>
+			)}
 		/>
 	);
 }

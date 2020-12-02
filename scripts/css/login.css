@@ -1,0 +1,62 @@
+.login {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	flex: 1;
+}
+
+.top {
+	/* border-bottom: 50px solid #ffc341; */
+	padding-top: 50px;
+	font-family: Greggiefont;
+	color: #eee;
+	font-size: 100px;
+}
+
+hr.line {
+	border-top: 5px solid #eee;
+  /*background-color: #eee;*/
+	/*box-shadow: 5px 10px #fff;*/
+
+}
+
+.login .kep-login-facebook, .login .google-button {
+	width: 300px;
+}
+
+.flex-container {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.center { 
+  justify-content: center; 
+}  
+
+.space-evenly { 
+  justify-content: space-evenly; 
+}
+/* 
+.space-evenly li {
+  background: #00c9c8; 
+} */
+
+.flex-item {
+	width: 400px;
+	text-align: center;
+}
+
+.footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	background-color: #333;
+	color: white;
+	text-align: center;
+  }
