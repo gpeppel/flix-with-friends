@@ -1,10 +1,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import './youtube360.css';
 
 import KeyListener from './utils/keylistener.js';
 
 
-const SPEED = 4;
+const SPEED = 3;
+
+const RESET_TIME = 1500;
 
 export function Youtube360Controller(props)
 {
@@ -21,7 +24,8 @@ export function Youtube360Controller(props)
 
 	//useEffect?
 
-	const keylistener = new KeyListener(undefined, undefined, () =>
+	const keylistener = new KeyListener();
+	keylistener.onUpdate = () =>
 	{
 		if(!player || !player.player)
 			return;
@@ -48,8 +52,25 @@ export function Youtube360Controller(props)
 		if(keylistener.isKeyDown('x'))
 			sphereProp.fov = Math.min(120, sphereProp.fov + SPEED);
 
+		if(keylistener.getKeyDownTime('a') > RESET_TIME && keylistener.getKeyDownTime('d') > RESET_TIME)
+			sphereProp.yaw = 0;
+		if(keylistener.getKeyDownTime('w') > RESET_TIME && keylistener.getKeyDownTime('s') > RESET_TIME)
+			sphereProp.pitch = 0;
+		if(keylistener.getKeyDownTime('q') > RESET_TIME && keylistener.getKeyDownTime('e') > RESET_TIME)
+			sphereProp.roll = 0;
+		if(keylistener.getKeyDownTime('z') > RESET_TIME && keylistener.getKeyDownTime('x') > RESET_TIME)
+			sphereProp.fov = 100;
+
+		if(keylistener.getKeyDownTime('r') > RESET_TIME)
+		{
+			sphereProp.yaw = 0;
+			sphereProp.pitch = 0;
+			sphereProp.roll = 0;
+			sphereProp.fov = 100;
+		}
+
 		player.player.setSphericalProperties(sphereProp);
-	});
+	};
 
 	function onChange(event)
 	{
@@ -64,9 +85,49 @@ export function Youtube360Controller(props)
 	}
 
 	return (
-		<div>
-			<input id='control360' type='checkbox' onChange={onChange} />
-			<label htmlFor='control360'>360 Keyboard Control</label>
+		<div id='control360-container'>
+			<div className='option'>
+				<input id='control360' type='checkbox' onChange={onChange} />
+				<label htmlFor='control360'>Enable 360 Keyboard Control</label>
+			</div>
+
+			<p>360 Video Keyboard Controls:</p>
+
+			<div className='desc-container'>
+				<div className='col'>
+					<div className='control-description'>
+						<span className='key'>A</span><span className='desc'>Yaw Left</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>D</span><span className='desc'>Yaw Right</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>W</span><span className='desc'>Pitch Up</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>S</span><span className='desc'>Pitch Down</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>Q</span><span className='desc'>Roll Left</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>E</span><span className='desc'>Roll Right</span>
+					</div>
+				</div>
+
+				<div className='col'>
+					<div className='control-description'>
+						<span className='key'>Z</span><span className='desc'>Zoom In</span>
+					</div>
+					<div className='control-description'>
+						<span className='key'>X</span><span className='desc'>Zoom Out</span>
+					</div>
+
+					<div className='control-description'>
+						<span className='key'>R</span><span className='desc'><span className='hold'>(hold)</span> Reset Rotation</span>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -2,15 +2,17 @@ import FrameUpdate from './frame-update.js';
 
 export default class KeyListener
 {
-	constructor(onKeyDown, onKeyUp, onUpdate)
+	constructor()
 	{
-		this.onKeyDown = onKeyDown;
-		this.onKeyUp = onKeyUp;
-		this.onUpdate = onUpdate;
+		this.onKeyDown = undefined;
+		this.onKeyUp = undefined;
+		this.onUpdate = undefined;
 
-		this.keysDown = {};
+		this.keyLifetime = 750;
+
 		this.frameUpdate = new FrameUpdate(this.onUpdateWrapper.bind(this), FrameUpdate.fps(60));
 
+		this._keysDown = {};
 		this.enabled = false;
 
 		window.addEventListener('keydown', (event) =>
@@ -21,7 +23,8 @@ export default class KeyListener
 			if(this.onKeyDown)
 				this.onKeyDown(event);
 
-			this.keysDown[event.key] = performance.now();
+			if(!this._keysDown[event.key])
+				this._keysDown[event.key] = performance.now();
 		});
 
 		window.addEventListener('keyup', (event) =>
@@ -32,21 +35,26 @@ export default class KeyListener
 			if(this.onKeyUp)
 				this.onKeyUp(event);
 
-			this.keysDown[event.key] = 0;
+			this._keysDown[event.key] = 0;
+		});
+
+		window.addEventListener('blur', () =>
+		{
+			this._keysDown = {};
 		});
 	}
 
 	start()
 	{
 		this.frameUpdate.start();
-		this.keysDown = {};
+		this._keysDown = {};
 		this.enabled = true;
 	}
 
 	stop()
 	{
 		this.frameUpdate.stop();
-		this.keysDown = {};
+		this._keysDown = {};
 		this.enabled = false;
 	}
 
@@ -59,10 +67,10 @@ export default class KeyListener
 	getKeysDown()
 	{
 		const keys = {};
-		for (const key in this.keysDown)
+		for (const key in this._keysDown)
 		{
-			if(this.keysDown[key])
-				keys[key] = this.keysDown[key];
+			if(this._keysDown[key])
+				keys[key] = this._keysDown[key];
 		}
 
 		return keys;
@@ -78,8 +86,17 @@ export default class KeyListener
 		return Object.entries(this.getKeysDown()).sort((a, b) => a[1] - b[1]).map((x) => x[0]);
 	}
 
+	getKeyDownTime(key)
+	{
+		const entry = this._keysDown[key];
+		if(!entry)
+			return 0;
+
+		return performance.now() - entry;
+	}
+
 	isKeyDown(key)
 	{
-		return !!this.keysDown[key];
+		return !!this._keysDown[key];
 	}
 }
