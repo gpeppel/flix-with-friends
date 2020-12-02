@@ -25,16 +25,7 @@ export default class KeyListener
 				this.onKeyDown(event);
 
 			if(!this._keysDown[event.key])
-			{
-				this._keysDown[event.key] = {
-					start: performance.now(),
-					last: performance.now()
-				};
-			}
-			else
-			{
-				this._keysDown[event.key].last = performance.now();
-			}
+				this._keysDown[event.key] = performance.now();
 		});
 
 		window.addEventListener('keyup', (event) =>
@@ -45,7 +36,7 @@ export default class KeyListener
 			if(this.onKeyUp)
 				this.onKeyUp(event);
 
-			this._keysDown[event.key] = null;
+			this._keysDown[event.key] = 0;
 		});
 
 		window.addEventListener('blur', () =>
@@ -93,7 +84,16 @@ export default class KeyListener
 
 	getKeysDownOrdered()
 	{
-		return Object.entries(this.getKeysDown()).sort((a, b) => a[1].last - b[1].last).map((x) => x[0]);
+		return Object.entries(this.getKeysDown()).sort((a, b) => a[1] - b[1]).map((x) => x[0]);
+	}
+
+	getKeyDownTime(key)
+	{
+		const entry = this._keysDown[key];
+		if(!entry)
+			return 0;
+
+		return performance.now() - entry;
 	}
 
 	isKeyDown(key)
