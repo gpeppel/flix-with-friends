@@ -14,7 +14,7 @@ export function FacebookButton()
 		Socket.emit('login_oauth_facebook', {
 			'response': response
 		});
-	}
+	}``
 
 	return (
 		<FacebookLogin
