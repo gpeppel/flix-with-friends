@@ -38,6 +38,10 @@ class Room(Base):
         del self.users[user.sid]
         return True
 
+    def empty_room(self):
+        for user in list(self.users.values()):
+            self.remove_user(user)
+
     def get_current_video_code(self):
         return self.current_video_code
 
