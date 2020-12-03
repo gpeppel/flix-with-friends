@@ -14,7 +14,6 @@ class BaseNamespace(flask_socketio.Namespace):
         self.connect_user(flask.request)
 
     def connect_user(self, request):
-        print('!' * 16, 'connect', request.sid)
         user = self.flaskserver.create_user_from_request(request)
         user.socket_connected = True
         user.last_socket_connect = None
@@ -23,7 +22,6 @@ class BaseNamespace(flask_socketio.Namespace):
         self.disconnect_user(flask.request)
 
     def disconnect_user(self, request):
-        print('!' * 16, 'connect', request.sid)
         user = self.flaskserver.get_user_by_request(request)
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()

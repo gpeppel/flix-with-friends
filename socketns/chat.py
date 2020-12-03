@@ -14,6 +14,9 @@ class ChatNamespace(flask_socketio.Namespace):
 
     def on_chat_loaded(self):
         user = self.flaskserver.get_user_by_request(flask.request)
+        if user.room is None:
+            return
+
         self.flaskserver.emit_all_messages(user.room)
 
     def add_to_db(self, msg):
@@ -25,14 +28,12 @@ class ChatNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
-        print(msg.serialize())
-
         self.flaskserver.emit_all_messages(self.flaskserver.rooms[msg.room_id])
 
     def on_message_send(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
-
-        print(user.serialize())
+        if user.room is None:
+            return None
 
         text = data['text']
         user_id = user.user_id

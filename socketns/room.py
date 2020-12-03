@@ -13,6 +13,11 @@ class RoomNamespace(flask_socketio.Namespace):
 
     def on_room_create(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated():
+            return {
+                'status': 'fail'
+            }
+
         room = self.flaskserver.create_room(user.get_session_id())
 
         room.add_user(user)
@@ -31,7 +36,13 @@ class RoomNamespace(flask_socketio.Namespace):
 
     def on_room_join(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.get_room(data['roomId'])
+        if not user.is_authenticated():
+            return {
+                'status': 'fail',
+                'error': 'authenticated'
+            }
+
+        room = self.flaskserver.get_room(data.get('roomId'))
 
         if room is None:
             return {
@@ -55,12 +66,20 @@ class RoomNamespace(flask_socketio.Namespace):
 
     def on_user_join(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated() or user.room is None:
+            return
 
         user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
 
 
     def on_room_settings_set(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated() or user.room is None:
+            return{
+                'status': 'fail',
+                'error': 'Not authenticated.'
+            }
+
         if not user.room.is_creator(user):
             self.flaskserver.socketio.emit(
                 ROOM_SETTINGS_GET,
