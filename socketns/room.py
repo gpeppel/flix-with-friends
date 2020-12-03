@@ -70,7 +70,7 @@ class RoomNamespace(flask_socketio.Namespace):
             return
 
         user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
-
+        self.flaskserver.emit_all_messages(user.room)
 
     def on_room_settings_set(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
