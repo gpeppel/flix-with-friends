@@ -7,15 +7,36 @@ export function HostOptions()
 {
 	React.useEffect(() =>
 	{
+		const voteThreshold = document.getElementById('vote-threshold');
 		const votePercent = document.getElementById('vote-percent-sign');
+		const voteDisabled = document.getElementById('vote-disabled');
 
 		votePercent.style.display = 'none';
+		voteDisabled.style.display = voteThreshold.value === '0' ? '' : 'none';
 
 		Socket.on('room_settings_get', (data) =>
 		{
 			setRoomSettings(data);
 		});
 	}, []);
+
+	function onVoteThresholdChange(event)
+	{
+		updateVoteThresholdChange(event.target.value);
+	}
+
+	function updateVoteThresholdChange(value)
+	{
+		const voteThreshold = document.getElementById('vote-threshold');
+		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
+
+		voteThreshold.value = value;
+		if(voteThresholdPercentage)
+			voteThreshold.value = Math.min(100, voteThreshold.value);
+
+		const voteDisabled = document.getElementById('vote-disabled');
+		voteDisabled.style.display = value === '0' ? '' : 'none';
+	}
 
 	function onUsePercentage(event)
 	{
@@ -76,22 +97,17 @@ export function HostOptions()
 
 	function setRoomSettings(settings)
 	{
-		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
-		const voteThreshold = document.getElementById('vote-threshold');
-
 		console.log(settings);
 
 		if(settings.vote_threshold !== undefined)
 		{
 			if(settings.vote_threshold >= 1)
 			{
-				voteThreshold.value = settings.vote_threshold;
-				voteThresholdPercentage.checked = false;
+				updateVoteThresholdChange(settings.vote_threshold);
 			}
 			else
 			{
-				voteThreshold.value = Math.floor(settings.vote_threshold * 100);
-				voteThresholdPercentage.checked = true;
+				updateVoteThresholdChange(Math.floor(settings.vote_threshold * 100));
 			}
 
 			updateUsePercentage(!(settings.vote_threshold >= 1));
@@ -103,8 +119,9 @@ export function HostOptions()
 			<div>
 				<div>
 					<label htmlFor='vote-threshold'>Vote Threshold: </label>
-					<input id='vote-threshold' type='number' min='0'/>
+					<input id='vote-threshold' type='number' min='0' onChange={onVoteThresholdChange}/>
 					<span id='vote-percent-sign'>%</span>
+					<span id='vote-disabled'>(disabled)</span>
 				</div>
 				<div>
 					<input id='vote-threshold-percentage' onChange={onUsePercentage} type='checkbox' />

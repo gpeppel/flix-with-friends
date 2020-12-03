@@ -19,3 +19,9 @@
 #vote-percent-sign {
 	margin-left: 4px;
 }
+
+#vote-disabled {
+	color: #dd0000;
+	font-size: 12px;
+	margin-left: 4px;
+}
