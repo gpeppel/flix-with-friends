@@ -1,0 +1,15 @@
+#host-options {
+	border-left: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+
+	padding: 5px;
+	width: 100%;
+}
+
+#host-options input[type='number'] {
+	width: 60px;
+}
+
+#vote-percent-sign {
+	margin-left: 4px;
+}
