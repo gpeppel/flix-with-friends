@@ -18,6 +18,16 @@ THRESHOLD = 'threshold'
 USER_COUNT = 'user_count'
 REACHES_VOTE_THRESHOLDS = [
     {
+        INPUT: 1,
+        THRESHOLD: 0,
+        OUTPUT: True
+    },
+    {
+        INPUT: 0,
+        THRESHOLD: 0,
+        OUTPUT: False
+    },
+    {
         INPUT: 4,
         THRESHOLD: 2,
         OUTPUT: True

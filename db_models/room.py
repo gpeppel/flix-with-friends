@@ -61,7 +61,7 @@ class Room(Base):
 
     def reaches_vote_threshold(self, vote_count):
         if self.vote_threshold <= 0:
-            return True
+            return vote_count > 0
         if self.vote_threshold < 1:
             return vote_count / len(self) >= self.vote_threshold
         return vote_count >= self.vote_threshold
