@@ -28,14 +28,15 @@ export function Content()
 
 	function copyRoomId()
 	{
-		var input = document.createElement('input');
+		const input = document.createElement('input');
 		input.value = userDetails.room.id;
-		input.id = 'inputID';
+
 		document.body.appendChild(input);
 		input.select();
 		document.execCommand('copy');
-		alert('Copied Room ID ' + input.value);
 		document.body.removeChild(input);
+
+		alert('Copied Room ID ' + userDetails.room.id);
 	}
 
 	return (
