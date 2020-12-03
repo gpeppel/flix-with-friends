@@ -10,6 +10,12 @@
 	width: 60px;
 }
 
+#lbl-vote-threshold-percentage {
+	position: relative;
+	top: -2px;
+	font-size: 12px;
+}
+
 #vote-percent-sign {
 	margin-left: 4px;
 }
