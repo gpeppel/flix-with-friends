@@ -19,6 +19,7 @@ class Room(Base):
         self.current_video_code = None
 
         self.vote_threshold = 0
+        self.users_add_video_enabled = False
 
     def emit(self, event, *args, sender=None):
         for sid in self.users:
@@ -69,9 +70,16 @@ class Room(Base):
     def set_vote_threshold(self, threshold):
         self.vote_threshold = utils.clamp(threshold, 0, len(self))
 
+    def can_users_add_videos(self):
+        return self.users_add_video_enabled
+
+    def set_users_can_add_video(self, bool):
+        self.users_add_video_enabled = bool
+
     def get_settings(self):
         return {
-            'vote_threshold': self.vote_threshold
+            'vote_threshold': self.vote_threshold,
+            'users_add_video_enabled': self.users_add_video_enabled
         }
 
     def __len__(self):

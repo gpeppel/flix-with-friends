@@ -6,6 +6,16 @@
 	width: 100%;
 }
 
+#host-options input[type='number'] {
+	width: 60px;
+}
+
+#host-options label {
+	position: relative;
+	top: -1px;
+	font-size: 15px;
+}
+
 #host-options .host-title {
 	font-size: 18px;
 	font-weight: bold;
@@ -13,8 +23,8 @@
 	margin: 0px 0px 15px 0px;
 }
 
-#host-options input[type='number'] {
-	width: 60px;
+#host-options .option {
+	margin-bottom: 5px;
 }
 
 #lbl-vote-threshold-percentage {

@@ -78,7 +78,11 @@ export function HostOptions()
 		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
 		const voteThreshold = document.getElementById('vote-threshold');
 
-		const settings = {};
+		const usersAddVideo = document.getElementById('users-add-video');
+
+		const settings = {
+			usersAddVideoEnabled: usersAddVideo.checked
+		};
 
 		try
 		{
@@ -112,22 +116,33 @@ export function HostOptions()
 
 			updateUsePercentage(!(settings.vote_threshold >= 1));
 		}
+
+		if(settings.users_add_video_enabled)
+		{
+			const usersAddVideo = document.getElementById('users-add-video');
+			usersAddVideo.checked = settings.users_add_video_enabled;
+		}
 	}
 
 	return (
 		<div id='host-options'>
 			<p className='host-title'>Host Options</p>
 			<div>
-				<div>
+				<div className='option'>
 					<label htmlFor='vote-threshold'>Vote Threshold: </label>
 					<input id='vote-threshold' type='number' min='0' onChange={onVoteThresholdChange}/>
 					<span id='vote-percent-sign'>%</span>
 					<span id='vote-disabled'>(disabled)</span>
 				</div>
-				<div>
+				<div className='option'>
 					<input id='vote-threshold-percentage' onChange={onUsePercentage} type='checkbox' />
 					<label id='lbl-vote-threshold-percentage' htmlFor='vote-threshold-percentage'>Use Percentage</label>
 				</div>
+			</div>
+
+			<div className='option'>
+				<input id='users-add-video' type='checkbox' />
+				<label htmlFor='users-add-video'>Can Other Users Add Videos?</label>
 			</div>
 
 			<div style={{

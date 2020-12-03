@@ -72,6 +72,9 @@ class RoomNamespace(flask_socketio.Namespace):
         except:
             pass
 
+        if 'usersAddVideoEnabled' in data:
+            user.room.set_users_can_add_video(data['usersAddVideoEnabled'])
+
         user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
 
         return {
