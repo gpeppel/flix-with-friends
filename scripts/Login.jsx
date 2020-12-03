@@ -7,7 +7,6 @@ import { TwitterButton } from './TwitterButton';
 import { Socket } from './Socket';
 
 import './css/login.css';
-import { Footer } from './Footer';
 
 export function Login()
 {

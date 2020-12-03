@@ -1,53 +1,14 @@
 .footer {
   padding: 1.5rem 1.5rem;
-  background: gray(25%);
-  color: #333333;
+  background: #333333;
   font-size: 0.85em;
   overflow-x: hidden;
-  text-align: center;
 }
 
-.footer a {
-  padding-bottom: 1px;
-  border: 0;
-  color: gray(90%);
-}
-.footer a:focus,
-.footer a:active,
-.footer a:hover {
-  color: #fff;
-  text-decoration: underline;
+.footer-top {
+  text-align: left;
 }
 
-.footer-credits {
-  margin: 0;
-  padding: 0;
-}
-
-.footer-credit {
-  display: block;
-  margin: 0;
-}
-
-.footer-creditSeparator {
-  display: none;
-}
-
-/* If loading the social button fails */
-.footer-social a,
-.footer-social iframe {
-  display: inline-block;
-  margin: 0 0 1em;
-  vertical-align: top;
-}
-
-@media (--break-md) {
-  .footer-credit {
-    display: inline-block;
-    margin: 0 0.25em;
-  }
-  .footer-creditSeparator {
-    display: inline-block;
-    padding: 0 0.25em;
-  }
+.footer-bot {
+  text-align: left;
 }

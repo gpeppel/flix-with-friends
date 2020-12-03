@@ -6,8 +6,8 @@ export function Footer()
 {
         return (
           <div className='footer'>
-            <span className="footer-social">THIS IS THE FOOTER</span>
-            <div className="footer-credits">THIS IS THE FOOTER</div>
-          </div>
+            <div className="footer-top">Created by:</div>
+            <div className="footer-bot">FOOTER</div>
+            </div>
         );
 }
