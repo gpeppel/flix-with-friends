@@ -53,6 +53,12 @@ class RoomNamespace(flask_socketio.Namespace):
             'current_video_code': room.get_current_video_code()
         }
 
+    def on_user_join(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request)
+
+        user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
+
+
     def on_room_settings_set(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
         if not user.room.is_creator(user):

@@ -14,7 +14,11 @@ const EVENT_YT_LOAD = 'yt_load';
 export function Content()
 {
 	const userDetails = React.useContext(UserContext);
-	Socket.emit('chat_loaded');
+
+	React.useEffect(() =>
+	{
+		Socket.emit('user_join', {});
+	}, []);
 
 	function onKeyUp(event)
 	{
