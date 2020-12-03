@@ -40,6 +40,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if user.room is None:
             return
 
+        if user.room.get_host_mode() and not user.room.is_creator(user):
+            return
+
         url = data.get('url')
         if url is None:
             return
@@ -60,6 +63,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_state_change(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
         if user.room is None:
+            return
+
+        if user.room.get_host_mode() and not user.room.is_creator(user):
             return
 
         offset = self.getval(data, 'offset',
@@ -113,6 +119,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if user.room is None:
             return
 
+        # does not work well with peer-sync mode, only allow in host-sync mode
         if not user.room.is_creator(user):
             return
 

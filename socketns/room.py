@@ -62,10 +62,18 @@ class RoomNamespace(flask_socketio.Namespace):
     def on_room_settings_set(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
         if not user.room.is_creator(user):
+            self.flaskserver.socketio.emit(
+                ROOM_SETTINGS_GET,
+                user.room.get_settings(),
+                room=user.sid
+            )
             return {
                 'status': 'fail',
-                'error': 'Permission denied'
+                'error': 'You are not the room host.'
             }
+
+        if 'hostMode' in data:
+            user.room.set_host_mode(data['hostMode'])
 
         try:
             user.room.set_vote_threshold(data['voteThreshold'])

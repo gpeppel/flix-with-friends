@@ -75,12 +75,15 @@ export function HostOptions()
 
 	function getRoomSettings()
 	{
+		const hostMode = document.getElementById('host-mode');
+
 		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
 		const voteThreshold = document.getElementById('vote-threshold');
 
 		const usersAddVideo = document.getElementById('users-add-video');
 
 		const settings = {
+			hostMode: hostMode.checked,
 			usersAddVideoEnabled: usersAddVideo.checked
 		};
 
@@ -103,9 +106,15 @@ export function HostOptions()
 	{
 		console.log(settings);
 
+		if(settings.host_mode)
+		{
+			const hostMode = document.getElementById('host-mode');
+			hostMode.checked = settings.host_mode;
+		}
+
 		if(settings.vote_threshold !== undefined)
 		{
-			if(settings.vote_threshold >= 1)
+			if(settings.vote_threshold >= 1 || settings.vote_threshold == 0)
 			{
 				updateVoteThresholdChange(settings.vote_threshold);
 			}
@@ -114,7 +123,7 @@ export function HostOptions()
 				updateVoteThresholdChange(Math.floor(settings.vote_threshold * 100));
 			}
 
-			updateUsePercentage(!(settings.vote_threshold >= 1));
+			updateUsePercentage(settings.vote_threshold > 0 && settings.vote_threshold < 1);
 		}
 
 		if(settings.users_add_video_enabled)
@@ -127,6 +136,12 @@ export function HostOptions()
 	return (
 		<div id='host-options'>
 			<p className='host-title'>Host Options</p>
+
+			<div className='option'>
+				<input id='host-mode' type='checkbox' />
+				<label htmlFor='host-mode'>Only Let the Host Control the Video Sync</label>
+			</div>
+
 			<div>
 				<div className='option'>
 					<label htmlFor='vote-threshold'>Vote Threshold: </label>

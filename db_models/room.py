@@ -18,6 +18,7 @@ class Room(Base):
 
         self.current_video_code = None
 
+        self.host_mode = True
         self.vote_threshold = 0
         self.users_add_video_enabled = False
 
@@ -60,6 +61,12 @@ class Room(Base):
 
         self.creator = user
 
+    def get_host_mode(self):
+        return self.host_mode
+
+    def set_host_mode(self, val):
+        self.host_mode = val
+
     def reaches_vote_threshold(self, vote_count):
         if self.vote_threshold <= 0:
             return False
@@ -73,11 +80,12 @@ class Room(Base):
     def can_users_add_videos(self):
         return self.users_add_video_enabled
 
-    def set_users_can_add_video(self, bool):
-        self.users_add_video_enabled = bool
+    def set_users_can_add_video(self, val):
+        self.users_add_video_enabled = val
 
     def get_settings(self):
         return {
+            'host_mode': self.host_mode,
             'vote_threshold': self.vote_threshold,
             'users_add_video_enabled': self.users_add_video_enabled
         }
