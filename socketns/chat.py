@@ -13,7 +13,6 @@ class ChatNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_chat_loaded(self):
-        print('\n\n\nCHAT_LOADED\n\n\n')
         self.flaskserver.emit_all_messages()
 
     def add_to_db(self, msg):
