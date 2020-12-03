@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { UserContext, isCreator } from './UserProvider';
 import { Socket } from './Socket';
 
 import './host-options.css';
 
 export function HostOptions()
 {
+	const userDetails = React.useContext(UserContext);
+
 	React.useEffect(() =>
 	{
 		const voteThreshold = document.getElementById('vote-threshold');
@@ -19,6 +22,12 @@ export function HostOptions()
 			setRoomSettings(data);
 		});
 	}, []);
+
+	React.useEffect(() =>
+	{
+		if(!isCreator(userDetails))
+			document.getElementById('host-options').style.display = 'none';
+	});
 
 	function onVoteThresholdChange(event)
 	{

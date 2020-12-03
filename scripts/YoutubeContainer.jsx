@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Socket } from './Socket';
-import { UserContext, UserDispatchContext } from './UserProvider';
+import { UserContext, UserDispatchContext, isCreator } from './UserProvider';
 
 import { Youtube360Controller } from './Youtube360Controller';
 import YoutubePlayer from './utils/youtube-player.js';
@@ -205,7 +205,7 @@ export function YoutubeContainer()
 		<div>
 			{ytComponent}
 
-			<Youtube360Controller player={ytPlayerRef.current} />
+			{ isCreator(userDetails) ? (<Youtube360Controller player={ytPlayerRef.current} />) : (<div></div>) }
 		</div>
 	);
 }
