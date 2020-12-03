@@ -69,6 +69,11 @@ class Room(Base):
     def set_vote_threshold(self, threshold):
         self.vote_threshold = utils.clamp(threshold, 0, len(self))
 
+    def get_settings(self):
+        return {
+            'vote_threshold': self.vote_threshold
+        }
+
     def __len__(self):
         return len(self.users)
 

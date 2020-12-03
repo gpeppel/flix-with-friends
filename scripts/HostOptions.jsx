@@ -13,16 +13,24 @@ export function HostOptions()
 
 		Socket.on('room_settings_get', (data) =>
 		{
-
+			setRoomSettings(data);
 		});
 	}, []);
 
 	function onUsePercentage(event)
 	{
+		updateUsePercentage(event.target.checked);
+	}
+
+	function updateUsePercentage(enabled)
+	{
 		const voteThreshold = document.getElementById('vote-threshold');
+		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
 		const votePercent = document.getElementById('vote-percent-sign');
 
-		if(event.target.checked)
+		voteThresholdPercentage.checked = enabled;
+
+		if(enabled)
 		{
 			voteThreshold.max = 100;
 			voteThreshold.value = Math.min(100, voteThreshold.value);
@@ -37,7 +45,11 @@ export function HostOptions()
 
 	function onSaveChanges()
 	{
-		Socket.emit('room_settings_set', getRoomSettings());
+		Socket.emit('room_settings_set', getRoomSettings(), (data) =>
+		{
+			if(data.status != 'ok')
+				alert('Error: failed to save room changes. ' + data.error);
+		});
 	}
 
 	function getRoomSettings()
@@ -60,6 +72,30 @@ export function HostOptions()
 
 		console.log(settings);
 		return settings;
+	}
+
+	function setRoomSettings(settings)
+	{
+		const voteThresholdPercentage = document.getElementById('vote-threshold-percentage');
+		const voteThreshold = document.getElementById('vote-threshold');
+
+		console.log(settings);
+
+		if(settings.vote_threshold !== undefined)
+		{
+			if(settings.vote_threshold >= 1)
+			{
+				voteThreshold.value = settings.vote_threshold;
+				voteThresholdPercentage.checked = false;
+			}
+			else
+			{
+				voteThreshold.value = Math.floor(settings.vote_threshold * 100);
+				voteThresholdPercentage.checked = true;
+			}
+
+			updateUsePercentage(!(settings.vote_threshold >= 1));
+		}
 	}
 
 	return (
