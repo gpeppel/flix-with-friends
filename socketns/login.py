@@ -51,10 +51,7 @@ class LoginNamespace(flask_socketio.Namespace):
         self.emit_login_ok(user)
 
     def on_login_oauth_google(self, data):
-        print(data)
-
         user = self.flaskserver.get_user_by_request(flask.request)
-
         token = data.get('tokenId')
         failed = False
         req = None

@@ -234,6 +234,7 @@ class YoutubeTest(unittest.TestCase):
             user = self.flaskserver.get_user_by_request(mock_req)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
+            room.set_creator(user)
             emit_list.clear()
 
             self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
@@ -265,6 +266,7 @@ class YoutubeTest(unittest.TestCase):
             user = self.flaskserver.get_user_by_request(mock_req)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
+            room.set_creator(user)
             emit_list.clear()
 
             for key, value_list in YT_STATE_CHANGES.items():

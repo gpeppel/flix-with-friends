@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Chat } from './Chat';
 import { YoutubeContainer } from './YoutubeContainer';
+import { HostOptions } from './HostOptions';
 import { UserContext } from './UserProvider';
 import { Socket } from './Socket';
 
@@ -13,7 +14,11 @@ const EVENT_YT_LOAD = 'yt_load';
 export function Content()
 {
 	const userDetails = React.useContext(UserContext);
-	Socket.emit('chat_loaded');
+
+	React.useEffect(() =>
+	{
+		Socket.emit('user_join', {});
+	}, []);
 
 	function onKeyUp(event)
 	{
@@ -24,24 +29,23 @@ export function Content()
 			});
 		}
 	}
-	
-	function copyRoomId() {
-		var input = document.createElement('input');
+
+	function copyRoomId()
+	{
+		const input = document.createElement('input');
 		input.value = userDetails.room.id;
-		input.id = 'inputID';
+
 		document.body.appendChild(input);
 		input.select();
 		document.execCommand('copy');
-		alert("Copied Room ID " + input.value);
 		document.body.removeChild(input);
-		}
+
+		alert('Copied Room ID ' + userDetails.room.id);
+	}
 
 	return (
 		<div className='main-content'>
-			<div style={{
-				display: 'flex',
-				flex: 1
-			}}>
+			<div className='main-panel'>
 				<Chat />
 			</div>
 			<div className='media-area'>
@@ -49,9 +53,13 @@ export function Content()
 				<YoutubeContainer />
 				<button onClick={copyRoomId} id='btnID'>Copy Room ID</button>
 			</div>
-			<div style={{
-				flex: 1
-			}}>
+			<div className='main-panel'>
+				<div>
+					<HostOptions />
+				</div>
+				<div>
+					<p>Playlist</p>
+				</div>
 			</div>
 		</div>
 	);

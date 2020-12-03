@@ -2,6 +2,9 @@ import flask
 import flask_socketio
 
 
+ROOM_SETTINGS_GET = 'room_settings_get'
+
+
 class RoomNamespace(flask_socketio.Namespace):
     def __init__(self, namespace, server):
         super().__init__(namespace)
@@ -10,6 +13,11 @@ class RoomNamespace(flask_socketio.Namespace):
 
     def on_room_create(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated():
+            return {
+                'status': 'fail'
+            }
+
         room = self.flaskserver.create_room(user.get_session_id())
 
         room.add_user(user)
@@ -28,7 +36,13 @@ class RoomNamespace(flask_socketio.Namespace):
 
     def on_room_join(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
-        room = self.flaskserver.get_room(data['roomId'])
+        if not user.is_authenticated():
+            return {
+                'status': 'fail',
+                'error': 'authenticated'
+            }
+
+        room = self.flaskserver.get_room(data.get('roomId'))
 
         if room is None:
             return {
@@ -48,4 +62,48 @@ class RoomNamespace(flask_socketio.Namespace):
             'room_id': room.room_id,
             'description': room.description,
             'current_video_code': room.get_current_video_code()
+        }
+
+    def on_user_join(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated() or user.room is None:
+            return
+
+        user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
+        self.flaskserver.emit_all_messages(user.room)
+
+    def on_room_settings_set(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request)
+        if not user.is_authenticated() or user.room is None:
+            return{
+                'status': 'fail',
+                'error': 'Not authenticated.'
+            }
+
+        if not user.room.is_creator(user):
+            self.flaskserver.socketio.emit(
+                ROOM_SETTINGS_GET,
+                user.room.get_settings(),
+                room=user.sid
+            )
+            return {
+                'status': 'fail',
+                'error': 'You are not the room host.'
+            }
+
+        if 'hostMode' in data:
+            user.room.set_host_mode(data['hostMode'])
+
+        try:
+            user.room.set_vote_threshold(data['voteThreshold'])
+        except:
+            pass
+
+        if 'usersAddVideoEnabled' in data:
+            user.room.set_users_can_add_video(data['usersAddVideoEnabled'])
+
+        user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
+
+        return {
+            'status': 'ok'
         }

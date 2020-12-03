@@ -18,6 +18,7 @@ import utils
 
 
 COOKIE_SESSION_ID = 'session_id'
+COOKIE_SESSION_TOKEN = 'session_token'
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
@@ -66,6 +67,10 @@ class FlaskServer:
         if session_id is None:
             resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
 
+        session_token = flask.request.cookies.get(COOKIE_SESSION_TOKEN)
+        if session_token is None:
+            resp.set_cookie(COOKIE_SESSION_TOKEN, utils.random_hex(64))
+
         return resp
 
     def debug(self):
@@ -106,11 +111,11 @@ class FlaskServer:
         )))
 
     def create_user_from_request(self, request):
-        session_id = request.cookies.get(COOKIE_SESSION_ID)
-        if session_id in self.users:
-            user = self.get_user_by_request(request)
+        user = self.get_user_by_request(request)
+        if user is not None:
             user.sid = request.sid
-        else:
+
+        if user is None:
             user = User.from_request(request)
             self.users[user.get_session_id()] = user
 
@@ -120,11 +125,13 @@ class FlaskServer:
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request):
-        session_id = request.cookies.get(COOKIE_SESSION_ID)
-        if session_id is None:
-            session_id = request.sid
+        session_id = request.cookies.get(COOKIE_SESSION_ID, request.sid)
+        session_token = request.cookies.get(COOKIE_SESSION_TOKEN)
 
-        return self.users[session_id]
+        user = self.users.get(session_id)
+        if user is None or session_token != user.session_token:
+            return None
+        return user
 
     def create_room(self, room_id):
         if room_id in self.rooms:

@@ -3,26 +3,29 @@ import random
 
 
 def random_hex(length, upper=False):
-    hex = '0123456789abcdef'
+    hexchars = '0123456789abcdef'
     if upper:
-        hex = hex.upper()
+        hexchars = hexchars.upper()
 
     result = ''
     for _ in range(length):
-        result += hex[random.randint(0, len(hex) - 1)]
+        result += hexchars[random.randint(0, len(hexchars) - 1)]
     return result
+
+def clamp(val, minval, maxval):
+    return max(min(val, maxval), minval)
 
 def unix_timestamp(timestamp=None):
     if timestamp is None:
         timestamp = datetime.datetime.utcnow()
     return int((timestamp - datetime.datetime(1970, 1, 1)).total_seconds() * 1000)
 
-def getval(d, key, default=None):
-    d, s = getdict(d, key)
-    return d.get(s, default)
+def getval(dct, key, default=None):
+    dct, subkey = getdict(dct, key)
+    return dct.get(subkey, default)
 
-def getdict(d, key):
+def getdict(dct, key):
     spl = key.split('.')
     for i in range(0, len(spl) - 1):
-        d = d[spl[i]]
-    return d, spl[-1]
+        dct = dct[spl[i]]
+    return dct, spl[-1]

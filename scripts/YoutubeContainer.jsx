@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Socket } from './Socket';
-import { UserContext, UserDispatchContext } from './UserProvider';
+import { UserContext, UserDispatchContext, isCreator } from './UserProvider';
 
 import { Youtube360Controller } from './Youtube360Controller';
 import YoutubePlayer from './utils/youtube-player.js';
@@ -65,10 +65,11 @@ export function YoutubeContainer()
 				return;
 
 			const sphereProp = ytPlayerRef.current.player.getSphericalProperties();
-			let yaw, pitch, roll;
+			let yaw, pitch, roll, fov;
 
 			if(LERP_ENABLED)
 			{
+				const t = deltaTime / 1000 * LERP_SPEED;
 				[yaw, pitch, roll] = Lerp.rotation(
 					sphereProp.yaw,
 					sphereProp.pitch,
@@ -76,18 +77,20 @@ export function YoutubeContainer()
 					lastRotation.yaw,
 					lastRotation.pitch,
 					lastRotation.roll,
-					deltaTime / 1000 * LERP_SPEED
+					t
 				);
+				fov = Lerp.float(lastRotation.fov, sphereProp.fov, t);
 			}
 			else
 			{
-				[yaw, pitch, roll] = [lastRotation.yaw, lastRotation.pitch, lastRotation.roll];
+				[yaw, pitch, roll, fov] = [lastRotation.yaw, lastRotation.pitch, lastRotation.roll, lastRotation.fov];
 			}
 
 			ytPlayerRef.current.player.setSphericalProperties({
 				yaw: yaw,
 				pitch: pitch,
-				roll: roll
+				roll: roll,
+				fov: fov
 			});
 		});
 		lerpRotation.start();
@@ -202,7 +205,7 @@ export function YoutubeContainer()
 		<div>
 			{ytComponent}
 
-			<Youtube360Controller player={ytPlayerRef.current} />
+			{ isCreator(userDetails) ? (<Youtube360Controller player={ytPlayerRef.current} />) : (<div></div>) }
 		</div>
 	);
 }
