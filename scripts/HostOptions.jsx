@@ -116,6 +116,7 @@ export function HostOptions()
 
 	return (
 		<div id='host-options'>
+			<p className='host-title'>Host Options</p>
 			<div>
 				<div>
 					<label htmlFor='vote-threshold'>Vote Threshold: </label>
