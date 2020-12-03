@@ -4,6 +4,7 @@
 	justify-content: center;
 	align-items: center;
 	flex: 1;
+	padding-bottom: 50px;
 }
 
 .top {
@@ -14,11 +15,16 @@
 	font-size: 100px;
 }
 
+.bottom {
+	padding-top: 300px;
+	background-color: #eea1b8;
+	padding-top: 50px;
+	font-family: Greggiefont;
+	color: #eee;
+	font-size: 100px;
+}
 hr.line {
 	border-top: 5px solid #eee;
-  /*background-color: #eee;*/
-	/*box-shadow: 5px 10px #fff;*/
-
 }
 
 .login .kep-login-facebook, .login .google-button {
@@ -27,13 +33,21 @@ hr.line {
 
 .flex-container {
   padding: 0;
-  margin: 0;
+  /* margin: 0; */
   list-style: none;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
+.flex-container2 {
+	padding: 0;
+	background: #eea1b8;
+	/* margin: 0; */
+	list-style: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
 .center { 
   justify-content: center; 
 }  
@@ -41,12 +55,14 @@ hr.line {
 .space-evenly { 
   justify-content: space-evenly; 
 }
-/* 
-.space-evenly li {
-  background: #00c9c8; 
-} */
 
 .flex-item {
 	width: 400px;
 	text-align: center;
+}
+
+.flex-item2 {
+	height: auto;
+	display: flex;
+	/* text-align: center; */
 }

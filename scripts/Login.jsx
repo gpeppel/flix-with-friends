@@ -35,7 +35,8 @@ export function Login()
 		<div>
 			<ul className="flex-container center">
 				<li className="top">
-					START WATCHING WITH FRIENDS NOW!
+					SIMPLE & EASY TO USE <br />
+					GET STARTED BY CLICKING BELOW
 					<hr className='line' />
 				</li>
 			</ul>
@@ -55,6 +56,11 @@ export function Login()
 				</li>
 			</ul>
 		</div>
+		{/* <ul className="flex-container2 center bottom">
+				<li className="flex-item2">
+					START FLIX'N WITH FRIENDS NOW!
+				</li>
+			</ul> */}
 		</div>
 	);
 }
