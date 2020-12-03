@@ -56,7 +56,6 @@ export function Login()
 				</li>
 			</ul>
 		</div>
-		<Footer />
 		</div>
 	);
 }

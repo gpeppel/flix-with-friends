@@ -1,20 +1,17 @@
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { Login } from './Login';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 ReactDOM.render(
 	(
-		<div style={{
-			display: 'flex',
-			flexDirection: 'column',
-			height: '100%'
-		}}>
-			<div className='main-header'>
-				<img className='logo' src="static/images/logo.png" alt="logo" />
-			</div>
-
-			<Login />
+		<div>
+			<Header />
+			<Login  />
+			<Footer />
 		</div>
 	)
 	, document.getElementById('content')
