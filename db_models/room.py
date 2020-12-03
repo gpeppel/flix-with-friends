@@ -1,6 +1,7 @@
 import random
 
 from db_models.base import Base
+import utils
 
 
 class Room(Base):
@@ -17,8 +18,10 @@ class Room(Base):
 
         self.current_video_code = None
 
+        self.vote_threshold = 0
+
     def emit(self, event, *args, sender=None):
-        for sid, user in self.users.items():
+        for sid in self.users:
             if sender is not None and sender.sid == sid:
                 continue
             self.socketio.emit(event, *args, room=sid)
@@ -51,6 +54,16 @@ class Room(Base):
             self.add_user(user)
 
         self.creator = user
+
+    def reaches_vote_threshold(self, vote_count):
+        if self.vote_threshold <= 0:
+            return True
+        if self.vote_threshold < 1:
+            return vote_count / len(self) >= self.vote_threshold
+        return vote_count >= self.vote_threshold
+
+    def set_vote_threshold(self, threshold):
+        self.vote_threshold = utils.clamp(threshold, 0, len(self))
 
     def __len__(self):
         return len(self.users)

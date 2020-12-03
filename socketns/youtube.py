@@ -4,6 +4,7 @@ import flask
 import flask_socketio
 
 import utils
+from utils import clamp, unix_timestamp
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -79,7 +80,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         timestamp = self.getval(data, 'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
-            utils.unix_timestamp()
+            unix_timestamp()
         )
 
         if data.get('state') not in [
@@ -114,9 +115,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
         if not user.room.is_creator(user):
             return
-
-        def clamp(val, minval, maxval):
-            return max(min(val, maxval), minval)
 
         yaw = self.getval(data, 'properties.yaw',
             lambda x: isinstance(x, float) and x >= 0 and x < 360,
