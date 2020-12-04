@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import './chat.css';
+import './css/chat.css';
 
 
 export function ChatMessage(props)

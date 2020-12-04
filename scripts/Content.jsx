@@ -4,8 +4,8 @@ import { YoutubeContainer } from './YoutubeContainer';
 import { HostOptions } from './HostOptions';
 import { UserContext } from './UserProvider';
 import { Socket } from './Socket';
-
-import './content.css';
+import { Queue } from './Queue';
+import './css/content.css';
 
 
 const EVENT_YT_LOAD = 'yt_load';
@@ -59,6 +59,8 @@ export function Content()
 				</div>
 				<div>
 					<p>Playlist</p>
+					<Queue />
+
 				</div>
 			</div>
 		</div>

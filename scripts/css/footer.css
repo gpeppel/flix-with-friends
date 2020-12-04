@@ -1,0 +1,14 @@
+.footer {
+  padding: 1.5rem 1.5rem;
+  background: #333333;
+  font-size: 0.85em;
+  overflow-x: hidden;
+}
+
+.footer-top {
+  text-align: left;
+}
+
+.footer-bot {
+  text-align: left;
+}

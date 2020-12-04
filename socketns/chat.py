@@ -12,13 +12,6 @@ class ChatNamespace(flask_socketio.Namespace):
         self.namespace = namespace
         self.flaskserver = server
 
-    def on_chat_loaded(self):
-        user = self.flaskserver.get_user_by_request(flask.request)
-        if user.room is None:
-            return
-
-        self.flaskserver.emit_all_messages(user.room)
-
     def add_to_db(self, msg):
         if not self.flaskserver.db_connected():
             return

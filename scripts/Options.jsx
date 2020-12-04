@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Content } from './Content';
 import { Socket } from './Socket';
 import { UserDispatchContext } from './UserProvider';
-import './options.css';
+import './css/options.css';
 
 
 export function Options()
