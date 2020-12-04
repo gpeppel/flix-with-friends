@@ -22,9 +22,9 @@ export function Options()
 			playlist: document.getElementById('playlist').value
 		}, (data) =>
 		{
-			console.log("playlist -->");
+			console.log('playlist -->');
 			console.log(data);
-			console.log("------");
+			console.log('------');
 			if(data.status != 'ok')
 				return;
 			updateUserDetails({
