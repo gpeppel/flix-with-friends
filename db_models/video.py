@@ -16,6 +16,15 @@ class Video(Base):
             self.playlist_id
         ))
 
+    def from_url(id, url):
+        video = Video(
+            id,
+            url,
+            None)
+        pass
+    # TODO
+
+
     def serialize(self):
         return {
             'video_id': self.video_id,

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Socket } from './Socket';
+import { UserContext } from './UserProvider';
 
 const EVENT_YT_LOAD = 'yt_load';
 const EVENT_YT_ENQUEUE = 'yt_enqueue';
@@ -7,6 +8,7 @@ const youtubeUrl = require('youtube-url');
 
 export function Queue()
 {
+	const userDetails = React.useContext(UserContext);
 	function getEmitChannel(event)
 	{
 		try
@@ -39,9 +41,12 @@ export function Queue()
 		{
 			if (youtubeUrl.valid(urlText))
 			{
+				const roomID = userDetails.room.id;
+				console.log(roomID);
 				const emitChannel = getEmitChannel(event);
 				Socket.emit(emitChannel, {
 					url: urlText,
+					roomId: roomID
 				});
 
 				urlInput.value = '';
@@ -77,6 +82,7 @@ export function Queue()
 				<li>
 					{' '}
 					<p>Queued videos go here</p>
+					{ /* TODO possibly sort videos if needed*/ }
 					{' '}
 				</li>
 			</ul>
