@@ -4,6 +4,7 @@ import { YoutubeContainer } from './YoutubeContainer';
 import { HostOptions } from './HostOptions';
 import { UserContext } from './UserProvider';
 import { Socket } from './Socket';
+import { Queue } from './Queue';
 
 import './content.css';
 
@@ -56,6 +57,8 @@ export function Content()
 			<div className='main-panel'>
 				<div>
 					<HostOptions />
+					<br></br>
+					<Queue />
 				</div>
 				<div>
 					<p>Playlist</p>
