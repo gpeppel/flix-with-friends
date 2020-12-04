@@ -19,13 +19,14 @@ export function Options()
 	{
 		Socket.emit('room_create', {
 			description: 'test room',
-			playlist: document.getElementById('playlist').value.split('\n')
+			playlist: document.getElementById('playlist').value
 		}, (data) =>
 		{
+			console.log("playlist -->");
 			console.log(data);
+			console.log("------");
 			if(data.status != 'ok')
 				return;
-
 			updateUserDetails({
 				room: {
 					id: data.room_id,
@@ -75,7 +76,7 @@ export function Options()
 
 			<div className='section'>
 				<div>
-					<textarea id='playlist' placeholder='Youtube Videos (one per line)'></textarea>
+					<input id='playlist' onKeyUp={onKeyUp} placeholder='Video URL GOES HERE'/>
 				</div>
 				<button className='button' onClick={onRoomNewClick}>Host Viewing Room</button>
 			</div>

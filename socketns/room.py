@@ -12,6 +12,7 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_room_create(self, data):
+        print(data)
         user = self.flaskserver.get_user_by_request(flask.request)
         if not user.is_authenticated():
             return {
