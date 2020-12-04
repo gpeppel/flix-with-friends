@@ -6,6 +6,7 @@ import flask_socketio
 from db_models.message import Message
 from db_models.room import Room
 from db_models.user import User
+from db_models.room_video_playlist import RoomVideoPlaylist
 
 import socketns
 import socketns.base
@@ -159,3 +160,10 @@ class FlaskServer:
 
     def db_connected(self):
         return self.db is not None and self.db.is_connected()
+
+    def add_video_to_playlist(self, url, room_id):
+        pass
+
+
+
+

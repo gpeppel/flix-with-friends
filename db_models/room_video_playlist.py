@@ -20,6 +20,13 @@ class RoomVideoPlaylist(Base):
             'room_id': self.room_id
         }
 
+    def from_room_id(room_id):
+        playlist = RoomVideoPlaylist(
+            None,
+            room_id
+            )
+        return playlist
+
     @staticmethod
     def create_table(cur):
         cur.execute("""

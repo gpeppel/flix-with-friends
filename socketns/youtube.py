@@ -5,6 +5,7 @@ import flask_socketio
 
 import utils
 from utils import clamp, unix_timestamp
+from db_models.video import Video
 
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
@@ -161,3 +162,19 @@ class YoutubeNamespace(flask_socketio.Namespace):
             except Exception:
                 val = default
         return val
+
+    def on_yt_enqueue(self, data):
+        print('\nNew Enqueue Data:')
+        print(data)
+
+        room_id = data['roomId']
+        url = data['url']
+        id = self.get_youtube_video_id(url)
+
+        video = Video.from_url(room_id, url)
+        cur = self.flaskserver.db.cursor()
+
+        # TODO create video and add to existing playlist
+
+
+    
