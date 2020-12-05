@@ -8,10 +8,9 @@ class RoomVideoPlaylist(Base):
 
     def insert_to_db(self, cur):
         cur.execute("""
-            INSERT INTO room_video_playlist VALUES (%s, %s);
+            INSERT INTO room_video_playlist VALUES (DEFAULT, %s);
         """, (
-            self.playlist_id,
-            self.room_id
+            self.room_id,
         ))
 
     def serialize(self):
@@ -22,7 +21,7 @@ class RoomVideoPlaylist(Base):
 
     def from_room_id(room_id):
         playlist = RoomVideoPlaylist(
-            None,
+            'playlist_id',
             room_id
             )
         return playlist
@@ -32,7 +31,7 @@ class RoomVideoPlaylist(Base):
         cur.execute("""
         CREATE TABLE IF NOT EXISTS room_video_playlist (
             playlist_id BIGSERIAL PRIMARY KEY,
-            room_id TEXT,
+            room_id TEXT UNIQUE,
             FOREIGN KEY (room_id)
                 REFERENCES room (room_id)
                 ON UPDATE CASCADE ON DELETE CASCADE

@@ -16,14 +16,17 @@ class Video(Base):
             self.playlist_id
         ))
 
-    def from_url(id, url):
-        video = Video(
-            id,
-            url,
-            None)
-        pass
-    # TODO
-
+    def delete_from_db(self, cur):
+        cur.execute("""
+            DELETE FROM video WHERE
+            video_id = %s AND
+            video_source = %s AND
+            playlist_id = %s;
+        """, (
+            self.video_id,
+            self.video_source,
+            self.playlist_id
+        ))
 
     def serialize(self):
         return {
