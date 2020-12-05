@@ -9,7 +9,8 @@ class Video(Base):
 
     def insert_to_db(self, cur):
         cur.execute("""
-            INSERT INTO video VALUES (%s, %s, %s);
+            INSERT INTO video VALUES (%s, %s, %s)
+            ON CONFLICT (video_id) DO NOTHING;
         """, (
             self.video_id,
             self.video_source,
