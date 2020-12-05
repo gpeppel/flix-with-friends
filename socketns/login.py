@@ -38,12 +38,22 @@ class LoginNamespace(flask_socketio.Namespace):
             'type': 'FACEBOOK'
         })
         
+        # user.username = data['response']['name']
+        # user.email = data['response']['email']
+        # user.profile_url = data['response']['picture']['data']['url']
+        # user.oauth_id = data['response']['id']
+        # user.oauth_type = 'FACEBOOK'
         user.username = data['response']['name']
-        user.email = data['response']['email']
-        user.profile_url = data['response']['picture']['data']['url']
-        user.oauth_id = data['response']['id']
-        user.oauth_type = 'FACEBOOK'
-
+        key = 'email'
+        if key in data['response'].keys():
+            print("True")
+            user.email = data['response']['email']
+        else:
+            print("False")
+            user.email = data['response']['id']
+            user.profile_url = data['response']['picture']['data']['url']
+            user.oauth_id = data['response']['id']
+            user.oauth_type = 'FACEBOOK'
         user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()

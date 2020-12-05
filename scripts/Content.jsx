@@ -59,12 +59,7 @@ export function Content()
 					<br></br>
 					<Queue />
 				</div>
-				<div>
-					<p>Playlist</p>
-					<Queue />
-
-				</div>
 			</div>
-		</div>
-	);
+	</div>
+		);
 }
