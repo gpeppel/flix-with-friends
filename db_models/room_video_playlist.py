@@ -8,7 +8,8 @@ class RoomVideoPlaylist(Base):
 
     def insert_to_db(self, cur):
         cur.execute("""
-            INSERT INTO room_video_playlist VALUES (DEFAULT, %s);
+            INSERT INTO room_video_playlist VALUES (DEFAULT, %s)
+            ON CONFLICT (room_id) DO NOTHING;
         """, (
             self.room_id,
         ))

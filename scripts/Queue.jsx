@@ -71,7 +71,7 @@ export function Queue()
 			{
 				const roomID = userDetails.room.id;
 				console.log(roomID);
-				const emitChannel = EVENT_YT_DEQUEUE
+				const emitChannel = EVENT_YT_DEQUEUE;
 				Socket.emit(emitChannel, {
 					url: urlText,
 					roomId: roomID
