@@ -110,6 +110,22 @@ class FlaskServer:
             messages
         )))
 
+    def emit_playlist(self, room_id):
+        cur = self.db.cursor()
+        playlist = self.get_playlist_from_room_id(cur, room_id)
+        playlist_id = playlist['playlist_id']
+
+        videos = self.get_videos_from_playlist_id(cur, playlist_id)
+        video_list = []
+
+        for video in videos:
+            video_list.append([video['video_id'],  video['video_source']])
+
+        room = self.rooms[room_id]
+        room.emit('queue_updated', {
+            'videos': video_list
+        })
+
     def create_user_from_request(self, request):
         user = self.get_user_by_request(request)
         if user is not None:
@@ -168,3 +184,10 @@ class FlaskServer:
         result = cur.fetchone()
         return result
 
+    def get_videos_from_playlist_id(self, cur, playlist_id):
+        cur.execute("""
+            SELECT * FROM video
+            WHERE video.playlist_id = %s;
+        """, (playlist_id,))
+        result = cur.fetchall()
+        return result

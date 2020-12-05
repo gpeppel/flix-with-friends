@@ -30,7 +30,7 @@ class RoomNamespace(flask_socketio.Namespace):
         room.add_user(user)
         room.set_creator(user)
 
-        room.current_video_code = data['playlist'][0]
+        room.current_video_code = data['playlist']
         if len(room.current_video_code) == 0:
             room.current_video_code = 'dQw4w9WgXcQ'
 

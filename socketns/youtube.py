@@ -180,6 +180,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
+        self.flaskserver.emit_playlist(room_id)
+
     def on_yt_dequeue(self, data):
         room_id = data['roomId']
         url = data['url']
@@ -197,3 +199,5 @@ class YoutubeNamespace(flask_socketio.Namespace):
         video.delete_from_db(cur)
         self.flaskserver.db.commit()
         cur.close()
+
+        self.flaskserver.emit_playlist(room_id)
