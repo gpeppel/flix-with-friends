@@ -3,6 +3,7 @@ import flask_socketio
 
 
 ROOM_SETTINGS_GET = 'room_settings_get'
+from db_models.room_video_playlist import RoomVideoPlaylist
 
 
 class RoomNamespace(flask_socketio.Namespace):
@@ -19,6 +20,11 @@ class RoomNamespace(flask_socketio.Namespace):
             }
 
         room = self.flaskserver.create_room(user.get_session_id())
+        playlist = RoomVideoPlaylist.from_room_id(room.room_id)
+        cur = self.flaskserver.db.cursor()
+        playlist.insert_to_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
 
         room.add_user(user)
         room.set_creator(user)
