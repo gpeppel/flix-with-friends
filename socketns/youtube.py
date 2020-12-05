@@ -7,7 +7,6 @@ import utils
 from utils import clamp, unix_timestamp
 from db_models.video import Video
 
-
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
 EVENT_YT_LOAD = 'yt_load'
 EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update'
@@ -164,17 +163,37 @@ class YoutubeNamespace(flask_socketio.Namespace):
         return val
 
     def on_yt_enqueue(self, data):
-        print('\nNew Enqueue Data:')
-        print(data)
-
         room_id = data['roomId']
         url = data['url']
-        id = self.get_youtube_video_id(url)
+        video_id = self.get_youtube_video_id(url)
 
-        video = Video.from_url(room_id, url)
+        print('\nNew Enqueue Data:')
+        print('room_id: %s' % room_id)
+        print('video_url: %s' % url)
+        print('video_id: %s' % video_id)
+
         cur = self.flaskserver.db.cursor()
+        playlist = self.flaskserver.get_playlist_from_room_id(cur, room_id)
+        video = Video(video_id, url, playlist['playlist_id'])
 
-        # TODO create video and add to existing playlist
+        video.insert_to_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
 
+    def on_yt_dequeue(self, data):
+        room_id = data['roomId']
+        url = data['url']
+        video_id = self.get_youtube_video_id(url)
 
-    
+        print('\nNew Dequeue Data:')
+        print('room_id: %s' % room_id)
+        print('video_url: %s' % url)
+        print('video_id: %s' % video_id)
+
+        cur = self.flaskserver.db.cursor()
+        playlist = self.flaskserver.get_playlist_from_room_id(cur, room_id)
+        video = Video(video_id, url, playlist['playlist_id'])
+
+        video.delete_from_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
