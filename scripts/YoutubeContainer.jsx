@@ -49,6 +49,7 @@ export function YoutubeContainer()
 	function onYtReady(event)
 	{
 		let lastRotation = undefined;
+		let sentVideoLoadOnFinished = false;
 
 		console.log('ready', event);
 
@@ -106,6 +107,22 @@ export function YoutubeContainer()
 				emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
 				break;
 			}
+
+			if(isCreator(userDetails) && ytPlayerRef.current.isVideoFinished())
+			{
+				if(userDetails.room.playlist && userDetails.room.playlist.videos.length > 0)
+				{
+					if(!sentVideoLoadOnFinished)
+					{
+						console.log('loading next video...');
+						Socket.emit(EVENT_YT_LOAD, {
+							//url: userDetails.room.playlist.videos[0].video_id
+							url: userDetails.room.playlist.videos[0][0]
+						});
+						sentVideoLoadOnFinished = true;
+					}
+				}
+			}
 		}, UPDATE_STATE_EMIT_DELAY);
 		stateEmitter.start();
 
@@ -139,6 +156,7 @@ export function YoutubeContainer()
 					}
 				});
 			});
+			sentVideoLoadOnFinished = false;
 		});
 
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>
