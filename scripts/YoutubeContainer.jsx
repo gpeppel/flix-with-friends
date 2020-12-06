@@ -10,6 +10,7 @@ import Lerp from './utils/lerp.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
+const EVENT_YT_DEQUEUE = 'yt_dequeue';
 const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
 
@@ -116,10 +117,15 @@ export function YoutubeContainer()
 					{
 						console.log('loading next video...');
 						Socket.emit(EVENT_YT_LOAD, {
-							//url: userDetails.room.playlist.videos[0].video_id
-							url: userDetails.room.playlist.videos[0][0]
+							url: userDetails.room.playlist.videos[0].video_id
 						});
 						sentVideoLoadOnFinished = true;
+
+						Socket.emit(EVENT_YT_DEQUEUE, {
+							url: userDetails.room.playlist.videos[0].video_source,
+							roomId: userDetails.room.id
+						});
+
 					}
 				}
 			}

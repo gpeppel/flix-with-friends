@@ -16,26 +16,26 @@ function getVideoTitle(videoId)
 	});
 }
 
-function playNow(videoUrl, roomID)
-{
-	Socket.emit('yt_load', {
-		url: videoUrl,
-		roomId: roomID
-	});
-
-	deQueue(videoUrl, roomID);
-}
-
-function deQueue(videoUrl, roomID)
-{
-	Socket.emit('yt_dequeue', {
-		url: videoUrl,
-		roomId: roomID
-	});
-}
-
 export function QueuedVideo(props)
 {
+
+	function playNow(videoUrl, roomID)
+	{
+		Socket.emit('yt_load', {
+			url: videoUrl,
+			roomId: roomID
+		});
+
+		deQueue(videoUrl, roomID);
+	}
+
+	function deQueue(videoUrl, roomID)
+	{
+		Socket.emit('yt_dequeue', {
+			url: videoUrl,
+			roomId: roomID
+		});
+	}
 
 	const userDetails = React.useContext(UserContext);
 	React.useEffect(() =>
