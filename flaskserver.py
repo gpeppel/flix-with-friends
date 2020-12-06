@@ -119,9 +119,9 @@ class FlaskServer:
         video_list = []
 
         for video in videos:
-            video_list.append([video['video_id'],  video['video_source']])
+            video_list.append({'video_id': video['video_id'], 'video_source': video['video_source']})
 
-        room = self.rooms[room_id]
+        room = self.get_room(room_id)
         room.emit('queue_updated', {
             'videos': video_list
         })
