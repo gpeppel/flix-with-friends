@@ -71,11 +71,6 @@ export function Login()
 				</li>
 			</ul>
 		</div>
-		{/* <ul className="flex-container2 center bottom">
-				<li className="flex-item2">
-					START FLIX'N WITH FRIENDS NOW!
-				</li>
-			</ul> */}
-		</div>
+	</div>
 	);
 }
