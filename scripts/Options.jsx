@@ -71,23 +71,43 @@ export function Options()
 	}
 
 	return (
-		<div className='options'>
-			<img className='popcorn-img' src='static/images/popcorn_button.png' alt='popcorn_button' />
-
-			<div className='section'>
-				<div>
-					<input id='playlist' onKeyUp={onKeyUp} placeholder='Video URL GOES HERE'/>
-				</div>
-				<button className='button' onClick={onRoomNewClick}>Host Viewing Room</button>
+		<div class="options-wrapper">
+		<div className="box">
+   			<div className="column" id="box-left">
+				   <br />
+      			CREATE A NEW VIEWING ROOM
+				  
+				  <img src="/static/images/line_left.png" id="line" />
+   			</div>
+   				<div className="column" id="box-right">
+				   <br />
+      				JOIN A VIEWING ROOM NOW
+					  <img src="/static/images/line_right.png" id="line-sm" />
+   				</div>
 			</div>
-
-			<div className='section room' style={{
-				display: 'flex',
-				flexDirection: 'column'
-			}}>
-				<input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code'/>
-				<button className='button' onClick={onRoomJoinClick}>Join Viewing Room</button>
+			<div className="box">
+   					<div className="column" id="box-left"><img src="/static/images/ticket.png" /></div>
+   					<div className="column" id="box-right"><img src="/static/images/popcorn_icon.png"/></div>
 			</div>
+			<div className="box">
+   				<div className="column" id="box-left"><input id='playlist' onKeyUp={onKeyUp} placeholder='Video URL GOES HERE' /></div>
+   				<div className="column" id="box-right"><input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code' /></div>
+			</div>
+			<div className="box">
+   				<div className="column" id="box-left"><button className='button' onClick={onRoomJoinClick}>Join Viewing Room</button></div>
+   				<div className="column" id="box-right"><button className='button' onClick={onRoomNewClick}>Host Viewing Room</button></div>
+			</div>
+			<div className="box">
+   				<div className="column" id="box-left"><br /></div>
+   				<div className="column" id="box-right"></div>
+			</div>
+			<div className="box" id="box-last">
+   				<div className="column" id="box-left"></div>
+   			<div className="column" id="box-right-last">
+      			Text goes here jwebfiuibewofjfbwie
+   			</div>
+			   
+		</div>
 		</div>
 	);
 }
