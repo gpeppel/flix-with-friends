@@ -26,6 +26,11 @@ export default class YoutubePlayer
 		this._loadCallback = callback;
 	}
 
+	isVideoFinished()
+	{
+		return this.player.getCurrentTime() == this.player.getDuration();
+	}
+
 	isPlayerInState(state)
 	{
 		return this.player.getPlayerState() == state;
