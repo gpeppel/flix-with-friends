@@ -72,10 +72,12 @@
   --button-messenger-color-dark: #0960d1;
   --button-twitter-color: #00aced;
   --button-twitter-color-dark: #0074a1;
+  --button-twitter2-color: #02c9c9;
+  --button-twitter2-color-dark: #0074a1;
   --button-linkedin-color: #0077b5;
   --button-linkedin-color-dark: #004569;
-  --button-whatsapp-color: #25d366;
-  --button-whatsapp-color-dark: #1a9247;
+  --button-whatsapp-color: #ffc300;
+  --button-whatsapp-color-dark: #cc8c02;
   --button-github-color: #25292e;
   --button-github-color-dark: #030304;
   --button-reddit-color: #fc461e;
@@ -147,7 +149,7 @@ button.aws-btn .aws-btn__wrapper {
   z-index: 1;
   background-color: transparent;
   font-size: 32px;
-  line-height: var(--button-default-line-height);
+  /* line-height: var(--button-default-line-height); */
   font-weight: var(--button-font-weight);
   font-family: 'Greggiefont', sans-serif;
   font-style: var(--button-font-style);
@@ -301,6 +303,29 @@ button.aws-btn .aws-btn__wrapper {
             justify-content: center; }
   .aws-btn--messenger.aws-btn--progress .aws-btn__progress:before, .aws-btn--messenger.aws-btn--progress .aws-btn__progress:after {
     color: #FFFFFF; }
+    /* ------- */
+    .aws-btn--twitter2 .aws-btn__wrapper:before {
+      background: #0074a1; }
+    .aws-btn--twitter2 .aws-btn__content {
+      background: #02c9c9;
+      color: #FFFFFF; }
+      .aws-btn--twitter2 .aws-btn__content path {
+        fill: #FFFFFF; }
+    .aws-btn--twitter2.aws-btn--progress .aws-btn__content > span {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      height: 100%;
+      width: 100%;
+      -webkit-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center; }
+    .aws-btn--twitter2.aws-btn--progress .aws-btn__progress:before, .aws-btn--twitter2.aws-btn--progress .aws-btn__progress:after {
+      color: #FFFFFF; }
+        /* ------- */
   .aws-btn--twitter .aws-btn__wrapper:before {
     background: #0074a1; }
   .aws-btn--twitter .aws-btn__content {
@@ -344,9 +369,9 @@ button.aws-btn .aws-btn__wrapper {
   .aws-btn--linkedin.aws-btn--progress .aws-btn__progress:before, .aws-btn--linkedin.aws-btn--progress .aws-btn__progress:after {
     color: #FFFFFF; }
   .aws-btn--whatsapp .aws-btn__wrapper:before {
-    background: #1a9247; }
+    background: #cc8c02; }
   .aws-btn--whatsapp .aws-btn__content {
-    background: #25d366;
+    background: #ffc300;
     color: #FFFFFF; }
     .aws-btn--whatsapp .aws-btn__content path {
       fill: #FFFFFF; }
