@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Content } from './Content';
 import { Socket } from './Socket';
 import { UserDispatchContext } from './UserProvider';
+import { AwesomeButtonProgress } from 'react-awesome-button';
 import './css/options.css';
+import './css/theme-eric.css';
 
 
 export function Options()
@@ -71,43 +73,58 @@ export function Options()
 	}
 
 	return (
-		<div class="options-wrapper">
-		<div className="box">
-   			<div className="column" id="box-left">
-				   <br />
-      			CREATE A NEW VIEWING ROOM
-				  
-				  <img src="/static/images/line_left.png" id="line" />
-   			</div>
-   				<div className="column" id="box-right">
-				   <br />
-      				JOIN A VIEWING ROOM NOW
-					  <img src="/static/images/line_right.png" id="line-sm" />
-   				</div>
+
+		  <div className="options-wrapper">
+			<div className="box">
+			  <div className="column" id="box-left">CREATE A NEW VIEWING ROOM<img src="/static/images/line_left.png" id="line" /></div>
+			  <div className="column" id="box-right">JOIN A VIEWING ROOM NOW<img src="/static/images/line_right.png" id="line-sm" /></div>
 			</div>
 			<div className="box">
-   					<div className="column" id="box-left"><img src="/static/images/ticket.png" /></div>
-   					<div className="column" id="box-right"><img src="/static/images/popcorn_icon.png"/></div>
+			  <div className="column" id="box-left"><img src="/static/images/ticket.png" /></div>
+			  <div className="column" id="box-right"><img src="/static/images/popcorn_icon.png" /></div>
 			</div>
 			<div className="box">
-   				<div className="column" id="box-left"><input id='playlist' onKeyUp={onKeyUp} placeholder='Video URL GOES HERE' /></div>
-   				<div className="column" id="box-right"><input id='roomCode' onKeyUp={onKeyUp} placeholder='Room Code' /></div>
-			</div>
+			  <div className="column" id="text-box-left">
+				  <div>
+				  <div className="row">
+					  <span><input className="slide-up-left" on type="text" placeholder="URL HERE" />
+					  <label htmlFor="card">ENTER</label></span>
+					  </div>
+				</div>
+			  </div>
+			  <div className="column" id="text-box-right">
+				  <div className="row">
+					  <span><input className="slide-up-right" type="text" placeholder="URL HERE" />
+					  <label htmlFor="card">ENTER</label></span>
+			  </div>
+			  </div>
+			  </div>
 			<div className="box">
-   				<div className="column" id="box-left"><button className='button' onClick={onRoomJoinClick}>Join Viewing Room</button></div>
-   				<div className="column" id="box-right"><button className='button' onClick={onRoomNewClick}>Host Viewing Room</button></div>
-			</div>
-			<div className="box">
-   				<div className="column" id="box-left"><br /></div>
-   				<div className="column" id="box-right"></div>
+				<div className="column" id="box-left">
+
+					<AwesomeButtonProgress type='twitter2' loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay='600' resultLabel='FOR A SECOND TIME'
+						onPress={(element, next) => { console.log('-------'); setTimeout(() => { next(); }, 600)}} >
+					CREATE NEW VIEWING ROOM!
+					</AwesomeButtonProgress>
+				</div>
+				<div className="column" id="box-right">	
+					<AwesomeButtonProgress type='whatsapp' loadingLabel='JOINING...' releaseDelay='600' resultLabel='FOUND FRIENDS!'
+						onPress={(element, next) => { console.log("What's up bro..."); setTimeout(() => { next(); }, 600)}}>
+					JOIN VIEWING ROOM
+					</AwesomeButtonProgress>
+				</div>
 			</div>
 			<div className="box" id="box-last">
-   				<div className="column" id="box-left"></div>
-   			<div className="column" id="box-right-last">
-      			Text goes here jwebfiuibewofjfbwie
-   			</div>
-			   
-		</div>
-		</div>
+			  <div className="column" id="box-left"></div>
+			  <div className="column" id="box-right-last">
+				<p>COPY &amp; PASTE YOUR INVITATION CODE IN THE ABOVE BOX TO JOIN YOUR FRIENDS!</p>
+			  </div>
+			  </div>
+			<div className="box" id="box-last">
+			  <div className="column" id="box-left"></div>
+			  <div className="column" id="box-right-last"></div>
+			</div>
+		  </div>
+		  
 	);
 }
