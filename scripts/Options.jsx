@@ -87,28 +87,27 @@ export function Options()
 			  <div className="column" id="text-box-left">
 				  <div>
 				  <div className="row">
-					  <span><input className="slide-up-left" on type="text" placeholder="URL HERE" />
-					  <label htmlFor="card">ENTER</label></span>
+					  <span><input className="slide-up-left" id='playlist' type="text" placeholder="URL HERE" />
+					  <label htmlFor="card">ENTER VIDEO</label></span>
 					  </div>
 				</div>
 			  </div>
 			  <div className="column" id="text-box-right">
 				  <div className="row">
-					  <span><input className="slide-up-right" type="text" placeholder="URL HERE" />
-					  <label htmlFor="card">ENTER</label></span>
+					  <span><input className="slide-up-right" id='roomCode' type="text" placeholder="CODE HERE" />
+					  <label htmlFor="card">ENTER INVITE</label></span>
 			  </div>
 			  </div>
 			  </div>
 			<div className="box">
 				<div className="column" id="box-left">
-
-					<AwesomeButtonProgress type='twitter2' loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay='600' resultLabel='FOR A SECOND TIME'
+					<AwesomeButtonProgress type='twitter2' onClick={onRoomNewClick} loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay='600' resultLabel='FOR A SECOND TIME'
 						onPress={(element, next) => { console.log('-------'); setTimeout(() => { next(); }, 600)}} >
 					CREATE NEW VIEWING ROOM!
 					</AwesomeButtonProgress>
 				</div>
 				<div className="column" id="box-right">	
-					<AwesomeButtonProgress type='whatsapp' loadingLabel='JOINING...' releaseDelay='600' resultLabel='FOUND FRIENDS!'
+					<AwesomeButtonProgress type='whatsapp' onClick={onRoomJoinClick} loadingLabel='JOINING...' releaseDelay='600' resultLabel='FOUND FRIENDS!'
 						onPress={(element, next) => { console.log("What's up bro..."); setTimeout(() => { next(); }, 600)}}>
 					JOIN VIEWING ROOM
 					</AwesomeButtonProgress>
