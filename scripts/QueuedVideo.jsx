@@ -62,6 +62,8 @@ export function QueuedVideo(props)
 				<span className='video_title'>Video Title</span>
 				<br></br>
 				<button id="queueWatchNow" type="submit" onClick={() => playNow(props.queuedVideo.video_source, userDetails.room.id)}>Watch Now</button>
+				<br></br>
+				<button id="dequeue" type="submit" onClick={() => deQueue(props.queuedVideo.video_source, userDetails.room.id)}>Remove from Playlist</button>
 			</div>
 		</div>
 	);
