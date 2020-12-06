@@ -1,7 +1,7 @@
 import { QueuedVideo } from './QueuedVideo';
 import * as React from 'react';
 import { Socket } from './Socket';
-import { UserContext } from './UserProvider';
+import { UserContext, UserDispatchContext } from './UserProvider';
 
 const EVENT_YT_LOAD = 'yt_load';
 const EVENT_YT_ENQUEUE = 'yt_enqueue';
@@ -10,19 +10,26 @@ const youtubeUrl = require('youtube-url');
 
 export function Queue()
 {
+	const userDetails = React.useContext(UserContext);
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [queue, setQueue] = React.useState([]);
+
 	React.useEffect(() =>
 	{
 		Socket.on('queue_updated', (data) =>
 		{
 			console.log('Queue feed updated.');
 			console.log(data);
-			setQueue(data)
+			setQueue(data);
 
+			updateUserDetails({
+				room: {
+					playlist: data
+				}
+			});
 		});
 	}, []);
 
-	const userDetails = React.useContext(UserContext);
 	function getEmitChannel(event)
 	{
 		try
@@ -121,7 +128,7 @@ export function Queue()
 			<button id="enqueue" type="submit" onClick={handleSubmit}>Add to Queue</button>
 			<button id="dequeue" type="submit" onClick={deQueue}>Remove from Queue (test button)</button>
 			<div id='queueFeed'>
-				{/* TODO map queue like messages*/} 
+				{/* TODO map queue like messages*/}
 			</div>
 		</div>
 	);
