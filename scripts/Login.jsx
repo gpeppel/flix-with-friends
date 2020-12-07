@@ -52,7 +52,7 @@ export function Login()
 				<li className="top">
 					SIMPLE & EASY TO USE <br />
 					GET STARTED BY CLICKING BELOW
-					<hr className='line' />
+					<hr className='hr-line' />
 				</li>
 			</ul>
 		<div className='login'>

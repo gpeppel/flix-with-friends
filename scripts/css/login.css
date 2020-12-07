@@ -1,4 +1,4 @@
-/* @font-face {
+@font-face {
     font-family: 'greggiefont';
     src: url('http://localhost:8080/static/fonts/greggiefont-webfont.eot');
     src: url('http://localhost:8080/static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
@@ -7,9 +7,9 @@
          url('http://localhost:8080/static/fonts/greggiefont-webfont.svg#greggiefont') format('svg');
     font-weight: normal;
     font-style: normal;
-} */
+}
 
-@font-face {
+/* @font-face {
     font-family: 'greggiefont';
     src: url('/static/fonts/greggiefont-webfont.eot');
     src: url('/static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
@@ -18,7 +18,7 @@
          url('/static/fonts/greggiefont-webfont.svg#greggiefont') format('svg');
     font-weight: normal;
     font-style: normal;
-}
+} */
 
 body {
 	font-family: 'greggiefont';
@@ -49,9 +49,7 @@ body {
 	color: #eee;
 	font-size: 100px;
 }
-hr.line {
-	border-top: 5px solid #eee;
-}
+.hr-line { border-top: 5px solid #eee; box-shadow: 0px 4px 2px #019292; width: 100%;}
 
 .login .kep-login-facebook, .login .google-button {
 	width: 300px;
