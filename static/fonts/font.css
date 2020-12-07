@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'greggiefont';
+    src: url('./static/fonts/greggiefont-webfont.eot');
+    src: url('./static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
+         url('./static/fonts/greggiefont-webfont.woff2') format('woff2'),
+         url('./static/fonts/greggiefont-webfont.woff') format('woff'),
+         url('./static/fonts/greggiefont-webfont.svg#greggiefontregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
