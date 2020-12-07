@@ -102,13 +102,13 @@ export function Options()
 			<div className="box">
 				<div className="column" id="box-left">
 					<AwesomeButtonProgress type='twitter2' loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay='600' resultLabel='FOR A SECOND TIME'
-						onPress={(element, next) => { console.log('-------'); setTimeout(() => { next(); }, 600)}} >
+						onPress={(event) => {onRoomNewClick();}} >
 					CREATE NEW VIEWING ROOM!
 					</AwesomeButtonProgress>
 				</div>
 				<div className="column" id="box-right">	
 					<AwesomeButtonProgress type='whatsapp' loadingLabel='JOINING...' releaseDelay='600' resultLabel='FOUND FRIENDS!'
-						onPress={(element, next) => { console.log("What's up bro..."); setTimeout(() => { next(); }, 600)}}>
+						onPress={(event) => {onRoomJoinClick();}}>
 					JOIN VIEWING ROOM
 					</AwesomeButtonProgress>
 				</div>
