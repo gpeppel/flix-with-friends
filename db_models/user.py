@@ -38,9 +38,14 @@ class User(Base):
         self.room = None
 
     def get_session_id(self):
-        if self.session_id is None:
-            return self.sid
-        return self.session_id
+        if self.session_id is not None:
+            return self.session_id
+        return self.sid
+
+    def authenticate(self, token):
+        if self.session_token is None:
+            return True
+        return token == self.session_token
 
     def insert_to_db(self, cur):
         cur.execute("""

@@ -23,7 +23,11 @@ class BaseNamespace(flask_socketio.Namespace):
 
     def disconnect_user(self, request):
         user = self.flaskserver.get_user_by_request(request)
+        if user is None or user == False:
+            return
+
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
 
-        user.room.remove_user(user)
+        if user.room is not None:
+            user.room.remove_user(user)
