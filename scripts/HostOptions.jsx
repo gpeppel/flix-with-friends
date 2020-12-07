@@ -2,7 +2,7 @@ import * as React from 'react';
 import { UserContext, isCreator } from './UserProvider';
 import { Socket } from './Socket';
 
-import './host-options.css';
+import './css/host-options.css';
 
 export function HostOptions()
 {

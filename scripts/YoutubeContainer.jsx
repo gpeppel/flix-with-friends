@@ -10,6 +10,7 @@ import Lerp from './utils/lerp.js';
 
 
 const EVENT_YT_LOAD = 'yt_load';
+const EVENT_YT_DEQUEUE = 'yt_dequeue';
 const EVENT_YT_STATE_CHANGE = 'yt_state_change';
 const EVENT_YT_SPHERE_UPDATE = 'yt_sphere_update';
 
@@ -49,6 +50,7 @@ export function YoutubeContainer()
 	function onYtReady(event)
 	{
 		let lastRotation = undefined;
+		let sentVideoLoadOnFinished = false;
 
 		console.log('ready', event);
 
@@ -106,6 +108,27 @@ export function YoutubeContainer()
 				emitStateChange(ytPlayerRef.current.player, YoutubePlayer.prototype.PLAYER_PAUSED_STR);
 				break;
 			}
+
+			if(isCreator(userDetails) && ytPlayerRef.current.isVideoFinished())
+			{
+				if(userDetails.room.playlist && userDetails.room.playlist.videos.length > 0)
+				{
+					if(!sentVideoLoadOnFinished)
+					{
+						console.log('loading next video...');
+						Socket.emit(EVENT_YT_LOAD, {
+							url: userDetails.room.playlist.videos[0].video_id
+						});
+						sentVideoLoadOnFinished = true;
+
+						Socket.emit(EVENT_YT_DEQUEUE, {
+							url: userDetails.room.playlist.videos[0].video_source,
+							roomId: userDetails.room.id
+						});
+
+					}
+				}
+			}
 		}, UPDATE_STATE_EMIT_DELAY);
 		stateEmitter.start();
 
@@ -139,6 +162,7 @@ export function YoutubeContainer()
 					}
 				});
 			});
+			sentVideoLoadOnFinished = false;
 		});
 
 		Socket.on(EVENT_YT_STATE_CHANGE, (data) =>

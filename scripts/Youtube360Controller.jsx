@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import './youtube360.css';
+import './css/youtube360.css';
 
 import KeyListener from './utils/keylistener.js';
 

@@ -1,28 +1,35 @@
 import { QueuedVideo } from './QueuedVideo';
 import * as React from 'react';
 import { Socket } from './Socket';
-import { UserContext } from './UserProvider';
+import { UserContext, UserDispatchContext } from './UserProvider';
 
 const EVENT_YT_LOAD = 'yt_load';
 const EVENT_YT_ENQUEUE = 'yt_enqueue';
-const EVENT_YT_DEQUEUE = 'yt_dequeue';
 const youtubeUrl = require('youtube-url');
 
 export function Queue()
 {
+	const userDetails = React.useContext(UserContext);
+	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [queue, setQueue] = React.useState([]);
+
 	React.useEffect(() =>
 	{
 		Socket.on('queue_updated', (data) =>
 		{
 			console.log('Queue feed updated.');
-			console.log(data);
-			setQueue(data)
 
+			console.log(data['videos']);
+			setQueue(data['videos']);
+
+			updateUserDetails({
+				room: {
+					playlist: data
+				}
+			});
 		});
 	}, []);
 
-	const userDetails = React.useContext(UserContext);
 	function getEmitChannel(event)
 	{
 		try
@@ -73,32 +80,6 @@ export function Queue()
 		}
 	}
 
-	function deQueue()
-	{
-		const urlInput = document.getElementById('urlInput');
-		const urlText = urlInput.value;
-
-		if (urlText.length > 0)
-		{
-			if (youtubeUrl.valid(urlText))
-			{
-				const roomID = userDetails.room.id;
-				console.log(roomID);
-				const emitChannel = EVENT_YT_DEQUEUE;
-				Socket.emit(emitChannel, {
-					url: urlText,
-					roomId: roomID
-				});
-
-				urlInput.value = '';
-			}
-			else
-			{
-				urlInput.placeholder = 'Invalid URL!';
-				urlInput.value = '';
-			}
-		}
-	}
 
 	function onKeyUp(event)
 	{
@@ -119,10 +100,13 @@ export function Queue()
 			<input id="urlInput" onFocus={setPlaceholder} onBlur={setPlaceholder} onKeyUp={onKeyUp} placeholder="Enter YouTube URL" />
 			<button id="watchNow" type="submit" onClick={handleSubmit}>Watch Now</button>
 			<button id="enqueue" type="submit" onClick={handleSubmit}>Add to Queue</button>
-			<button id="dequeue" type="submit" onClick={deQueue}>Remove from Queue (test button)</button>
+			{/*	<button id="dequeue" type="submit" onClick={deQueue}>Remove from Queue (test button)</button>*/}
 			<div id='queueFeed'>
-				{/* TODO map queue like messages*/} 
+				{
+					queue.map((queuedVideo) => (<QueuedVideo key={queuedVideo.video_id} queuedVideo={queuedVideo} />))
+				}
 			</div>
 		</div>
 	);
 }
+
