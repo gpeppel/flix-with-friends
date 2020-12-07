@@ -25,6 +25,7 @@ load_dotenv(dotenv_path)
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
+SESSION_USE = False
 DEBUG = True
 
 class FlaskServer:
@@ -152,6 +153,9 @@ class FlaskServer:
 
         if user is None:
             user = User.from_request(request, session)
+            if not SESSION_USE:
+                user.session_id = None
+
             self.users[user.get_session_id()] = user
 
         return user
@@ -160,7 +164,10 @@ class FlaskServer:
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request, session):
-        session_id = session.get('id')
+        session_id = None
+        if SESSION_USE:
+            session_id = session.get('id')
+
         if session_id is None:
             if not hasattr(request, 'sid'):
                 return None
