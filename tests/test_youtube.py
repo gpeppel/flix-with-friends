@@ -1,7 +1,7 @@
 import unittest
 
 import app
-from tests.helpers import MockRequest, hook_socket_emit
+from tests.helpers import MockRequest, MockSession, hook_socket_emit
 import utils
 
 
@@ -228,21 +228,22 @@ class YoutubeTest(unittest.TestCase):
 
     def test_handle_yt_load(self):
         mock_req = MockRequest(TEST_SID)
+        mock_session = MockSession()
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            user = self.flaskserver.get_user_by_request(mock_req)
+            self.flaskserver.base_ns.connect_user(mock_req, mock_session)
+            user = self.flaskserver.get_user_by_request(mock_req, mock_session)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
             room.set_creator(user)
             emit_list.clear()
 
-            self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
+            self.flaskserver.youtube_ns.handle_yt_load(mock_req, mock_session, {})
 
             self.assertTrue(len(emit_list) == 0)
 
             for vobj in YOUTUBE_VIDEO_IDS:
-                self.flaskserver.youtube_ns.handle_yt_load(mock_req, {
+                self.flaskserver.youtube_ns.handle_yt_load(mock_req, mock_session, {
                     'url': vobj[URL]
                 })
 
@@ -255,15 +256,16 @@ class YoutubeTest(unittest.TestCase):
                 self.assertEqual(emit['event'], 'yt_load')
                 self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.base_ns.disconnect_user(mock_req, mock_session)
             self.flaskserver.delete_room(room)
 
     def test_handle_yt_state_change_success(self):
         mock_req = MockRequest(TEST_SID)
+        mock_session = MockSession()
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            user = self.flaskserver.get_user_by_request(mock_req)
+            self.flaskserver.base_ns.connect_user(mock_req, mock_session)
+            user = self.flaskserver.get_user_by_request(mock_req, mock_session)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
             room.set_creator(user)
@@ -280,7 +282,7 @@ class YoutubeTest(unittest.TestCase):
 
                 for val in value_list:
                     outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
-                    self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
+                    self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, mock_session, state)
                     emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_state_change')
@@ -290,39 +292,42 @@ class YoutubeTest(unittest.TestCase):
                     else:
                         self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.base_ns.disconnect_user(mock_req, mock_session)
             self.flaskserver.delete_room(room)
 
     def test_handle_yt_state_change_fail(self):
         mock_req = MockRequest(TEST_SID)
+        mock_session = MockSession()
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            user = self.flaskserver.get_user_by_request(mock_req)
+            self.flaskserver.base_ns.connect_user(mock_req, mock_session)
+            user = self.flaskserver.get_user_by_request(mock_req, mock_session)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
             emit_list.clear()
 
             for name in YT_STATE_NAMES_INVALID:
-                self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, {
+                self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, mock_session, {
                     'state': name
                 })
 
                 self.assertTrue(len(emit_list) == 0)
 
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+            self.flaskserver.base_ns.disconnect_user(mock_req, mock_session)
             self.flaskserver.delete_room(room)
 
     def test_handle_yt_sphere_update(self):
         mock_req = MockRequest(TEST_SID)
         mock_req2 = MockRequest(TEST_SID2)
+        mock_session = MockSession()
+        mock_session2 = MockSession()
 
         with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            self.flaskserver.base_ns.connect_user(mock_req2)
+            self.flaskserver.base_ns.connect_user(mock_req, mock_session)
+            self.flaskserver.base_ns.connect_user(mock_req2, mock_session2)
 
-            user = self.flaskserver.get_user_by_request(mock_req)
-            user2 = self.flaskserver.get_user_by_request(mock_req2)
+            user = self.flaskserver.get_user_by_request(mock_req, mock_session)
+            user2 = self.flaskserver.get_user_by_request(mock_req2, mock_session2)
             room = self.flaskserver.create_room(TEST_SID)
             room.add_user(user)
             room.set_creator(user)
@@ -341,7 +346,7 @@ class YoutubeTest(unittest.TestCase):
 
                 for val in value_list:
                     outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
-                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, props)
+                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, mock_session, props)
                     emit = emit_list.pop()
 
                     self.assertEqual(emit['event'], 'yt_sphere_update')
@@ -350,8 +355,8 @@ class YoutubeTest(unittest.TestCase):
                     for k in key.split('|'):
                         self.assertEqual(utils.getval(data, k), outval)
 
-            self.flaskserver.base_ns.disconnect_user(mock_req)
-            self.flaskserver.base_ns.disconnect_user(mock_req2)
+            self.flaskserver.base_ns.disconnect_user(mock_req, mock_session)
+            self.flaskserver.base_ns.disconnect_user(mock_req2, mock_session2)
             self.flaskserver.delete_room(room)
 
     def get_outval(self, data, key, inval, outval):

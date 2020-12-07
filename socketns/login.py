@@ -27,7 +27,7 @@ class LoginNamespace(flask_socketio.Namespace):
         print("Got an event for new temp user input with data:", data)
 
     def on_login_oauth_facebook(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if 'status' in data['response'].keys():
             self.emit_login_fail(user)
             return
@@ -37,7 +37,7 @@ class LoginNamespace(flask_socketio.Namespace):
             'id': data['response']['id'],
             'type': 'FACEBOOK'
         })
-        
+
         # user.username = data['response']['name']
         # user.email = data['response']['email']
         # user.profile_url = data['response']['picture']['data']['url']
@@ -62,7 +62,7 @@ class LoginNamespace(flask_socketio.Namespace):
 
     def on_login_oauth_twitter(self, data):
         print(data)
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         key = 'status'
         if key in data['data'].keys():
             self.flaskserver.socketio.emit('login_response', {
@@ -82,7 +82,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 user.email = data['data']['user_id']
             else:
                 user.email = data['data']['user_id']
-            
+
             user.profile_url = twitter_profile_pic
             user.oauth_id = data['data']['user_id']
             user.oauth_type = 'TWITTER'
@@ -93,9 +93,9 @@ class LoginNamespace(flask_socketio.Namespace):
 
             self.emit_login_ok(user)
 
-    
+
     def on_login_oauth_google(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         token = data.get('tokenId')
         failed = False
         req = None

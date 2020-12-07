@@ -1,7 +1,7 @@
 import unittest
 
 import app
-from tests.helpers import MockRequest
+from tests.helpers import MockRequest, MockSession
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -14,10 +14,11 @@ class FlaskServerTest(unittest.TestCase):
 
     def test_create_delete_user(self):
         mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+        mock_session = MockSession()
+        user = self.flaskserver.create_user_from_request(mock_req, mock_session)
 
         self.assertEqual(user.sid, TEST_SID)
-        self.assertEqual(self.flaskserver.users[TEST_SID], user)
+        self.assertEqual(self.flaskserver.users[user.get_session_id()], user)
 
         self.flaskserver.delete_user(user)
         self.assertFalse(TEST_SID in self.flaskserver.users)
@@ -28,7 +29,8 @@ class FlaskServerTest(unittest.TestCase):
         self.assertEqual(self.flaskserver.rooms['abc'], room_abc)
 
         mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+        mock_session = MockSession()
+        user = self.flaskserver.create_user_from_request(mock_req, mock_session)
         room_abc.add_user(user)
 
         self.assertTrue(len(room_abc) == 1)

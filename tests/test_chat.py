@@ -3,7 +3,7 @@ import unittest
 import unittest.mock as mock
 
 import app
-from tests.helpers import MockRequest
+from tests.helpers import MockRequest, MockSession
 
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
@@ -43,12 +43,14 @@ class ChatTest(unittest.TestCase):
     @mock.patch('random.randint')
     def test_parse_chat_message_success(self, mocked_id_generator):
         mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+        mock_session = MockSession()
+        user = self.flaskserver.create_user_from_request(mock_req, mock_session)
         room = self.flaskserver.create_room(user.sid)
         room.add_user(user)
 
         with mock.patch('flask.request', mock_req),\
-             mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
+            mock.patch('flask.session', mock_session),\
+            mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
             for test in self.success_tests:
                 mocked_id_generator.return_value = 1
                 response = self.flaskserver.chat_ns.on_message_send(
