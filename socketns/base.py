@@ -33,3 +33,8 @@ class BaseNamespace(flask_socketio.Namespace):
             pass
         else:
             user.room.remove_user(user)
+
+        cur = self.flaskserver.db.cursor()
+        user.remove_from_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()

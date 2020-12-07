@@ -141,6 +141,18 @@ class User(Base):
 
         return user
 
+    def remove_from_db(self, cur):
+        cur.execute("""
+            DELETE FROM account WHERE
+            user_id = %s AND
+            oauth_type = %s AND
+            oauth_id = %s;
+        """ , (
+                self.user_id,
+                self.oauth_type,
+                self.oauth_id
+            ))
+
     @staticmethod
     def create_table(cur):
         cur.execute("""
@@ -153,7 +165,6 @@ class User(Base):
                 settings TEXT,
                 oauth_id TEXT,
                 oauth_type TEXT,
-                UNIQUE(email),
                 UNIQUE(oauth_id, oauth_type)
             );
         """)
