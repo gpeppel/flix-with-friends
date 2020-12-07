@@ -4,7 +4,8 @@ import flask
 import flask_socketio
 
 import utils
-
+from utils import clamp, unix_timestamp
+from db_models.video import Video
 
 EVENT_YT_STATE_CHANGE = 'yt_state_change'
 EVENT_YT_LOAD = 'yt_load'
@@ -39,6 +40,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if user.room is None:
             return
 
+        if user.room.get_host_mode() and not user.room.is_creator(user):
+            return
+
         url = data.get('url')
         if url is None:
             return
@@ -46,6 +50,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
         video_id = self.get_youtube_video_id(url)
         if video_id is None:
             return
+
+        user.room.current_video_code = video_id
 
         user.room.emit(EVENT_YT_LOAD, {
             'videoId': video_id
@@ -57,6 +63,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
     def handle_yt_state_change(self, request, data):
         user = self.flaskserver.get_user_by_request(request)
         if user.room is None:
+            return
+
+        if user.room.get_host_mode() and not user.room.is_creator(user):
             return
 
         offset = self.getval(data, 'offset',
@@ -77,7 +86,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         timestamp = self.getval(data, 'timestamp',
             lambda x: isinstance(x, int),
             lambda x: int(x),
-            utils.unix_timestamp()
+            unix_timestamp()
         )
 
         if data.get('state') not in [
@@ -110,8 +119,9 @@ class YoutubeNamespace(flask_socketio.Namespace):
         if user.room is None:
             return
 
-        def clamp(val, minval, maxval):
-            return max(min(val, maxval), minval)
+        # does not work well with peer-sync mode, only allow in host-sync mode
+        if not user.room.is_creator(user):
+            return
 
         yaw = self.getval(data, 'properties.yaw',
             lambda x: isinstance(x, float) and x >= 0 and x < 360,
@@ -134,9 +144,6 @@ class YoutubeNamespace(flask_socketio.Namespace):
             100
         )
 
-        #if not user.room.is_creator(user):
-        #    return
-
         user.room.emit(EVENT_YT_SPHERE_UPDATE, {
             'properties': {
                 'yaw': yaw,
@@ -144,7 +151,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
                 'roll': roll,
                 'fov': fov
             }
-        })
+        }, sender=user)
 
     def getval(self, data, key, fnc_chk, fnc_fix, default=None):
         val = utils.getval(data, key, default)
@@ -154,3 +161,43 @@ class YoutubeNamespace(flask_socketio.Namespace):
             except Exception:
                 val = default
         return val
+
+    def on_yt_enqueue(self, data):
+        room_id = data['roomId']
+        url = data['url']
+        video_id = self.get_youtube_video_id(url)
+
+        print('\nNew Enqueue Data:')
+        print('room_id: %s' % room_id)
+        print('video_url: %s' % url)
+        print('video_id: %s' % video_id)
+
+        cur = self.flaskserver.db.cursor()
+        playlist = self.flaskserver.get_playlist_from_room_id(cur, room_id)
+        video = Video(video_id, url, playlist['playlist_id'])
+
+        video.insert_to_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
+
+        self.flaskserver.emit_playlist(room_id)
+
+    def on_yt_dequeue(self, data):
+        room_id = data['roomId']
+        url = data['url']
+        video_id = self.get_youtube_video_id(url)
+
+        print('\nNew Dequeue Data:')
+        print('room_id: %s' % room_id)
+        print('video_url: %s' % url)
+        print('video_id: %s' % video_id)
+
+        cur = self.flaskserver.db.cursor()
+        playlist = self.flaskserver.get_playlist_from_room_id(cur, room_id)
+        video = Video(video_id, url, playlist['playlist_id'])
+
+        video.delete_from_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
+
+        self.flaskserver.emit_playlist(room_id)

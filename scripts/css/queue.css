@@ -1,0 +1,46 @@
+.queueItem {
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid #aaaaaa;
+	padding: 8px;
+}
+
+.queueItem .header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.queueItem .header .left {
+	display: flex;
+	align-items: center;
+}
+
+.queueItem .video_url {
+	font-size: 14px;
+	margin: 5px 0px 0px 0px;
+}
+
+.queueItem .video_id {
+	font-size: 14px;
+	margin: 5px 0px 0px 0px;
+}
+
+.queueItem .thumbnail {
+	width: 160px;
+	padding-right: 5px;
+}
+
+#queue {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+
+	border-right: 1px solid #000;
+	height: 100%;
+}
+
+#queuedFeed {
+	overflow: auto;
+	height: 400px;
+}

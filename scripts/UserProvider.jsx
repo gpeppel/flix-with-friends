@@ -3,21 +3,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { Socket } from './Socket';
-
 export const UserContext = React.createContext(undefined);
 export const UserDispatchContext = React.createContext(undefined);
 
 export function UserProvider({children})
 {
-	React.useEffect(() =>
-	{
-		Socket.on('connect', (data) =>
-		{
-			console.log(data);
-		});
-	}, []);
-
 	const [userDetails, setUserDetails] = React.useState({
 		id: undefined,
 		username: undefined,
@@ -33,7 +23,32 @@ export function UserProvider({children})
 
 	function updateUserDetails(user)
 	{
-		setUserDetails(Object.assign({}, userDetails, user));
+		function updateObj(obj, newobj)
+		{
+			for (const key in newobj)
+			{
+				if(newobj[key] instanceof Object)
+				{
+					if(obj[key] instanceof Object)
+					{
+						updateObj(obj[key], newobj[key]);
+					}
+					else
+					{
+						obj[key] = newobj[key];
+					}
+				}
+				else
+				{
+					obj[key] = newobj[key];
+				}
+			}
+		}
+
+		const obj = Object.assign({}, userDetails);
+
+		updateObj(obj, user);
+		setUserDetails(obj);
 	}
 
 	return (
@@ -49,6 +64,10 @@ UserProvider.propTypes = {
 	children: PropTypes.node,
 };
 
+export function isCreator(user)
+{
+	return user.room && user.room.id == user.sessionId;
+}
 
 export function debugElement(user)
 {

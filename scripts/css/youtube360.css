@@ -1,0 +1,63 @@
+#control360-container {
+	display: inline-block;
+	border: 1px solid #222222;
+	border-radius: 5px;
+
+	margin: 10px 0px 15px 0px;
+	padding: 15px;
+
+	box-shadow: 2px 2px 2px 2px #22222266;
+}
+
+#control360-container .option {
+	margin-bottom: 10px;
+
+	user-select: none;
+}
+
+#control360-container label {
+	position: relative;
+	top: -2px;
+	font-size: 14px;
+}
+
+#control360-container p {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0px 0px 5px 0px;
+}
+
+#control360-container .desc-container {
+	display: flex;
+}
+
+#control360-container .desc-container .col {
+	margin-right: 5px;
+	padding: 5px;
+}
+
+#control360-container .control-description {
+	font-size: 14px;
+}
+
+#control360-container .control-description .key {
+	font-family: monospace;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+#control360-container .control-description .key::before {
+	content: '[';
+}
+
+#control360-container .control-description .key::after {
+	content: ']';
+}
+
+#control360-container .control-description .desc::before {
+	content: ' - ';
+}
+
+#control360-container .control-description .desc .hold {
+	font-style: italic;
+}

@@ -18,6 +18,7 @@ import utils
 
 
 COOKIE_SESSION_ID = 'session_id'
+COOKIE_SESSION_TOKEN = 'session_token'
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
@@ -65,6 +66,10 @@ class FlaskServer:
         if session_id is None:
             resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
 
+        session_token = flask.request.cookies.get(COOKIE_SESSION_TOKEN)
+        if session_token is None:
+            resp.set_cookie(COOKIE_SESSION_TOKEN, utils.random_hex(64))
+
         return resp
 
     def debug(self):
@@ -104,12 +109,28 @@ class FlaskServer:
             messages
         )))
 
+    def emit_playlist(self, room_id):
+        cur = self.db.cursor()
+        playlist = self.get_playlist_from_room_id(cur, room_id)
+        playlist_id = playlist['playlist_id']
+
+        videos = self.get_videos_from_playlist_id(cur, playlist_id)
+        video_list = []
+
+        for video in videos:
+            video_list.append({'video_id': video['video_id'], 'video_source': video['video_source']})
+
+        room = self.get_room(room_id)
+        room.emit('queue_updated', {
+            'videos': video_list
+        })
+
     def create_user_from_request(self, request):
-        session_id = request.cookies.get(COOKIE_SESSION_ID)
-        if session_id in self.users:
-            user = self.get_user_by_request(request)
+        user = self.get_user_by_request(request)
+        if user is not None:
             user.sid = request.sid
-        else:
+
+        if user is None:
             user = User.from_request(request)
             self.users[user.get_session_id()] = user
 
@@ -119,11 +140,13 @@ class FlaskServer:
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request):
-        session_id = request.cookies.get(COOKIE_SESSION_ID)
-        if session_id is None:
-            session_id = request.sid
+        session_id = request.cookies.get(COOKIE_SESSION_ID, request.sid)
+        session_token = request.cookies.get(COOKIE_SESSION_TOKEN)
 
-        return self.users[session_id]
+        user = self.users.get(session_id)
+        if user is None or session_token != user.session_token:
+            return None
+        return user
 
     def emit_room_info(self, room):
         if not self.db_connected():
@@ -143,10 +166,11 @@ class FlaskServer:
             room = Room(self.socketio, room_id)
             self.rooms[room.room_id] = room
 
-            cur = self.db.cursor()
-            room.insert_to_db(cur)
-            self.db.commit()
-            cur.close()
+            if self.db_connected():
+                cur = self.db.cursor()
+                room.insert_to_db(cur)
+                self.db.commit()
+                cur.close()
 
         return room
 
@@ -161,3 +185,19 @@ class FlaskServer:
 
     def db_connected(self):
         return self.db is not None and self.db.is_connected()
+
+    def get_playlist_from_room_id(self, cur, room_id):
+        cur.execute("""
+            SELECT * FROM room_video_playlist
+            WHERE room_video_playlist.room_id = %s;
+        """, (room_id,))
+        result = cur.fetchone()
+        return result
+
+    def get_videos_from_playlist_id(self, cur, playlist_id):
+        cur.execute("""
+            SELECT * FROM video
+            WHERE video.playlist_id = %s;
+        """, (playlist_id,))
+        result = cur.fetchall()
+        return result

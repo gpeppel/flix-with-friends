@@ -12,8 +12,10 @@ from db_models.user import User
 dotenv_path = os.path.join(os.path.dirname(__file__), '../react.env')
 load_dotenv(dotenv_path)
 
-GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-
+GOOGLE_APP_ID = os.getenv('GOOGLE_APP_ID')
+TWITTER_CONSUMER_KEY = os.getenv('TWITTER_CONSUMER_KEY')
+TWITTER_CONSUMER_SECRET = os.getenv('TWITTER_CONSUMER_SECRET')
+FACEBOOK_APP_ID = os.getenv('FACEBOOK_APP_ID')
 
 class LoginNamespace(flask_socketio.Namespace):
     def __init__(self, namespace, server):
@@ -26,8 +28,6 @@ class LoginNamespace(flask_socketio.Namespace):
 
     def on_login_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
-
-        # TODO verify access token
         if 'status' in data['response'].keys():
             self.emit_login_fail(user)
             return
@@ -37,24 +37,64 @@ class LoginNamespace(flask_socketio.Namespace):
             'id': data['response']['id'],
             'type': 'FACEBOOK'
         })
-
+        
+        # user.username = data['response']['name']
+        # user.email = data['response']['email']
+        # user.profile_url = data['response']['picture']['data']['url']
+        # user.oauth_id = data['response']['id']
+        # user.oauth_type = 'FACEBOOK'
         user.username = data['response']['name']
-        user.email = data['response']['email']
-        user.profile_url = data['response']['picture']['data']['url']
-        user.oauth_id = data['response']['id']
-        user.oauth_type = 'FACEBOOK'
-
+        key = 'email'
+        if key in data['response'].keys():
+            print("True")
+            user.email = data['response']['email']
+        else:
+            print("False")
+            user.email = data['response']['id']
+            user.profile_url = data['response']['picture']['data']['url']
+            user.oauth_id = data['response']['id']
+            user.oauth_type = 'FACEBOOK'
         user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
         self.emit_login_ok(user)
 
-    def on_login_oauth_google(self, data):
+    def on_login_oauth_twitter(self, data):
         print(data)
-
         user = self.flaskserver.get_user_by_request(flask.request)
+        key = 'status'
+        if key in data['data'].keys():
+            self.flaskserver.socketio.emit('login_response', {
+                'status': 'fail',
+                'userId': None
+            }, room=user.sid)
+        else:
+            cur = self.flaskserver.db.cursor()
+            User.get_from_db(cur, user, oauth={
+                'id': data['data']['user_id'],
+                'type': 'TWITTER'
+            })
 
+            user.username = data['data']['screen_name']
+            if user.email:
+                user.email = data['data']['user_id']
+            else:
+                user.email = data['data']['user_id']
+            
+            user.profile_url = data['data']['oauth_token']
+            user.oauth_id = data['data']['user_id']
+            user.oauth_type = 'TWITTER'
+
+            User.insert_to_db(cur, user, password=None)
+            self.flaskserver.db.commit()
+            cur.close()
+
+            self.emit_login_ok(user)
+
+    
+    def on_login_oauth_google(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request)
         token = data.get('tokenId')
         failed = False
         req = None
@@ -62,7 +102,7 @@ class LoginNamespace(flask_socketio.Namespace):
         # https://developers.google.com/identity/sign-in/web/backend-auth
         try:
             req = google.auth.transport.requests.Request()
-            idinfo = google.oauth2.id_token.verify_oauth2_token(token, req, GOOGLE_CLIENT_ID)
+            idinfo = google.oauth2.id_token.verify_oauth2_token(token, req, GOOGLE_APP_ID)
         except Exception as exc:
             print(exc)
             failed = True

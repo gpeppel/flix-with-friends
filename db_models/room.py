@@ -1,6 +1,7 @@
 import random
 
 from db_models.base import Base
+import utils
 
 
 class Room(Base):
@@ -17,8 +18,12 @@ class Room(Base):
 
         self.current_video_code = None
 
+        self.host_mode = True
+        self.vote_threshold = 0
+        self.users_add_video_enabled = False
+
     def emit(self, event, *args, sender=None):
-        for sid, user in self.users.items():
+        for sid in self.users:
             if sender is not None and sender.sid == sid:
                 continue
             self.socketio.emit(event, *args, room=sid)
@@ -34,6 +39,10 @@ class Room(Base):
         user.room = None
         del self.users[user.sid]
         return True
+
+    def empty_room(self):
+        for user in list(self.users.values()):
+            self.remove_user(user)
 
     def get_current_video_code(self):
         return self.current_video_code
@@ -51,6 +60,35 @@ class Room(Base):
             self.add_user(user)
 
         self.creator = user
+
+    def get_host_mode(self):
+        return self.host_mode
+
+    def set_host_mode(self, val):
+        self.host_mode = val
+
+    def reaches_vote_threshold(self, vote_count):
+        if self.vote_threshold <= 0:
+            return False
+        if self.vote_threshold < 1:
+            return vote_count / len(self) >= self.vote_threshold
+        return vote_count >= self.vote_threshold
+
+    def set_vote_threshold(self, threshold):
+        self.vote_threshold = utils.clamp(threshold, 0, len(self))
+
+    def can_users_add_videos(self):
+        return self.users_add_video_enabled
+
+    def set_users_can_add_video(self, val):
+        self.users_add_video_enabled = val
+
+    def get_settings(self):
+        return {
+            'host_mode': self.host_mode,
+            'vote_threshold': self.vote_threshold,
+            'users_add_video_enabled': self.users_add_video_enabled
+        }
 
     def __len__(self):
         return len(self.users)

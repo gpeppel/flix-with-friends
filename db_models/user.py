@@ -2,6 +2,7 @@ from db_models.base import Base
 
 
 COOKIE_SESSION_ID = 'session_id'
+COOKIE_SESSION_TOKEN = 'session_token'
 
 
 class User(Base):
@@ -14,7 +15,8 @@ class User(Base):
         oauth_id=None,
         oauth_type=None,
         sid=None,
-        session_id=None
+        session_id=None,
+        session_token=None
     ):
         self.user_id = user_id
         self.username = username
@@ -26,6 +28,7 @@ class User(Base):
 
         self.sid = sid
         self.session_id = session_id
+        self.session_token = session_token
 
         self.password = None
 
@@ -61,6 +64,9 @@ class User(Base):
         result = cur.fetchone()
         self.user_id = result['user_id']
 
+    def is_authenticated(self):
+        return self.user_id is not None
+
     def serialize(self):
         obj = {
             'user_id': self.user_id,
@@ -89,7 +95,8 @@ class User(Base):
         user = User(
             None,
             sid=req.sid,
-            session_id=req.cookies.get(COOKIE_SESSION_ID)
+            session_id=req.cookies.get(COOKIE_SESSION_ID),
+            session_token=req.cookies.get(COOKIE_SESSION_TOKEN),
         )
         return user
 
@@ -141,7 +148,6 @@ class User(Base):
                 settings TEXT,
                 oauth_id TEXT,
                 oauth_type TEXT,
-                UNIQUE(username),
                 UNIQUE(email),
                 UNIQUE(oauth_id, oauth_type)
             );

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ChatMessage } from './ChatMessage';
 import { Socket } from './Socket';
-import './chat.css';
+import './css/chat.css';
 
 
 export function Chat()
