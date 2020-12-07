@@ -52,7 +52,7 @@ export function QueuedVideo(props)
 				<span className='right'>
 				</span>
 			</div>
-			<div className='content'>
+			<div>
 				{/*
 				<span className='video_url'>Video URL: {props.queuedVideo.video_source}</span>
 				<br></br>
