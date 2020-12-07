@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
     font-family: 'greggiefont';
     src: url('http://localhost:8080/static/fonts/greggiefont-webfont.eot');
     src: url('http://localhost:8080/static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
@@ -7,9 +7,9 @@
          url('http://localhost:8080/static/fonts/greggiefont-webfont.svg#greggiefont') format('svg');
     font-weight: normal;
     font-style: normal;
-}
+} */
 
-/* @font-face {
+@font-face {
     font-family: 'greggiefont';
     src: url('/static/fonts/greggiefont-webfont.eot');
     src: url('/static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
@@ -18,7 +18,7 @@
          url('/static/fonts/greggiefont-webfont.svg#greggiefont') format('svg');
     font-weight: normal;
     font-style: normal;
-} */
+}
 
 body {
 	font-family: 'greggiefont';
