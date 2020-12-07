@@ -75,18 +75,19 @@ class LoginNamespace(flask_socketio.Namespace):
                 'id': data['data']['user_id'],
                 'type': 'TWITTER'
             })
-
             user.username = data['data']['screen_name']
+            twitter_profile_pic = 'https://twivatar.glitch.me/' + data['data']['screen_name']
+
             if user.email:
                 user.email = data['data']['user_id']
             else:
                 user.email = data['data']['user_id']
             
-            user.profile_url = data['data']['oauth_token']
+            user.profile_url = twitter_profile_pic
             user.oauth_id = data['data']['user_id']
             user.oauth_type = 'TWITTER'
 
-            User.insert_to_db(cur, user, password=None)
+            user.insert_to_db(cur)
             self.flaskserver.db.commit()
             cur.close()
 

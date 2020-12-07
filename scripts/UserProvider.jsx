@@ -66,7 +66,12 @@ UserProvider.propTypes = {
 
 export function isCreator(user)
 {
-	return user.room && user.room.id == user.sessionId;
+	if(!user.room)
+		return false;
+
+	if(user.sessionId)
+		return user.room.id == user.sessionId;
+	return user.room.id == user.sid;
 }
 
 export function debugElement(user)

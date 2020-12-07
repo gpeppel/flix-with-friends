@@ -17,6 +17,7 @@ import socketns.room
 import utils
 
 
+COOKIE_ENABLED = False
 COOKIE_SESSION_ID = 'session_id'
 COOKIE_SESSION_TOKEN = 'session_token'
 
@@ -62,13 +63,14 @@ class FlaskServer:
     def index(self):
         resp = flask.make_response(flask.render_template('index.html'))
 
-        session_id = flask.request.cookies.get(COOKIE_SESSION_ID)
-        if session_id is None:
-            resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
+        if COOKIE_ENABLED:
+            session_id = flask.request.cookies.get(COOKIE_SESSION_ID)
+            if session_id is None:
+                resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
 
-        session_token = flask.request.cookies.get(COOKIE_SESSION_TOKEN)
-        if session_token is None:
-            resp.set_cookie(COOKIE_SESSION_TOKEN, utils.random_hex(64))
+            session_token = flask.request.cookies.get(COOKIE_SESSION_TOKEN)
+            if session_token is None:
+                resp.set_cookie(COOKIE_SESSION_TOKEN, utils.random_hex(64))
 
         return resp
 
@@ -127,10 +129,10 @@ class FlaskServer:
 
     def create_user_from_request(self, request):
         user = self.get_user_by_request(request)
-        if user is not None:
+        if user is not None and user != False:
             user.sid = request.sid
 
-        if user is None:
+        if user is None or user == False:
             user = User.from_request(request)
             self.users[user.get_session_id()] = user
 
@@ -140,12 +142,18 @@ class FlaskServer:
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request):
-        session_id = request.cookies.get(COOKIE_SESSION_ID, request.sid)
-        session_token = request.cookies.get(COOKIE_SESSION_TOKEN)
+        if COOKIE_ENABLED:
+            session_id = request.cookies.get(COOKIE_SESSION_ID, request.sid)
+            session_token = request.cookies.get(COOKIE_SESSION_TOKEN)
+        else:
+            session_id = request.sid
+            session_token = None
 
         user = self.users.get(session_id)
-        if user is None or session_token != user.session_token:
+        if user is None:
             return None
+        if not user.authenticate(session_token):
+            return False
         return user
 
     def emit_room_info(self, room):
