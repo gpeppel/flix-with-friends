@@ -1,10 +1,8 @@
 import flask
 import flask_socketio
-
-
-ROOM_SETTINGS_GET = 'room_settings_get'
 from db_models.room_video_playlist import RoomVideoPlaylist
 
+ROOM_SETTINGS_GET = 'room_settings_get'
 
 class RoomNamespace(flask_socketio.Namespace):
     def __init__(self, namespace, server):
@@ -31,7 +29,7 @@ class RoomNamespace(flask_socketio.Namespace):
         room.set_creator(user)
 
         room.current_video_code = self.flaskserver.youtube_ns.get_youtube_video_id(data['playlist'])
-        if room.current_video_code == None:
+        if room.current_video_code is None:
             room.current_video_code = 'dQw4w9WgXcQ'
 
         self.flaskserver.emit_room_info(room)
@@ -73,13 +71,15 @@ class RoomNamespace(flask_socketio.Namespace):
             'current_video_code': room.get_current_video_code()
         }
 
-    def on_user_join(self, data):
+    def on_user_join(self):
         user = self.flaskserver.get_user_by_request(flask.request)
         if not user.is_authenticated() or user.room is None:
             return
 
         user.room.emit(ROOM_SETTINGS_GET, user.room.get_settings())
         self.flaskserver.emit_all_messages(user.room)
+        self.flaskserver.emit_room_info(user.room)
+        self.flaskserver.emit_playlist(user.room.room_id)
 
     def on_room_settings_set(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
