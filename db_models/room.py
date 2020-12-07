@@ -38,6 +38,8 @@ class Room(Base):
 
         user.room = None
         del self.users[user.sid]
+        if len(self.users) == 0:
+            self.empty_room()
         return True
 
     def empty_room(self):
