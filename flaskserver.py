@@ -22,7 +22,6 @@ COOKIE_SESSION_TOKEN = 'session_token'
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
-
 class FlaskServer:
     def __init__(self, app, db):
         self.app = app
@@ -148,6 +147,17 @@ class FlaskServer:
         if user is None or session_token != user.session_token:
             return None
         return user
+
+    def emit_room_info(self, room):
+        if not self.db_connected():
+            return
+
+        cur = self.db.cursor()
+        room_info_dict = room.serialize()
+
+        room.emit('room_info_received', {
+            'room_info': room_info_dict
+            })
 
     def create_room(self, room_id):
         if room_id in self.rooms:

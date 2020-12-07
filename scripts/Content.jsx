@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import { Chat } from './Chat';
+import { RoomInfo } from './RoomInfo';
 import { YoutubeContainer } from './YoutubeContainer';
 import { HostOptions } from './HostOptions';
 import { UserContext } from './UserProvider';
@@ -47,6 +48,7 @@ export function Content()
 		<div className='main-content'>
 			<div className='main-panel'>
 				<Chat />
+				<RoomInfo />
 			</div>
 			<div className='media-area'>
 				<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>

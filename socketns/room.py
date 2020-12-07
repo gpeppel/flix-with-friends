@@ -34,6 +34,8 @@ class RoomNamespace(flask_socketio.Namespace):
         if room.current_video_code == None:
             room.current_video_code = 'dQw4w9WgXcQ'
 
+        self.flaskserver.emit_room_info(room)
+
         return {
             'status': 'ok',
             'room_id': room.room_id,
