@@ -31,8 +31,11 @@ class FlaskServer:
     def __init__(self, app, db):
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
-        self.app.add_url_rule('/debug', 'debug', self.debug)
-        self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
+        self.app.add_url_rule('/create-join', 'create-join', self.create_join)
+
+        if DEBUG:
+            self.app.add_url_rule('/debug', 'debug', self.debug)
+            self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
 
         self.app.config['SESSION_TYPE'] = 'redis'
         self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
@@ -70,12 +73,21 @@ class FlaskServer:
         )
 
     def index(self):
-        resp = flask.make_response(flask.render_template('index.html'))
+        user = self.get_user_by_request(flask.request, flask.session)
+        if user is not None and user.is_authenticated():
+            return flask.redirect('/create-join', code=302)
 
         if 'id' not in flask.session:
             flask.session['id'] = utils.random_hex(32)
 
-        return resp
+        return flask.render_template('index.html')
+
+    def create_join(self):
+        user = self.get_user_by_request(flask.request, flask.session)
+        if user is None or not user.is_authenticated():
+            return flask.redirect('/', code=302)
+
+        return flask.render_template('create-join.html')
 
     def debug(self):
         return flask.render_template('debug.html')
@@ -148,7 +160,11 @@ class FlaskServer:
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request, session):
-        session_id = session.get('id', request.sid)
+        session_id = session.get('id')
+        if session_id is None:
+            if not hasattr(request, 'sid'):
+                return None
+            session_id = request.sid
 
         user = self.users.get(session_id)
         if user is None:
