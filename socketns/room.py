@@ -71,7 +71,7 @@ class RoomNamespace(flask_socketio.Namespace):
             'current_video_code': room.get_current_video_code()
         }
 
-    def on_user_join(self):
+    def on_user_join(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
         if not user.is_authenticated() or user.room is None:
             return

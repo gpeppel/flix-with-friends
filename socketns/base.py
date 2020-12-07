@@ -29,11 +29,7 @@ class BaseNamespace(flask_socketio.Namespace):
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
 
-<<<<<<< HEAD
-        if user.room is not None:
-=======
         if user.room is None:
             pass
         else:
->>>>>>> 8d7ed36a03af33ab6351afb5a820f128ab7ebb1c
             user.room.remove_user(user)
