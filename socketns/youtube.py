@@ -19,7 +19,7 @@ class YoutubeNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_yt_load(self, data):
-        self.handle_yt_load(flask.request, data)
+        self.handle_yt_load(flask.request, flask.session, data)
 
     def get_youtube_video_id(self, url):
         match = re.match(
@@ -35,8 +35,8 @@ class YoutubeNamespace(flask_socketio.Namespace):
 
         return None
 
-    def handle_yt_load(self, request, data):
-        user = self.flaskserver.get_user_by_request(request)
+    def handle_yt_load(self, request, session, data):
+        user = self.flaskserver.get_user_by_request(request, session)
         if user.room is None:
             return
 
@@ -58,10 +58,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
         })
 
     def on_yt_state_change(self, data):
-        self.handle_yt_state_change(flask.request, data)
+        self.handle_yt_state_change(flask.request, flask.session, data)
 
-    def handle_yt_state_change(self, request, data):
-        user = self.flaskserver.get_user_by_request(request)
+    def handle_yt_state_change(self, request, session, data):
+        user = self.flaskserver.get_user_by_request(request, session)
         if user.room is None:
             return
 
@@ -112,10 +112,10 @@ class YoutubeNamespace(flask_socketio.Namespace):
         })
 
     def on_yt_sphere_update(self, data):
-        self.handle_yt_sphere_update(flask.request, data)
+        self.handle_yt_sphere_update(flask.request, flask.session, data)
 
-    def handle_yt_sphere_update(self, request, data):
-        user = self.flaskserver.get_user_by_request(request)
+    def handle_yt_sphere_update(self, request, session, data):
+        user = self.flaskserver.get_user_by_request(request, session)
         if user.room is None:
             return
 

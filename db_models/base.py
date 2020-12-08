@@ -3,13 +3,13 @@ from abc import ABC, abstractmethod
 class Base(ABC):
     @abstractmethod
     def insert_to_db(self, cur):
-        pass
+        pass #pragma: no cover
 
     @abstractmethod
     def serialize(self):
-        return {}
+        return {} #pragma: no cover
 
     @staticmethod
     @abstractmethod
     def create_table(cur):
-        pass
+        pass #pragma: no cover

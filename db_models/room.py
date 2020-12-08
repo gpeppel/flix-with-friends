@@ -32,14 +32,19 @@ class Room(Base):
         self.users[user.sid] = user
         user.room = self
 
+        if self.creator is None:
+            self.creator = user
+
     def remove_user(self, user):
         if user.sid not in self.users:
             return False
 
         user.room = None
         del self.users[user.sid]
-        if len(self.users) == 0:
-            self.empty_room()
+
+        if self.is_creator(user):
+            self.set_random_host()
+
         return True
 
     def empty_room(self):
@@ -83,8 +88,10 @@ class Room(Base):
         return self.users_add_video_enabled
 
     def set_random_host(self):
-        new_host = random.choice(list(self.users.values()))
-        self.set_creator(new_host)
+        if len(self) == 0:
+            self.set_creator(None)
+            return
+        self.set_creator(random.choice(list(self.users.values())))
 
     def set_users_can_add_video(self, val):
         self.users_add_video_enabled = val

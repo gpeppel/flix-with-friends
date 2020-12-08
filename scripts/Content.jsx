@@ -9,8 +9,6 @@ import { Socket } from './Socket';
 import { Queue } from './Queue';
 import './css/content.css';
 
-const EVENT_YT_LOAD = 'yt_load';
-
 
 export function Content()
 {
@@ -34,16 +32,6 @@ export function Content()
 		Socket.emit('user_join', {});
 	}, []);
 
-	function onKeyUp(event)
-	{
-		if(event.key == 'Enter')
-		{
-			Socket.emit(EVENT_YT_LOAD, {
-				'url': event.target.value
-			});
-		}
-	}
-
 	function copyRoomId()
 	{
 		const input = document.createElement('input');
@@ -64,7 +52,6 @@ export function Content()
 				<RoomInfo />
 			</div>
 			<div className='media-area'>
-				<input onKeyUp={onKeyUp} placeholder="Enter YouTube URL"/>
 				<YoutubeContainer />
 				<button onClick={copyRoomId} id='btnID'>Copy Room ID</button>
 			</div>
