@@ -12,20 +12,34 @@ class BaseNamespace(flask_socketio.Namespace):
 
     def on_connect(self):
         self.connect_user(flask.request)
+        print('----------------------')
+        print('...Socket Connected...')
+        print('----------------------')
+
 
     def connect_user(self, request):
         user = self.flaskserver.create_user_from_request(request)
         user.socket_connected = True
         user.last_socket_connect = None
+        print('----------------------')
+        print(user.username + ' connected')
+        print('----------------------')
 
     def on_disconnect(self):
         self.disconnect_user(flask.request)
+        print('-------------------------')
+        print('...Socket Disconnected...')
+        print('-------------------------')
 
     def disconnect_user(self, request):
         user = self.flaskserver.get_user_by_request(request)
         room = user.room
         if user is None or user == False:
             return
+       
+        print('----------------------')
+        print(user.username + ' connected')
+        print('----------------------')
 
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
