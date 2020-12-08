@@ -9,7 +9,12 @@ import './css/theme-eric.css';
 
 export function Options()
 {
-	window.onbeforeunload = function (event) { Socket.emit('disconnect');};
+	window.addEventListener('beforeunload', function (e) {
+		e.preventDefault();
+		e.returnValue = Socket.emit('disconnect');
+        });
+
+	// window.onbeforeunload = function (event) { Socket.emit('disconnect');};
 
 	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = useState(false);

@@ -15,7 +15,7 @@ h2 					{ text-align: center; }
 .column 			{ display: table-cell; background-color: #000; padding: 30px;}
 .content1 			{ border-right: 15px solid #fff;}
 .column.sidebar1 	{ width: 300px; text-align: center;}
-.box 				{ display: -webkit-flex; display: -ms-flexbox; display: flex; overflow: hidden; text-align: center; font-family: 'Greggiefont';}
+.box 				{flex-direction: row; min-height: 10vh; display: -webkit-flex; display: -ms-flexbox; display: flex; overflow: hidden; text-align: center; font-family: 'Greggiefont';}
 /* #box-last {padding-top: 40px;} */
 .box .column 		{ flex: 1; padding: 10px;}
 .box .column:last-child { margin: 0;}
@@ -43,7 +43,7 @@ h2 					{ text-align: center; }
 #text-box-right {background-color: #02c9c9; font-family: 'Greggiefont'; color: #ffffff; font-size: 22px;}
 /* #label-left{ background-color: #02c9c9;} */
 div#box-last {
-  height: 1000px;
+  /* height: 1000px; */
   background: linear-gradient(to right, #ffc300 50%, #e9a1b8 50%);
 }
 
