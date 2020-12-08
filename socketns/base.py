@@ -31,7 +31,7 @@ class BaseNamespace(flask_socketio.Namespace):
         user.last_socket_connect = datetime.datetime.utcnow()
 
         host = False
-        if user.room.is_creator:
+        if user.room.is_creator(user):
             host = True
 
         if user.room is None:
