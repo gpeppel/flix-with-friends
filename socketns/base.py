@@ -23,13 +23,15 @@ class BaseNamespace(flask_socketio.Namespace):
         user.last_socket_connect = None
         print('----------------------')
         print(str(user.username) + ' connected')
+        print('inside connect_user')
         print('----------------------')
 
     def on_disconnect(self):
-        self.disconnect_user(flask.request)
         print('-------------------------')
         print('...Socket Disconnected...')
         print('-------------------------')
+        self.disconnect_user(flask.request)
+        
 
     def disconnect_user(self, request):
         user = self.flaskserver.get_user_by_request(request)
@@ -38,7 +40,7 @@ class BaseNamespace(flask_socketio.Namespace):
             return
        
         print('----------------------')
-        print(str(user.username) + ' connected')
+        print('Inside disconnect_user')
         print('----------------------')
 
         user.socket_connected = False
