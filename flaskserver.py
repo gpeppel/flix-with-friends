@@ -40,8 +40,8 @@ class FlaskServer:
 
         self.app.config['SESSION_TYPE'] = 'redis'
         self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
-        self.session = flask_session.Session()
-        self.session.init_app(self.app)
+        # self.session = flask_session.Session()
+        # self.session.init_app(self.app)
 
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
