@@ -186,6 +186,12 @@ class FlaskServer:
     def get_user_by_session_id(self, session_id):
         return self.users.get(session_id)
 
+    def get_user_by_sid(self, sid):
+        for _, user in self.users.items():
+            if user.sid == sid:
+                return user
+        return None
+
     def emit_room_info(self, room):
         if not self.db_connected():
             return

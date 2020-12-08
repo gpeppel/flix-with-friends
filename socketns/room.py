@@ -115,3 +115,17 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok'
         }
+
+    def on_room_assign_host(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        if not user.is_authenticated():
+            return
+
+        sid = data.get('sid')
+        if not user.room.is_creator(user) or sid is None:
+            return
+
+        newhost = self.flaskserver.get_user_by_sid(sid)
+        if newhost is not None:
+            user.room.set_creator(newhost)
+            self.flaskserver.emit_room_info(user.room)
