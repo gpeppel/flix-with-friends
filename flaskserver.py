@@ -163,6 +163,9 @@ class FlaskServer:
         return user
 
     def delete_user(self, user):
+        if user.room is not None:
+            user.room.remove_user(user)
+
         del self.users[user.get_session_id()]
 
     def get_user_by_request(self, request, session):
