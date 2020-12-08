@@ -84,6 +84,7 @@ class Room(Base):
 
     def set_random_host(self):
         new_host = random.choice(list(self.users.values()))
+        print(new_host)
         self.set_creator(new_host)
 
     def set_users_can_add_video(self, val):
