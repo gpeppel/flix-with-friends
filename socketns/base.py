@@ -39,7 +39,7 @@ class BaseNamespace(flask_socketio.Namespace):
             return
        
         print('---------------------------')
-        print('Inside disconnect_user -->' + print(str(user.username)))
+        print('Inside disconnect_user -->' + str(user.username))
         print('Room ---> ' + str(room))
         print('---------------------------')
 
