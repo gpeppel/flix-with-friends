@@ -14,11 +14,10 @@ class BaseNamespace(flask_socketio.Namespace):
         print('----------------------')
         print('...Socket Connected...')
         print('----------------------')
-        self.connect_user(flask.request)
+        self.connect_user(flask.request, flask.session)
 
-    def connect_user(self, request):
-        print(request)
-        user = self.flaskserver.create_user_from_request(request)
+    def connect_user(self, request, session):
+        user = self.flaskserver.create_user_from_request(request, session)
         user.socket_connected = True
         user.last_socket_connect = None
         print('----------------------')
@@ -30,36 +29,28 @@ class BaseNamespace(flask_socketio.Namespace):
         print('-------------------------')
         print('...Socket Disconnected...')
         print('-------------------------')
-        self.disconnect_user(flask.request)
-        
+        self.disconnect_user(flask.request, flask.session)
 
-    def disconnect_user(self, request):
-        user = self.flaskserver.get_user_by_request(request)
-        room = user.room
-        if user is None or user == False:
+    def disconnect_user(self, request, session):
+        user = self.flaskserver.get_user_by_request(request, session)
+        if user is None:
             return
-       
-        print('---------------------------')
-        print('Inside disconnect_user -->' + str(user.username))
-        print('Room ---> ' + str(room))
-        print('---------------------------')
+            
+        print('----------------------')
+        print('Inside disconnect_user')
+        print('----------------------')
+
+        room = user.room
 
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
-
-        host = False
-        if user.room.is_creator(user):
-            host = True
-
-        if user.room is None:
-            pass
-        else:
-            if host:
-                user.room.set_random_host()
-            user.room.remove_user(user)
 
         cur = self.flaskserver.db.cursor()
         user.remove_from_db(cur)
         self.flaskserver.db.commit()
         cur.close()
-        self.flaskserver.emit_room_info(room)
+
+        self.flaskserver.delete_user(user)
+
+        if room is not None:
+            self.flaskserver.emit_room_info(room)

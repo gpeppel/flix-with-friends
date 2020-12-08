@@ -11,8 +11,7 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_room_create(self, data):
-        print(data)
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request,  flask.session)
         if not user.is_authenticated():
             return {
                 'status': 'fail'
@@ -42,7 +41,7 @@ class RoomNamespace(flask_socketio.Namespace):
         }
 
     def on_room_join(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated():
             return {
                 'status': 'fail',
@@ -72,7 +71,7 @@ class RoomNamespace(flask_socketio.Namespace):
         }
 
     def on_user_join(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated() or user.room is None:
             return
 
@@ -82,7 +81,7 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver.emit_playlist(user.room.room_id)
 
     def on_room_settings_set(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated() or user.room is None:
             return{
                 'status': 'fail',
@@ -116,3 +115,17 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok'
         }
+
+    def on_room_assign_host(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        if not user.is_authenticated():
+            return
+
+        sid = data.get('sid')
+        if not user.room.is_creator(user) or sid is None:
+            return
+
+        newhost = self.flaskserver.get_user_by_sid(sid)
+        if newhost is not None:
+            user.room.set_creator(newhost)
+            self.flaskserver.emit_room_info(user.room)

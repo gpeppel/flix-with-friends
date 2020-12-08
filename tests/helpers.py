@@ -2,16 +2,37 @@ from contextlib import contextmanager
 import unittest.mock as mock
 
 
-class MockRequest:
-    def __init__(self, sid):
-        self.sid = sid
+@contextmanager
+def connect_test_user(flaskserver):
+    try:
+        client = flaskserver.app.test_client()
+        sio_client = flaskserver.socketio.test_client(flaskserver.app, flask_test_client=client)
+        yield client, sio_client
+    finally:
+        sio_client.disconnect()
 
-        self.cookies = {}
+@contextmanager
+def connect_login_test_user(flaskserver):
+    with connect_test_user(flaskserver) as result:
+        client, sio_client = result
+        sio_client.emit('login_test', {})
 
-    def set_cookie(self, key, val):
-        self.cookies[key] = val
+        yield client, sio_client
 
-# https://docs.python.org/2.5/whatsnew/pep-343.html
+@contextmanager
+def create_room(flaskserver, sio_client):
+    try:
+        sio_client.emit('room_create', {
+            'playlist': '',
+            'description': ''
+        })
+
+        user = flaskserver.get_user_by_session_id(sio_client.sid)
+        room = user.room
+        yield room
+    finally:
+        flaskserver.delete_room(room)
+
 @contextmanager
 def hook_socket_emit(request=None):
     emit_list = []

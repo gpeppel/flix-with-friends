@@ -15,8 +15,7 @@ class User(Base):
         oauth_id=None,
         oauth_type=None,
         sid=None,
-        session_id=None,
-        session_token=None
+        session_id=None
     ):
         self.user_id = user_id
         self.username = username
@@ -28,7 +27,6 @@ class User(Base):
 
         self.sid = sid
         self.session_id = session_id
-        self.session_token = session_token
 
         self.password = None
 
@@ -41,11 +39,6 @@ class User(Base):
         if self.session_id is not None:
             return self.session_id
         return self.sid
-
-    def authenticate(self, token):
-        if self.session_token is None:
-            return True
-        return token == self.session_token
 
     def insert_to_db(self, cur):
         cur.execute("""
@@ -96,12 +89,11 @@ class User(Base):
         return obj
 
     @staticmethod
-    def from_request(req):
+    def from_request(req, session):
         user = User(
             None,
             sid=req.sid,
-            session_id=req.cookies.get(COOKIE_SESSION_ID),
-            session_token=req.cookies.get(COOKIE_SESSION_TOKEN),
+            session_id=session.get('id')
         )
         return user
 
