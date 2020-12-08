@@ -23,8 +23,10 @@ export function HostOptions()
 		});
 	}, []);
 
-	if(!isCreator(userDetails))
-		document.getElementById('host-options').style.display = 'none';
+	React.useEffect(() =>
+	{
+		document.getElementById('host-options').style.display = isCreator(userDetails) ? '' : 'none';
+	});
 
 	function onVoteThresholdChange(event)
 	{
