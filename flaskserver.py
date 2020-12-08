@@ -1,6 +1,9 @@
 import json
+import os
 
+from dotenv import load_dotenv
 import flask
+import flask_session
 import flask_socketio
 
 from db_models.message import Message
@@ -16,19 +19,29 @@ import socketns.room
 
 import utils
 
+dotenv_path = os.path.join(os.path.dirname(__file__), 'flask.env')
+load_dotenv(dotenv_path)
 
-COOKIE_ENABLED = False
-COOKIE_SESSION_ID = 'session_id'
-COOKIE_SESSION_TOKEN = 'session_token'
 
 MESSAGES_EMIT_CHANNEL = 'messages_received'
+
+SESSION_USE = False
+DEBUG = True
 
 class FlaskServer:
     def __init__(self, app, db):
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
-        self.app.add_url_rule('/debug', 'debug', self.debug)
-        self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
+        self.app.add_url_rule('/create-join', 'create-join', self.create_join)
+
+        if DEBUG:
+            self.app.add_url_rule('/debug', 'debug', self.debug)
+            self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
+
+        self.app.config['SESSION_TYPE'] = 'redis'
+        self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
+        self.session = flask_session.Session()
+        self.session.init_app(self.app)
 
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
@@ -63,18 +76,21 @@ class FlaskServer:
         )
 
     def index(self):
-        resp = flask.make_response(flask.render_template('index.html'))
+        user = self.get_user_by_request(flask.request, flask.session)
+        if user is not None and user.is_authenticated():
+            return flask.redirect('/create-join', code=302)
 
-        if COOKIE_ENABLED:
-            session_id = flask.request.cookies.get(COOKIE_SESSION_ID)
-            if session_id is None:
-                resp.set_cookie(COOKIE_SESSION_ID, utils.random_hex(32))
+        if 'id' not in flask.session:
+            flask.session['id'] = utils.random_hex(32)
 
-            session_token = flask.request.cookies.get(COOKIE_SESSION_TOKEN)
-            if session_token is None:
-                resp.set_cookie(COOKIE_SESSION_TOKEN, utils.random_hex(64))
+        return flask.render_template('index.html')
 
-        return resp
+    def create_join(self):
+        user = self.get_user_by_request(flask.request, flask.session)
+        if user is None or not user.is_authenticated():
+            return flask.redirect('/', code=302)
+
+        return flask.render_template('create-join.html')
 
     def debug(self):
         return flask.render_template('debug.html')
@@ -122,20 +138,26 @@ class FlaskServer:
         video_list = []
 
         for video in videos:
-            video_list.append({'video_id': video['video_id'], 'video_source': video['video_source']})
+            video_list.append({
+                'video_id': video['video_id'],
+                'video_source': video['video_source']
+            })
 
         room = self.get_room(room_id)
         room.emit('queue_updated', {
             'videos': video_list
         })
 
-    def create_user_from_request(self, request):
-        user = self.get_user_by_request(request)
-        if user is not None and user != False:
+    def create_user_from_request(self, request, session):
+        user = self.get_user_by_request(request, session)
+        if user is not None:
             user.sid = request.sid
 
-        if user is None or user == False:
-            user = User.from_request(request)
+        if user is None:
+            user = User.from_request(request, session)
+            if not SESSION_USE:
+                user.session_id = None
+
             self.users[user.get_session_id()] = user
 
         return user
@@ -143,19 +165,19 @@ class FlaskServer:
     def delete_user(self, user):
         del self.users[user.get_session_id()]
 
-    def get_user_by_request(self, request):
-        if COOKIE_ENABLED:
-            session_id = request.cookies.get(COOKIE_SESSION_ID, request.sid)
-            session_token = request.cookies.get(COOKIE_SESSION_TOKEN)
-        else:
+    def get_user_by_request(self, request, session):
+        session_id = None
+        if SESSION_USE:
+            session_id = session.get('id')
+
+        if session_id is None:
+            if not hasattr(request, 'sid'):
+                return None
             session_id = request.sid
-            session_token = None
 
         user = self.get_user_by_session_id(session_id)
         if user is None:
             return None
-        if not user.authenticate(session_token):
-            return False
         return user
 
     def get_user_by_session_id(self, session_id):
@@ -165,7 +187,6 @@ class FlaskServer:
         if not self.db_connected():
             return
 
-        cur = self.db.cursor()
         room_info_dict = room.serialize()
 
         room.emit('room_info_received', {

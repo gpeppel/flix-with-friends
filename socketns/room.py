@@ -11,7 +11,7 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_room_create(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request,  flask.session)
         if not user.is_authenticated():
             return {
                 'status': 'fail'
@@ -41,7 +41,7 @@ class RoomNamespace(flask_socketio.Namespace):
         }
 
     def on_room_join(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated():
             return {
                 'status': 'fail',
@@ -71,7 +71,7 @@ class RoomNamespace(flask_socketio.Namespace):
         }
 
     def on_user_join(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated() or user.room is None:
             return
 
@@ -81,7 +81,7 @@ class RoomNamespace(flask_socketio.Namespace):
         self.flaskserver.emit_playlist(user.room.room_id)
 
     def on_room_settings_set(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if not user.is_authenticated() or user.room is None:
             return{
                 'status': 'fail',

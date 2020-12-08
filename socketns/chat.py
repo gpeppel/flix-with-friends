@@ -22,7 +22,7 @@ class ChatNamespace(flask_socketio.Namespace):
         self.flaskserver.emit_all_messages(self.flaskserver.rooms[msg.room_id])
 
     def on_message_send(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if user.room is None:
             return
 
