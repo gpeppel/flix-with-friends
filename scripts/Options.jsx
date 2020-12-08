@@ -9,6 +9,8 @@ import './css/theme-eric.css';
 
 export function Options()
 {
+	window.onbeforeunload = function (event) { Socket.emit('disconnect');};
+
 	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = useState(false);
 
