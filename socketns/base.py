@@ -26,18 +26,17 @@ class BaseNamespace(flask_socketio.Namespace):
         if user is None:
             return
 
+        room = user.room
+
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
-
-        room = user.room
-        if room is None:
-            return
-
-        user.room.remove_user(user)
 
         cur = self.flaskserver.db.cursor()
         user.remove_from_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
-        self.flaskserver.emit_room_info(room)
+        self.flaskserver.delete_user(user)
+
+        if room is not None:
+            self.flaskserver.emit_room_info(room)
