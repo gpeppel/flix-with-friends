@@ -26,6 +26,13 @@ export function RoomInfo()
 		});
 	}
 
+	function getSessionId(user)
+	{
+		if(user.session_id)
+			return user;
+		return user.sid;
+	}
+
 	getRoomInfo();
 
 	return (
@@ -34,7 +41,7 @@ export function RoomInfo()
 			<p>Room Creator: {creator ? creator.username : 'Nobody'}</p>
 			<div id="userFeed">
 				{
-					Object.values(users).map((user) => (<User key={user.user_id} user={user} /> ))
+					Object.values(users).map((user) => (<User key={getSessionId(user)} user={user} /> ))
 				}
 			</div>
 		</div>
