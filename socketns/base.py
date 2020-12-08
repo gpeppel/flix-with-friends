@@ -26,7 +26,7 @@ class BaseNamespace(flask_socketio.Namespace):
             print('inside connect_user')
             print('----------------------')
         else:
-            user.socket_connected = False
+            user.socket_connected = None
 
     def on_disconnect(self):
         print('-------------------------')
