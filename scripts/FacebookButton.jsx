@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { Socket } from './Socket';
-import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
-import { AwesomeButton } from "react-awesome-button";
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import { AwesomeButton } from 'react-awesome-button';
 import './css/theme-eric.css';
 
 export function FacebookButton()
@@ -14,7 +14,7 @@ export function FacebookButton()
 		Socket.emit('login_oauth_facebook', {
 			'response': response
 		});
-	}``
+	}
 
 	return (
 		<FacebookLogin
