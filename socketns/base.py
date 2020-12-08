@@ -11,11 +11,10 @@ class BaseNamespace(flask_socketio.Namespace):
         self.flaskserver = server
 
     def on_connect(self):
-        self.connect_user(flask.request)
         print('----------------------')
         print('...Socket Connected...')
         print('----------------------')
-
+        self.connect_user(flask.request)
 
     def connect_user(self, request):
         user = self.flaskserver.create_user_from_request(request)
