@@ -17,6 +17,7 @@ class BaseNamespace(flask_socketio.Namespace):
         self.connect_user(flask.request)
 
     def connect_user(self, request):
+        print(request)
         user = self.flaskserver.create_user_from_request(request)
         user.socket_connected = True
         user.last_socket_connect = None
