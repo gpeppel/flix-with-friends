@@ -30,7 +30,7 @@ def main():
     flaskserver.run(
         os.environ.get('IP', '0.0.0.0'),
         int(os.environ.get('PORT', 8080)),
-        debug=True
+        debug=False
     )
 
 def create_flask_server(db_obj):
