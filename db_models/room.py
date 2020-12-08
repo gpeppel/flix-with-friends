@@ -113,9 +113,12 @@ class Room(Base):
         obj = {
             'room_id': self.room_id,
             'description': self.description,
-            'creator': self.creator.serialize(),
+            'creator': None,
             'users': {}
         }
+
+        if self.creator is not None:
+            obj['creator'] = self.creator.serialize()
 
         for user in self.users.values():
             obj['users'][user.get_session_id()] = user.serialize()

@@ -68,10 +68,7 @@ export function isCreator(user)
 {
 	if(!user.room)
 		return false;
-
-	if(user.sessionId)
-		return user.room.id == user.sessionId;
-	return user.room.id == user.sid;
+	return user.room.isCreator;
 }
 
 export function debugElement(user)

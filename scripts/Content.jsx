@@ -4,7 +4,7 @@ import { Chat } from './Chat';
 import { RoomInfo } from './RoomInfo';
 import { YoutubeContainer } from './YoutubeContainer';
 import { HostOptions } from './HostOptions';
-import { UserContext } from './UserProvider';
+import { UserContext, UserDispatchContext } from './UserProvider';
 import { Socket } from './Socket';
 import { Queue } from './Queue';
 import './css/content.css';
@@ -15,9 +15,22 @@ const EVENT_YT_LOAD = 'yt_load';
 export function Content()
 {
 	const userDetails = React.useContext(UserContext);
+	const updateUserDetails = React.useContext(UserDispatchContext);
 
 	React.useEffect(() =>
 	{
+		Socket.on('room_info_received', (data) =>
+		{
+			updateUserDetails({
+				room: {
+					isCreator: (data.room_info.creator ?
+						data.room_info.creator.sid == userDetails.sid
+						: false
+					)
+				}
+			});
+		});
+
 		Socket.emit('user_join', {});
 	}, []);
 
@@ -62,6 +75,6 @@ export function Content()
 					<Queue />
 				</div>
 			</div>
-	</div>
-		);
+		</div>
+	);
 }
