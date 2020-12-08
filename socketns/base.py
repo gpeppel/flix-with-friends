@@ -38,9 +38,10 @@ class BaseNamespace(flask_socketio.Namespace):
         if user is None or user == False:
             return
        
-        print('----------------------')
-        print('Inside disconnect_user')
-        print('----------------------')
+        print('---------------------------')
+        print('Inside disconnect_user -->' + print(str(user.username)))
+        print('Room ---> ' + str(room))
+        print('---------------------------')
 
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
