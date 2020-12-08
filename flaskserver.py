@@ -31,7 +31,7 @@ class FlaskServer:
         self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
 
         self.socketio = flask_socketio.SocketIO(self.app)
-        self.socketio.init_app(self.app, ping_timeout=5, cors_allowed_origins='*')
+        self.socketio.init_app(self.app, cors_allowed_origins='*')
 
         self.db = db
 
