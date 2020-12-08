@@ -17,14 +17,16 @@ class BaseNamespace(flask_socketio.Namespace):
         self.connect_user(flask.request)
 
     def connect_user(self, request):
-        print(request)
         user = self.flaskserver.create_user_from_request(request)
-        user.socket_connected = True
-        user.last_socket_connect = None
-        print('----------------------')
-        print(str(user.username) + ' connected')
-        print('inside connect_user')
-        print('----------------------')
+        if user.oauth_type:
+            user.socket_connected = True
+            user.last_socket_connect = None
+            print('----------------------')
+            print(str(user.username) + ' connected')
+            print('inside connect_user')
+            print('----------------------')
+        else:
+            user.socket_connected = False
 
     def on_disconnect(self):
         print('-------------------------')
