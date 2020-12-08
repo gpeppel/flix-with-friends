@@ -1,15 +1,15 @@
 from contextlib import contextmanager
 import unittest.mock as mock
 
+def connect_test_user(flaskserver):
+    client = flaskserver.app.test_client()
+    sio_client = flaskserver.socketio.test_client(flaskserver.app, flask_test_client=client)
+    return client, sio_client
+def connect_login_test_user(flaskserver):
+    client, sio_client = connect_test_user(flaskserver)
+    sio_client.emit('login_test', {})
 
-class MockRequest:
-    def __init__(self, sid):
-        self.sid = sid
-
-        self.cookies = {}
-
-    def set_cookie(self, key, val):
-        self.cookies[key] = val
+    return client, sio_client
 
 # https://docs.python.org/2.5/whatsnew/pep-343.html
 @contextmanager

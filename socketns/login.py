@@ -1,4 +1,5 @@
 import os
+import random
 
 from dotenv import load_dotenv
 import flask
@@ -37,7 +38,7 @@ class LoginNamespace(flask_socketio.Namespace):
             'id': data['response']['id'],
             'type': 'FACEBOOK'
         })
-        
+
         # user.username = data['response']['name']
         # user.email = data['response']['email']
         # user.profile_url = data['response']['picture']['data']['url']
@@ -82,7 +83,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 user.email = data['data']['user_id']
             else:
                 user.email = data['data']['user_id']
-            
+
             user.profile_url = twitter_profile_pic
             user.oauth_id = data['data']['user_id']
             user.oauth_type = 'TWITTER'
@@ -93,7 +94,7 @@ class LoginNamespace(flask_socketio.Namespace):
 
             self.emit_login_ok(user)
 
-    
+
     def on_login_oauth_google(self, data):
         user = self.flaskserver.get_user_by_request(flask.request)
         token = data.get('tokenId')
@@ -131,6 +132,14 @@ class LoginNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
+        self.emit_login_ok(user)
+
+    def on_login_test(self, data):
+        if not self.flaskserver.test_login_enabled:
+            return
+
+        user = self.flaskserver.get_user_by_request(flask.request)
+        user.user_id = -random.randint(1, 65535)
         self.emit_login_ok(user)
 
     def emit_login_ok(self, user):

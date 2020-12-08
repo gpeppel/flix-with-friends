@@ -3,7 +3,7 @@ import unittest
 import unittest.mock as mock
 
 import app
-from tests.helpers import MockRequest
+from tests.helpers import connect_login_test_user, hook_socket_emit
 
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
@@ -15,6 +15,7 @@ class ChatTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.flaskserver = app.create_flask_server(app.db)
+        cls.flaskserver.test_login_enabled = True
 
     def setUp(self):
         self.success_tests = [
@@ -42,23 +43,27 @@ class ChatTest(unittest.TestCase):
 
     @mock.patch('random.randint')
     def test_parse_chat_message_success(self, mocked_id_generator):
-        mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
-        room = self.flaskserver.create_room(user.sid)
-        room.add_user(user)
+        _, sio_client = connect_login_test_user(self.flaskserver)
+        sio_client.emit('room_create', {
+            'playlist': '',
+            'description': ''
+        })
 
-        with mock.patch('flask.request', mock_req),\
-             mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
+        # TODO
+        return
+
+        with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
             for test in self.success_tests:
                 mocked_id_generator.return_value = 1
-                response = self.flaskserver.chat_ns.on_message_send(
+                sio_client.emit('message_send', (
                     test[INPUT_MESSAGE]
-                )
+                ))
                 expected = test[MESSAGE_EXPECTED]
 
-                for key, val in expected.items():
-                    if key == 'timestamp':
-                        self.assertTrue((response[key] - val).total_seconds() < 3)
-                    else:
-                        self.assertEqual(response[key], val)
-        self.flaskserver.delete_room(room)
+                with hook_socket_emit() as emit_list:
+                    emit = emit_list.pop()
+                    for key, val in expected.items():
+                        if key == 'timestamp':
+                            self.assertTrue((emit['args'][key] - val).total_seconds() < 3)
+                        else:
+                            self.assertEqual(emit['args'][key], val)

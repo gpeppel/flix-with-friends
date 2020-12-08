@@ -1,7 +1,7 @@
 import unittest
 
 import app
-from tests.helpers import MockRequest
+from tests.helpers import connect_login_test_user
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
@@ -11,24 +11,23 @@ class FlaskServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.flaskserver = app.create_flask_server(app.db)
+        cls.flaskserver.test_login_enabled = True
 
     def test_create_delete_user(self):
-        mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+        _, sio_client = connect_login_test_user(self.flaskserver)
+        user = self.flaskserver.get_user_by_session_id(sio_client.sid)
 
-        self.assertEqual(user.sid, TEST_SID)
-        self.assertEqual(self.flaskserver.users[TEST_SID], user)
-
+        self.assertEqual(user.sid, sio_client.sid)
         self.flaskserver.delete_user(user)
-        self.assertFalse(TEST_SID in self.flaskserver.users)
+        self.assertIsNone(self.flaskserver.get_user_by_session_id(sio_client.sid))
 
     def test_create_delete_room(self):
         room_abc = self.flaskserver.create_room('abc')
         self.assertEqual(room_abc.room_id, 'abc')
         self.assertEqual(self.flaskserver.rooms['abc'], room_abc)
 
-        mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+        _, sio_client = connect_login_test_user(self.flaskserver)
+        user = self.flaskserver.get_user_by_session_id(sio_client.sid)
         room_abc.add_user(user)
 
         self.assertTrue(len(room_abc) == 1)

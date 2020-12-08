@@ -52,6 +52,8 @@ class FlaskServer:
         self.rooms = {}
         self.users = {}
 
+        self.test_login_enabled = False
+
     def run(self, host, port, debug=False):
         self.socketio.run(
             self.app,
@@ -149,12 +151,15 @@ class FlaskServer:
             session_id = request.sid
             session_token = None
 
-        user = self.users.get(session_id)
+        user = self.get_user_by_session_id(session_id)
         if user is None:
             return None
         if not user.authenticate(session_token):
             return False
         return user
+
+    def get_user_by_session_id(self, session_id):
+        return self.users.get(session_id)
 
     def emit_room_info(self, room):
         if not self.db_connected():
@@ -165,7 +170,7 @@ class FlaskServer:
 
         room.emit('room_info_received', {
             'room_info': room_info_dict
-            })
+        })
 
     def create_room(self, room_id):
         if room_id in self.rooms:
