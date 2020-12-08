@@ -17,6 +17,7 @@ export function Login()
 	{
 		Socket.on('login_response', (data) =>
 		{
+			console.log('LOGIN_RESPONSE ---> ');
 			console.log(data);
 
 			if(data.status != 'ok')
