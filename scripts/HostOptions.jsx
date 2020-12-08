@@ -23,11 +23,8 @@ export function HostOptions()
 		});
 	}, []);
 
-	React.useEffect(() =>
-	{
-		if(!isCreator(userDetails))
-			document.getElementById('host-options').style.display = 'none';
-	});
+	if(!isCreator(userDetails))
+		document.getElementById('host-options').style.display = 'none';
 
 	function onVoteThresholdChange(event)
 	{
