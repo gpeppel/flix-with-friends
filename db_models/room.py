@@ -88,16 +88,10 @@ class Room(Base):
         return self.users_add_video_enabled
 
     def set_random_host(self):
-<<<<<<< HEAD
-        new_host = random.choice(list(self.users.values()))
-        print(new_host)
-        self.set_creator(new_host)
-=======
         if len(self) == 0:
             self.set_creator(None)
             return
         self.set_creator(random.choice(list(self.users.values())))
->>>>>>> cd247f6f91b76adeecefa84b265c722d3b2c1a2f
 
     def set_users_can_add_video(self, val):
         self.users_add_video_enabled = val
