@@ -1,17 +1,38 @@
 from contextlib import contextmanager
 import unittest.mock as mock
 
+
+@contextmanager
 def connect_test_user(flaskserver):
-    client = flaskserver.app.test_client()
-    sio_client = flaskserver.socketio.test_client(flaskserver.app, flask_test_client=client)
-    return client, sio_client
+    try:
+        client = flaskserver.app.test_client()
+        sio_client = flaskserver.socketio.test_client(flaskserver.app, flask_test_client=client)
+        yield client, sio_client
+    finally:
+        sio_client.disconnect()
+
+@contextmanager
 def connect_login_test_user(flaskserver):
-    client, sio_client = connect_test_user(flaskserver)
-    sio_client.emit('login_test', {})
+    with connect_test_user(flaskserver) as result:
+        client, sio_client = result
+        sio_client.emit('login_test', {})
 
-    return client, sio_client
+        yield client, sio_client
 
-# https://docs.python.org/2.5/whatsnew/pep-343.html
+@contextmanager
+def create_room(flaskserver, sio_client):
+    try:
+        sio_client.emit('room_create', {
+            'playlist': '',
+            'description': ''
+        })
+
+        user = flaskserver.get_user_by_session_id(sio_client.sid)
+        room = user.room
+        yield room
+    finally:
+        flaskserver.delete_room(room)
+
 @contextmanager
 def hook_socket_emit(request=None):
     emit_list = []

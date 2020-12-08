@@ -14,23 +14,25 @@ class FlaskServerTest(unittest.TestCase):
         cls.flaskserver.test_login_enabled = True
 
     def test_create_delete_user(self):
-        _, sio_client = connect_login_test_user(self.flaskserver)
-        user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
+            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
 
-        self.assertEqual(user.sid, sio_client.sid)
-        self.flaskserver.delete_user(user)
-        self.assertIsNone(self.flaskserver.get_user_by_session_id(sio_client.sid))
+            self.assertEqual(user.sid, sio_client.sid)
+            self.flaskserver.delete_user(user)
+            self.assertIsNone(self.flaskserver.get_user_by_session_id(sio_client.sid))
 
     def test_create_delete_room(self):
         room_abc = self.flaskserver.create_room('abc')
         self.assertEqual(room_abc.room_id, 'abc')
         self.assertEqual(self.flaskserver.rooms['abc'], room_abc)
 
-        _, sio_client = connect_login_test_user(self.flaskserver)
-        user = self.flaskserver.get_user_by_session_id(sio_client.sid)
-        room_abc.add_user(user)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
+            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
 
-        self.assertTrue(len(room_abc) == 1)
+            room_abc.add_user(user)
+            self.assertTrue(len(room_abc) == 1)
 
         self.flaskserver.delete_room(room_abc)
         self.assertFalse('abc' in self.flaskserver.rooms)

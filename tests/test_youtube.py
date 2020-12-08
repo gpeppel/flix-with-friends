@@ -1,7 +1,7 @@
 import unittest
 
 import app
-from tests.helpers import connect_login_test_user, hook_socket_emit
+from tests.helpers import connect_login_test_user, create_room, hook_socket_emit
 import utils
 
 
@@ -228,117 +228,110 @@ class YoutubeTest(unittest.TestCase):
             )
 
     def test_handle_yt_load(self):
-        _, sio_client = connect_login_test_user(self.flaskserver)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            sio_client.emit('room_create', {
-                'playlist': '',
-                'description': ''
-            })
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            sio_client.emit('yt_load', {})
+                    sio_client.emit('yt_load', {})
 
-            self.assertTrue(len(emit_list) == 0)
+                    self.assertTrue(len(emit_list) == 0)
 
-            for vobj in YOUTUBE_VIDEO_IDS:
-                sio_client.emit('yt_load', {
-                    'url': vobj[URL]
-                })
+                    for vobj in YOUTUBE_VIDEO_IDS:
+                        sio_client.emit('yt_load', {
+                            'url': vobj[URL]
+                        })
 
-                if len(emit_list) == 0:
-                    self.assertIsNone(vobj[ID])
-                    continue
+                        if len(emit_list) == 0:
+                            self.assertIsNone(vobj[ID])
+                            continue
 
-                emit = emit_list.pop()
+                        emit = emit_list.pop()
 
-                self.assertEqual(emit['event'], 'yt_load')
-                self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
+                        self.assertEqual(emit['event'], 'yt_load')
+                        self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
     def test_handle_yt_state_change_success(self):
-        _, sio_client = connect_login_test_user(self.flaskserver)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            sio_client.emit('room_create', {
-                'playlist': '',
-                'description': ''
-            })
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            for key, value_list in YT_STATE_CHANGES.items():
-                state = {
-                    'state': 'ready',
-                    'offset': 0,
-                    'rate': 1,
-                    'runAt': 0,
-                    'timestamp': 0
-                }
+                    for key, value_list in YT_STATE_CHANGES.items():
+                        state = {
+                            'state': 'ready',
+                            'offset': 0,
+                            'rate': 1,
+                            'runAt': 0,
+                            'timestamp': 0
+                        }
 
-                for val in value_list:
-                    outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
-                    sio_client.emit('yt_state_change', state)
-                    emit = emit_list.pop()
+                        for val in value_list:
+                            outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
+                            sio_client.emit('yt_state_change', state)
+                            emit = emit_list.pop()
 
-                    self.assertEqual(emit['event'], 'yt_state_change')
+                            self.assertEqual(emit['event'], 'yt_state_change')
 
-                    if key == 'timestamp':
-                        self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
-                    else:
-                        self.assertEqual(utils.getval(emit['args'][0], key), outval)
+                            if key == 'timestamp':
+                                self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
+                            else:
+                                self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
     def test_handle_yt_state_change_fail(self):
-        _, sio_client = connect_login_test_user(self.flaskserver)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            sio_client.emit('room_create', {
-                'playlist': '',
-                'description': ''
-            })
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            for name in YT_STATE_NAMES_INVALID:
-                sio_client.emit('yt_state_change', {
-                    'state': name
-                })
+                    for name in YT_STATE_NAMES_INVALID:
+                        sio_client.emit('yt_state_change', {
+                            'state': name
+                        })
 
-                self.assertTrue(len(emit_list) == 0)
+                        self.assertTrue(len(emit_list) == 0)
 
     def test_handle_yt_sphere_update(self):
-        _, sio_client = connect_login_test_user(self.flaskserver)
-        _, sio_client2 = connect_login_test_user(self.flaskserver)
+        with connect_login_test_user(self.flaskserver) as result,\
+            connect_login_test_user(self.flaskserver) as result2:
+            _, sio_client = result
+            _, sio_client2 = result2
 
-        user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
 
-        with hook_socket_emit() as emit_list:
-            sio_client.emit('room_create', {
-                'playlist': '',
-                'description': ''
-            })
-            sio_client2.emit('room_join', {
-                'roomId': user.room.room_id
-            })
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    sio_client2.emit('room_join', {
+                        'roomId': user.room.room_id
+                    })
+                    emit_list.clear()
 
-            for key, value_list in YT_SPHERE_UPDATES.items():
-                props = {
-                    'properties': {
-                        'yaw': 0,
-                        'pitch': 0,
-                        'roll': 0,
-                        'fov': 100
-                    }
-                }
+                    for key, value_list in YT_SPHERE_UPDATES.items():
+                        props = {
+                            'properties': {
+                                'yaw': 0,
+                                'pitch': 0,
+                                'roll': 0,
+                                'fov': 100
+                            }
+                        }
 
-                for val in value_list:
-                    outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
-                    sio_client.emit('yt_sphere_update', props)
-                    emit = emit_list.pop()
+                        for val in value_list:
+                            outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
+                            sio_client.emit('yt_sphere_update', props)
+                            emit = emit_list.pop()
 
-                    self.assertEqual(emit['event'], 'yt_sphere_update')
+                            self.assertEqual(emit['event'], 'yt_sphere_update')
 
-                    data = emit['args'][0]
-                    for k in key.split('|'):
-                        self.assertEqual(utils.getval(data, k), outval)
+                            data = emit['args'][0]
+                            for k in key.split('|'):
+                                self.assertEqual(utils.getval(data, k), outval)
 
     def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):
