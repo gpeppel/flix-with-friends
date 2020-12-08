@@ -136,7 +136,7 @@ class LoginNamespace(flask_socketio.Namespace):
 
     def on_login_test(self, data):
         if not self.flaskserver.test_login_enabled:
-            return
+            return  #pragma: no cover
 
         user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         user.user_id = -random.randint(1, 65535)
