@@ -17,6 +17,8 @@ export function Options()
 		setFlag(true);
 	}
 
+
+
 	function onRoomNewClick()
 	{
 		Socket.emit('room_create', {
@@ -87,27 +89,27 @@ export function Options()
 			  <div className="column" id="text-box-left">
 				  <div>
 				  <div className="row">
-					  <span><input className="slide-up-left" id='playlist' type="text" placeholder="URL HERE" />
-					  <label htmlFor="card">ENTER VIDEO</label></span>
+					  <span><input className="slide-up-left" id='playlist' type="text" placeholder="GOES HERE" />
+					  <label htmlFor="card">URL</label></span>
 					  </div>
 				</div>
 			  </div>
 			  <div className="column" id="text-box-right">
 				  <div className="row">
-					  <span><input className="slide-up-right" id='roomCode' type="text" placeholder="CODE HERE" />
-					  <label htmlFor="card">ENTER INVITE</label></span>
+					  <span><input className="slide-up-right" id='roomCode' type="text" placeholder="GOES HERE" />
+					  <label htmlFor="card">CODE</label></span>
 			  </div>
 			  </div>
 			  </div>
 			<div className="box">
-				<div className="column" id="box-left">
-					<AwesomeButtonProgress type='twitter2' loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay='600' resultLabel='FOR A SECOND TIME'
+				<div className="column" id="box-left-btn">
+					<AwesomeButtonProgress type='twitter2' loadingLabel='I HOPE NOTHING BREAKS..' releaseDelay={5000} resultLabel='FOR A SECOND TIME'
 						onPress={(event) => {onRoomNewClick();}} >
 					CREATE NEW VIEWING ROOM!
 					</AwesomeButtonProgress>
 				</div>
-				<div className="column" id="box-right">	
-					<AwesomeButtonProgress type='whatsapp' loadingLabel='JOINING...' releaseDelay='600' resultLabel='FOUND FRIENDS!'
+				<div className="column" id="box-right-btn">
+					<AwesomeButtonProgress type='whatsapp' loadingLabel='JOINING...' releaseDelay={6000} resultLabel='FOUND FRIENDS!'
 						onPress={(event) => {onRoomJoinClick();}}>
 					JOIN VIEWING ROOM
 					</AwesomeButtonProgress>
@@ -116,12 +118,11 @@ export function Options()
 			<div className="box" id="box-last">
 			  <div className="column" id="box-left"></div>
 			  <div className="column" id="box-right-last">
-				<p>COPY &amp; PASTE YOUR INVITATION CODE IN THE ABOVE BOX TO JOIN YOUR FRIENDS!</p>
+			  COPY &amp; PASTE YOUR INVITATION CODE IN THE ABOVE BOX
+			  <hr className='hr-line2'/>
 			  </div>
 			  </div>
 			<div className="box" id="box-last">
-			  <div className="column" id="box-left"></div>
-			  <div className="column" id="box-right-last"></div>
 			</div>
 		  </div>
 		  
