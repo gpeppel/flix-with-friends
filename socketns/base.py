@@ -22,7 +22,7 @@ class BaseNamespace(flask_socketio.Namespace):
         user.socket_connected = True
         user.last_socket_connect = None
         print('----------------------')
-        print(user.username + ' connected')
+        print(str(user.username) + ' connected')
         print('----------------------')
 
     def on_disconnect(self):
@@ -38,7 +38,7 @@ class BaseNamespace(flask_socketio.Namespace):
             return
        
         print('----------------------')
-        print(user.username + ' connected')
+        print(str(user.username) + ' connected')
         print('----------------------')
 
         user.socket_connected = False
