@@ -38,8 +38,8 @@ class FlaskServer:
             self.app.add_url_rule('/debug', 'debug', self.debug)
             self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
 
-        self.app.config['SESSION_TYPE'] = 'redis'
-        self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
+        # self.app.config['SESSION_TYPE'] = 'redis'
+        # self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
         # self.session = flask_session.Session()
         # self.session.init_app(self.app)
 
@@ -80,8 +80,9 @@ class FlaskServer:
         if user is not None and user.is_authenticated():
             return flask.redirect('/create-join', code=302)
 
-        if 'id' not in flask.session:
-            flask.session['id'] = utils.random_hex(32)
+        if SESSION_USE:
+            if 'id' not in flask.session:
+                flask.session['id'] = utils.random_hex(32)
 
         return flask.render_template('index.html')
 
