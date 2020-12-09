@@ -131,6 +131,9 @@ class FlaskServer:
         )))
 
     def emit_playlist(self, room_id):
+        if not self.db_connected():
+            return
+
         cur = self.db.cursor()
         playlist = self.get_playlist_from_room_id(cur, room_id)
         playlist_id = playlist['playlist_id']
@@ -194,9 +197,6 @@ class FlaskServer:
         return None
 
     def emit_room_info(self, room):
-        if not self.db_connected():
-            return
-
         room_info_dict = room.serialize()
 
         room.emit('room_info_received', {
