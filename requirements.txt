@@ -6,3 +6,4 @@ python-dotenv
 requests
 flask-session
 redis
+eventlet
