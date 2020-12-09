@@ -55,20 +55,23 @@ export function Login()
 					<br />
 					GET STARTED BY CLICKING BELOW
 					<hr className='hr-line' />
-				</div>
-			</div>
-			<div className='login'>
-				<div className="flex-item">
-					<img className='login-img' src='static/images/fb_button.png' alt='fb' />
-					<FacebookButton />
-				</div>
-				<div className="flex-item">
-					<img className='login-img' src='static/images/google.png' alt='google' />
-					<GoogleButton />
-				</div>
-				<div className="flex-item">
-					<img className='login-img' src='static/images/twitter.png' alt='twitter' />
-					<TwitterButton />
+
+					<div className='login-container'>
+						<div className='login'>
+							<div className="flex-item">
+								<img className='login-img' src='static/images/fb_button.png' alt='fb' />
+								<FacebookButton />
+							</div>
+							<div className="flex-item">
+								<img className='login-img' src='static/images/google.png' alt='google' />
+								<GoogleButton />
+							</div>
+							<div className="flex-item">
+								<img className='login-img' src='static/images/twitter.png' alt='twitter' />
+								<TwitterButton />
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

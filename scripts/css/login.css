@@ -14,12 +14,15 @@ body {
 	width: 100%;
 }
 
+.login-container {
+	width: 100%;
+}
+
 .login {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-evenly;
-	flex: 1;
 
 	padding-bottom: 50px;
 }
@@ -34,7 +37,7 @@ body {
 	padding-top: 50px;
 	font-family: 'greggiefont';
 	color: #eee;
-	font-size: 80px;
+	font-size: 100px;
 	text-align: center;
 }
 
@@ -60,7 +63,7 @@ body {
 
 @media (max-width: 850px) {
 	.aws-btn {
-		font-size: 26px;
+		font-size: 24px;
 	}
 
 	.top {
@@ -68,24 +71,16 @@ body {
 	}
 
 	.login .login-img {
-		width: 180px;
+		width: 160px;
 	}
 }
 
 @media (max-width: 767px) {
-	.aws-btn {
-		font-size: 24px;
-	}
-
 	.top {
 		font-size: 50px;
 	}
 
 	.login {
 		flex-direction: column;
-	}
-
-	.login .login-img {
-		width: 140px;
 	}
 }
