@@ -333,6 +333,24 @@ class YoutubeTest(unittest.TestCase):
                             for k in key.split('|'):
                                 self.assertEqual(utils.getval(data, k), outval)
 
+    def test_yt_enqueue(self):
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
+
+            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
+
+                    sio_client.emit('yt_enqueue', {
+                        'roomId': user.room.room_id,
+                        'url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+                    })
+                    emit = emit_list.pop()
+
+                    self.assertEqual(emit['event'], 'queue_updated')
+
     def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):
             obj, last = utils.getdict(data, k)
