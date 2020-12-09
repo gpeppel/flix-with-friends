@@ -1,11 +1,9 @@
 from datetime import datetime
 import unittest
 import unittest.mock as mock
-import sys
-import time
 
 import app
-from tests.helpers import MockRequest
+from tests.helpers import connect_login_test_user, create_room, hook_socket_emit
 
 INPUT_MESSAGE = 'message'
 MESSAGE_EXPECTED = 'Message()_expected'
@@ -17,6 +15,7 @@ class ChatTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.flaskserver = app.create_flask_server(app.db)
+        cls.flaskserver.test_login_enabled = True
 
     def setUp(self):
         self.success_tests = [
@@ -28,7 +27,7 @@ class ChatTest(unittest.TestCase):
                     'message_id': None,
                     'text': 'test_message_text',
                     'timestamp': datetime.now(),
-                    'room_id': 'testroom',
+                    'room_id': '69cbaae81f874b36ae9e24be92f79006',
                     'user_id': None,
                 }
             }
@@ -42,21 +41,24 @@ class ChatTest(unittest.TestCase):
                 attribute_dict[key] = message_dict[key]
         return attribute_dict
 
-    @mock.patch('random.randint')
-    def test_parse_chat_message_success(self, mocked_id_generator):
-        mock_req = MockRequest(TEST_SID)
-        user = self.flaskserver.create_user_from_request(mock_req)
+    def test_parse_chat_message_success(self):
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
+            with create_room(self.flaskserver, sio_client):
+                # TODO
+                return
 
-        with mock.patch('flask.request', mock_req):
             with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
                 for test in self.success_tests:
-                    mocked_id_generator.return_value = 1
-                    response = self.flaskserver.chat_ns.on_message_send(
-                        test[INPUT_MESSAGE])
+                    sio_client.emit('message_send', (
+                        test[INPUT_MESSAGE]
+                    ))
                     expected = test[MESSAGE_EXPECTED]
 
-                    for key, val in expected.items():
-                        if key == 'timestamp':
-                            self.assertTrue((response[key] - val).total_seconds() < 3)
-                        else:
-                            self.assertEqual(response[key], val)
+                    with hook_socket_emit() as emit_list:
+                        emit = emit_list.pop()
+                        for key, val in expected.items():
+                            if key == 'timestamp':
+                                self.assertTrue((emit['args'][key] - val).total_seconds() < 3)
+                            else:
+                                self.assertEqual(emit['args'][key], val)

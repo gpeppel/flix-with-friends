@@ -1,4 +1,5 @@
 import os
+import random
 
 from dotenv import load_dotenv
 import flask
@@ -27,47 +28,42 @@ class LoginNamespace(flask_socketio.Namespace):
         print("Got an event for new temp user input with data:", data)
 
     def on_login_oauth_facebook(self, data):
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        if 'status' in data['response'].keys():
+            self.emit_login_fail(user)
+            return
 
-        key = 'status'
+        cur = self.flaskserver.db.cursor()
+        User.get_from_db(cur, user, oauth={
+            'id': data['response']['id'],
+            'type': 'FACEBOOK'
+        })
+
+        # user.username = data['response']['name']
+        # user.email = data['response']['email']
+        # user.profile_url = data['response']['picture']['data']['url']
+        # user.oauth_id = data['response']['id']
+        # user.oauth_type = 'FACEBOOK'
+        user.username = data['response']['name']
+        key = 'email'
         if key in data['response'].keys():
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
+            print("True")
+            user.email = data['response']['email']
         else:
-            # TODO verify access token
-
-            cur = self.flaskserver.db.cursor()
-            User.get_from_db(cur, user, oauth={
-                'id': data['response']['id'],
-                'type': 'FACEBOOK'
-            })
-
-            user.username = data['response']['name']
-            key = 'email'
-            if key in data['response'].keys():
-                print("True")
-                user.email = data['response']['email']
-            else:
-                print("False")
-                user.email = data['response']['id']
+            print("False")
+            user.email = data['response']['id']
             user.profile_url = data['response']['picture']['data']['url']
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
+        user.insert_to_db(cur)
+        self.flaskserver.db.commit()
+        cur.close()
 
-            User.insert_to_db(cur, user, password=None)
-            self.flaskserver.db.commit()
-            cur.close()
+        self.emit_login_ok(user)
 
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'ok',
-                'userId': user.user_id
-            }, room=user.sid)
-    
     def on_login_oauth_twitter(self, data):
         print(data)
-        user = self.flaskserver.get_user_by_request(flask.request)
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         key = 'status'
         if key in data['data'].keys():
             self.flaskserver.socketio.emit('login_response', {
@@ -80,32 +76,27 @@ class LoginNamespace(flask_socketio.Namespace):
                 'id': data['data']['user_id'],
                 'type': 'TWITTER'
             })
-
             user.username = data['data']['screen_name']
+            twitter_profile_pic = 'https://twivatar.glitch.me/' + data['data']['screen_name']
+
             if user.email:
                 user.email = data['data']['user_id']
             else:
                 user.email = data['data']['user_id']
-            
-            user.profile_url = data['data']['oauth_token']
+
+            user.profile_url = twitter_profile_pic
             user.oauth_id = data['data']['user_id']
             user.oauth_type = 'TWITTER'
 
-            User.insert_to_db(cur, user, password=None)
+            user.insert_to_db(cur)
             self.flaskserver.db.commit()
             cur.close()
 
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'ok',
-                'userId': user.user_id
-            }, room=user.sid)
-            
-    
+            self.emit_login_ok(user)
+
+
     def on_login_oauth_google(self, data):
-        print(data)
-
-        user = self.flaskserver.get_user_by_request(flask.request)
-
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         token = data.get('tokenId')
         failed = False
         req = None
@@ -122,10 +113,7 @@ class LoginNamespace(flask_socketio.Namespace):
                 req.session.close()
 
         if failed:
-            self.flaskserver.socketio.emit('login_response', {
-                'status': 'fail',
-                'userId': None
-            }, room=user.sid)
+            self.emit_login_fail(user)
             return
 
         cur = self.flaskserver.db.cursor()
@@ -140,11 +128,38 @@ class LoginNamespace(flask_socketio.Namespace):
         user.oauth_id = data['googleId']
         user.oauth_type = 'GOOGLE'
 
-        User.insert_to_db(cur, user, password=None)
+        user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
 
+        self.emit_login_ok(user)
+
+    def on_login_test(self, data):
+        if not self.flaskserver.test_login_enabled:
+            return  #pragma: no cover
+
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        user.user_id = -random.randint(1, 65535)
+        self.emit_login_ok(user)
+
+    def emit_login_ok(self, user):
         self.flaskserver.socketio.emit('login_response', {
             'status': 'ok',
-            'userId': user.user_id
+            'user': {
+                'id': user.user_id,
+                'username': user.username,
+                'email': user.email,
+                'profile_url': user.profile_url,
+                'settings': user.settings,
+                'oauth_id': user.oauth_id,
+                'oauth_type': user.oauth_type,
+                'sid': user.sid,
+                'session_id': user.session_id
+            }
+        }, room=user.sid)
+
+    def emit_login_fail(self, user):
+        self.flaskserver.socketio.emit('login_response', {
+            'status': 'fail',
+            'user': {}
         }, room=user.sid)

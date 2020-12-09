@@ -1,25 +1,44 @@
+@font-face {
+    font-family: 'greggiefont';
+    src: url('/static/fonts/greggiefont-webfont.eot');
+    src: url('/static/fonts/greggiefont-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/fonts/greggiefont-webfont.woff2') format('woff2'),
+         url('/static/fonts/greggiefont-webfont.woff') format('woff'),
+         url('/static/fonts/greggiefont-webfont.svg#greggiefont') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+	font-family: 'greggiefont';
+	width: 100%;
+}
 .login {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 	flex: 1;
+	padding-bottom: 50px;
 }
 
 .top {
 	/* border-bottom: 50px solid #ffc341; */
 	padding-top: 50px;
-	font-family: Greggiefont;
+	font-family: 'greggiefont';
 	color: #eee;
 	font-size: 100px;
 }
 
-hr.line {
-	border-top: 5px solid #eee;
-  /*background-color: #eee;*/
-	/*box-shadow: 5px 10px #fff;*/
-
+.bottom {
+	padding-top: 300px;
+	background-color: #eea1b8;
+	padding-top: 50px;
+	font-family: 'greggiefont';
+	color: #eee;
+	font-size: 100px;
 }
+.hr-line { border-top: 5px solid #eee; box-shadow: 0px 4px 2px #019292; width: 100%;}
 
 .login .kep-login-facebook, .login .google-button {
 	width: 300px;
@@ -27,13 +46,21 @@ hr.line {
 
 .flex-container {
   padding: 0;
-  margin: 0;
+  /* margin: 0; */
   list-style: none;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
+.flex-container2 {
+	padding: 0;
+	background: #eea1b8;
+	/* margin: 0; */
+	list-style: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
 .center { 
   justify-content: center; 
 }  
@@ -41,22 +68,13 @@ hr.line {
 .space-evenly { 
   justify-content: space-evenly; 
 }
-/* 
-.space-evenly li {
-  background: #00c9c8; 
-} */
-
 .flex-item {
 	width: 400px;
 	text-align: center;
 }
 
-.footer {
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-	background-color: #333;
-	color: white;
-	text-align: center;
-  }
+.flex-item2 {
+	height: auto;
+	display: flex;
+	/* text-align: center; */
+}

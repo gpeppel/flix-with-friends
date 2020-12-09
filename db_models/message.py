@@ -1,7 +1,8 @@
+from db_models.base import Base
 import utils
 
 
-class Message:
+class Message(Base):
     def __init__(self, message_id, text, timestamp, room_id, user_id, userdata=None):
         self.message_id = message_id
         self.text = text
@@ -9,6 +10,22 @@ class Message:
         self.room_id = room_id
         self.user_id = user_id
         self.userdata = userdata
+
+    def insert_to_db(self, cur):
+        cur.execute("""
+            INSERT INTO message VALUES (DEFAULT, %s, %s, %s, %s) RETURNING message_id;
+        """, (
+            self.text,
+            self.timestamp,
+            self.room_id,
+            self.user_id
+        ))
+
+        result = cur.fetchone()
+        if cur.lastrowid == None:
+            cur.rollback()
+
+        self.message_id = result['message_id']
 
     def serialize(self):
         return {
@@ -30,7 +47,7 @@ class Message:
 
         if room_id is not None:
             query += ' WHERE m.room_id = %s'
-            values = (room_id)
+            values = (room_id,)
 
         query += ';'
         cur.execute(query, values)
@@ -49,23 +66,9 @@ class Message:
                 }
             ))
 
+        messages.sort(key=lambda x: x.timestamp)
         return messages
 
-    @staticmethod
-    def insert_to_db(cur, msg):
-        cur.execute("""
-            INSERT INTO message VALUES (DEFAULT, %s, %s, %s, %s) RETURNING message_id
-        """, (
-            msg.text,
-            msg.timestamp,
-            msg.room_id,
-            msg.user_id
-        ))
-
-        result = cur.fetchone()
-        msg.message_id = result['message_id']
-
-        return msg
 
     @staticmethod
     def create_table(cur):

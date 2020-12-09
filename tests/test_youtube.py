@@ -1,11 +1,12 @@
 import unittest
 
 import app
-from tests.helpers import MockRequest, hook_socket_emit
+from tests.helpers import connect_login_test_user, create_room, hook_socket_emit
 import utils
 
 
 TEST_SID = '69cbaae81f874b36ae9e24be92f79006'
+TEST_SID2 = '0123456789abcdef'
 
 URL = 'url'
 ID = 'id'
@@ -140,7 +141,7 @@ YT_STATE_CHANGES = {
 }
 
 YT_SPHERE_UPDATES = {
-    'properties.yaw|properties.roll': [
+    'properties.yaw': [
         {
             INPUT: None,
             OUTPUT: 0
@@ -162,7 +163,7 @@ YT_SPHERE_UPDATES = {
             OUTPUT: 0
         }
     ],
-    'properties.pitch': [
+    'properties.pitch|properties.roll': [
         {
             INPUT: None,
             OUTPUT: 0
@@ -217,6 +218,7 @@ class YoutubeTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.flaskserver = app.create_flask_server(app.db)
+        cls.flaskserver.test_login_enabled = True
 
     def test_get_youtube_video_id(self):
         for vobj in YOUTUBE_VIDEO_IDS:
@@ -226,102 +228,110 @@ class YoutubeTest(unittest.TestCase):
             )
 
     def test_handle_yt_load(self):
-        mock_req = MockRequest(TEST_SID)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            self.flaskserver.youtube_ns.handle_yt_load(mock_req, {})
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            self.assertTrue(len(emit_list) == 0)
+                    sio_client.emit('yt_load', {})
 
-            for vobj in YOUTUBE_VIDEO_IDS:
-                self.flaskserver.youtube_ns.handle_yt_load(mock_req, {
-                    'url': vobj[URL]
-                })
+                    self.assertTrue(len(emit_list) == 0)
 
-                if len(emit_list) == 0:
-                    self.assertIsNone(vobj[ID])
-                    continue
+                    for vobj in YOUTUBE_VIDEO_IDS:
+                        sio_client.emit('yt_load', {
+                            'url': vobj[URL]
+                        })
 
-                emit = emit_list.pop()
+                        if len(emit_list) == 0:
+                            self.assertIsNone(vobj[ID])
+                            continue
 
-                self.assertEqual(emit['event'], 'yt_load')
-                self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
+                        emit = emit_list.pop()
+
+                        self.assertEqual(emit['event'], 'yt_load')
+                        self.assertEqual(emit['args'][0]['videoId'], vobj[ID])
 
     def test_handle_yt_state_change_success(self):
-        mock_req = MockRequest(TEST_SID)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            for key, value_list in YT_STATE_CHANGES.items():
-                state = {
-                    'state': 'ready',
-                    'offset': 0,
-                    'rate': 1,
-                    'runAt': 0,
-                    'timestamp': 0
-                }
+                    for key, value_list in YT_STATE_CHANGES.items():
+                        state = {
+                            'state': 'ready',
+                            'offset': 0,
+                            'rate': 1,
+                            'runAt': 0,
+                            'timestamp': 0
+                        }
 
-                for val in value_list:
-                    outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
-                    self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, state)
-                    emit = emit_list.pop()
+                        for val in value_list:
+                            outval = self.get_outval(state, key, val[INPUT], val[OUTPUT])
+                            sio_client.emit('yt_state_change', state)
+                            emit = emit_list.pop()
 
-                    self.assertEqual(emit['event'], 'yt_state_change')
+                            self.assertEqual(emit['event'], 'yt_state_change')
 
-                    if key == 'timestamp':
-                        self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
-                    else:
-                        self.assertEqual(utils.getval(emit['args'][0], key), outval)
-
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+                            if key == 'timestamp':
+                                self.assertTrue(int(outval) - utils.getval(emit['args'][0], key) < 5)
+                            else:
+                                self.assertEqual(utils.getval(emit['args'][0], key), outval)
 
     def test_handle_yt_state_change_fail(self):
-        mock_req = MockRequest(TEST_SID)
+        with connect_login_test_user(self.flaskserver) as result:
+            _, sio_client = result
 
-        with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            emit_list.clear()
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    emit_list.clear()
 
-            for name in YT_STATE_NAMES_INVALID:
-                self.flaskserver.youtube_ns.handle_yt_state_change(mock_req, {
-                    'state': name
-                })
+                    for name in YT_STATE_NAMES_INVALID:
+                        sio_client.emit('yt_state_change', {
+                            'state': name
+                        })
 
-                self.assertTrue(len(emit_list) == 0)
-
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+                        self.assertTrue(len(emit_list) == 0)
 
     def test_handle_yt_sphere_update(self):
-        mock_req = MockRequest(TEST_SID)
+        with connect_login_test_user(self.flaskserver) as result,\
+            connect_login_test_user(self.flaskserver) as result2:
+            _, sio_client = result
+            _, sio_client2 = result2
 
-        with hook_socket_emit() as emit_list:
-            self.flaskserver.base_ns.connect_user(mock_req)
-            emit_list.clear()
+            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
 
-            for key, value_list in YT_SPHERE_UPDATES.items():
-                props = {
-                    'properties': {
-                        'yaw': 0,
-                        'pitch': 0,
-                        'roll': 0,
-                        'fov': 100
-                    }
-                }
+            with hook_socket_emit() as emit_list:
+                with create_room(self.flaskserver, sio_client):
+                    sio_client2.emit('room_join', {
+                        'roomId': user.room.room_id
+                    })
+                    emit_list.clear()
 
-                for val in value_list:
-                    outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
-                    self.flaskserver.youtube_ns.handle_yt_sphere_update(mock_req, props)
-                    emit = emit_list.pop()
+                    for key, value_list in YT_SPHERE_UPDATES.items():
+                        props = {
+                            'properties': {
+                                'yaw': 0,
+                                'pitch': 0,
+                                'roll': 0,
+                                'fov': 100
+                            }
+                        }
 
-                    self.assertEqual(emit['event'], 'yt_sphere_update')
+                        for val in value_list:
+                            outval = self.get_outval(props, key, val[INPUT], val[OUTPUT])
+                            sio_client.emit('yt_sphere_update', props)
+                            emit = emit_list.pop()
 
-                    data = emit['args'][0]
-                    for k in key.split('|'):
-                        self.assertEqual(utils.getval(data, k), outval)
+                            self.assertEqual(emit['event'], 'yt_sphere_update')
 
-            self.flaskserver.base_ns.disconnect_user(mock_req)
+                            data = emit['args'][0]
+                            for k in key.split('|'):
+                                self.assertEqual(utils.getval(data, k), outval)
 
     def get_outval(self, data, key, inval, outval):
         for k in key.split('|'):
