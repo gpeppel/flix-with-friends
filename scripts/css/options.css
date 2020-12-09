@@ -84,7 +84,7 @@ div#box-last {
 .slide-up-left {
   display: inline-block;
   width: 215px;
-  padding: 10px 0 10px 15px;
+  padding: 2px 0 10px 15px;
   font-family: "Open Sans", sans;
   font-weight: 400;
   color: #02c9c9;
@@ -160,7 +160,7 @@ div#box-last {
 .slide-up-right {
   display: inline-block;
   width: 215px;
-  padding: 10px 0 10px 15px;
+  padding: 2px 0 10px 15px;
   font-family: "Open Sans", sans;
   font-weight: 400;
   color: #377D6A;
