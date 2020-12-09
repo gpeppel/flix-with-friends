@@ -43,7 +43,7 @@ h2 					{ text-align: center; }
 #text-box-right {background-color: #02c9c9; font-family: 'Greggiefont'; color: #ffffff; font-size: 22px;}
 /* #label-left{ background-color: #02c9c9;} */
 div#box-last {
-  /* height: 1000px; */
+  height: 120px;
   background: linear-gradient(to right, #ffc300 50%, #e9a1b8 50%);
 }
 
@@ -84,7 +84,7 @@ div#box-last {
 .slide-up-left {
   display: inline-block;
   width: 215px;
-  padding: 10px 0 10px 15px;
+  padding: 2px 0 10px 15px;
   font-family: "Open Sans", sans;
   font-weight: 400;
   color: #02c9c9;
@@ -159,7 +159,7 @@ div#box-last {
 .slide-up-right {
   display: inline-block;
   width: 215px;
-  padding: 10px 0 10px 15px;
+  padding: 2px 0 10px 15px;
   font-family: "Open Sans", sans;
   font-weight: 400;
   color: #377D6A;

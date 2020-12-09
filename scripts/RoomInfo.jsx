@@ -37,8 +37,8 @@ export function RoomInfo()
 
 	return (
 		<div id="roomInfoBox">
+			<p>Room Host: {creator ? creator.username : 'Nobody'}</p>
 			<p>Users:</p>
-			<p>Room Creator: {creator ? creator.username : 'Nobody'}</p>
 			<div id="userFeed">
 				{
 					Object.values(users).map((user) => (<User key={getSessionId(user)} user={user} /> ))
