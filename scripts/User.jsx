@@ -4,7 +4,7 @@ import * as React from 'react';
 import { UserContext, isCreator } from './UserProvider';
 import { Socket } from './Socket';
 
-import './user.css';
+import './css/user.css';
 
 export function User(props)
 {
