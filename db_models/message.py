@@ -66,7 +66,7 @@ class Message(Base):
                 }
             ))
 
-        messages.sort(key=lambda x: x.timestamp, reverse=True)
+        messages.sort(key=lambda x: x.timestamp)
         return messages
 
 
