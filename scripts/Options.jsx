@@ -3,7 +3,7 @@ import { Content } from './Content';
 import { Socket } from './Socket';
 import { UserDispatchContext } from './UserProvider';
 import { AwesomeButtonProgress } from 'react-awesome-button';
-import './css/options.css';
+import './css/Options.css';
 import './css/theme-eric.css';
 
 
