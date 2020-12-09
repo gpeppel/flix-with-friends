@@ -66,7 +66,9 @@ class Message(Base):
                 }
             ))
 
+        messages.sort(key=lambda x: x.timestamp, reverse=True)
         return messages
+
 
     @staticmethod
     def create_table(cur):
