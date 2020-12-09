@@ -15,12 +15,11 @@
 }
 
 .message .username {
-	font-size: 14px;
-	font-weight: bold;
+	font-size: 24px;
 }
 
 .message .text {
-	font-size: 14px;
+	font-size: 20px;
 	margin: 5px 0px 0px 0px;
 }
 
@@ -28,7 +27,9 @@
 	font-size: 12px;
 	opacity: 0.5;
 }
-
+span.right {
+	margin-left: 5px;
+}
 .message .profileImg {
 	width: 32px;
 	height: 32px;
@@ -39,7 +40,6 @@
 	display: flex;
 	flex-direction: column;
 	flex: 1;
-
 	border-right: 1px solid #000;
 	height: 100%;
 }
@@ -47,4 +47,5 @@
 #messageFeed {
 	overflow: auto;
 	height: 400px;
+	font-size: 26px;
 }

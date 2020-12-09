@@ -2,9 +2,10 @@
 	display: inline-block;
 	border: 1px solid #222222;
 	border-radius: 5px;
-
+	background-color: #ffc300;
 	margin: 10px 0px 15px 0px;
 	padding: 15px;
+	color: #fff;
 
 	box-shadow: 2px 2px 2px 2px #22222266;
 }
@@ -18,11 +19,12 @@
 #control360-container label {
 	position: relative;
 	top: -2px;
-	font-size: 14px;
+	font-size: 28px;
+	margin-left: 10px;
 }
 
 #control360-container p {
-	font-size: 14px;
+	font-size: 26px;
 	font-weight: bold;
 	margin: 0px 0px 5px 0px;
 }
@@ -37,12 +39,12 @@
 }
 
 #control360-container .control-description {
-	font-size: 14px;
+	font-size: 26px;
 }
 
 #control360-container .control-description .key {
 	font-family: monospace;
-	font-size: 15px;
+	font-size: 26px;
 	font-weight: bold;
 }
 

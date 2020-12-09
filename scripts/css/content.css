@@ -16,12 +16,16 @@ body {
 .main-content {
 	display: flex;
 	flex: 1;
+	font-size: 20px;
 }
 
 .main-panel {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
+	background-color: #ffc300;
+	color: #fff;
+	font-size: 14px;
 }
 
 .media-area {

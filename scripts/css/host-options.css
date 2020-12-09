@@ -1,8 +1,9 @@
 #host-options {
 	border-left: 1px solid #000000;
 	border-bottom: 1px solid #000000;
-
+	background-color: #e9a1b8;
 	padding: 15px 10px;
+	color: #fff;
 }
 
 #host-options input[type='number'] {
@@ -12,12 +13,13 @@
 #host-options label {
 	position: relative;
 	top: -1px;
-	font-size: 15px;
+	font-size: 24px;
+	margin-left: 5px;
 }
 
 #host-options .host-title {
-	font-size: 18px;
-	font-weight: bold;
+	font-size: 26px;
+	/* font-weight: bold; */
 	text-align: center;
 	margin: 0px 0px 15px 0px;
 }
@@ -29,7 +31,7 @@
 #lbl-vote-threshold-percentage {
 	position: relative !important;
 	top: -2px !important;
-	font-size: 12px !important;
+	font-size: 26px !important;
 }
 
 #vote-percent-sign {
@@ -38,6 +40,6 @@
 
 #vote-disabled {
 	color: #dd0000;
-	font-size: 12px;
+	font-size: 22px;
 	margin-left: 4px;
 }

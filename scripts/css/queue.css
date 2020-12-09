@@ -44,3 +44,9 @@
 	overflow: auto;
 	height: 400px;
 }
+.video_title {
+	font-size: 24px;
+}
+#roomInfoBox {
+	font-size: 30px;
+}
