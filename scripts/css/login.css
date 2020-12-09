@@ -68,7 +68,6 @@ body {
 .space-evenly { 
   justify-content: space-evenly; 
 }
-
 .flex-item {
 	width: 400px;
 	text-align: center;
