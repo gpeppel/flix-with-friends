@@ -3,21 +3,12 @@ import { Content } from './Content';
 import { Socket } from './Socket';
 import { UserDispatchContext } from './UserProvider';
 import { AwesomeButtonProgress } from 'react-awesome-button';
-import './css/options.css';
+import './css/Options.css';
 import './css/theme-eric.css';
 
 
 export function Options()
 {
-	window.addEventListener('unload', () =>
-	{
-		Socket.emit('disconnect', {
-			// 'userId': userId,
-		});
-	});
-
-	// window.onbeforeunload = function (event) { Socket.emit('disconnect');};
-
 	const updateUserDetails = React.useContext(UserDispatchContext);
 	const [userFlag, setFlag] = useState(false);
 
@@ -89,8 +80,8 @@ export function Options()
 	return (
 		<div className="options-wrapper">
 			<div className="box">
-				<div className="column" id="box-left">CREATE A NEW VIEWING ROOM<img src="/static/images/line_left.png" id="line" /></div>
-				<div className="column" id="box-right">JOIN A VIEWING ROOM NOW<img src="/static/images/line_right.png" id="line-sm" /></div>
+				<div className="column" id="box-left">CREATE A NEW VIEWING ROOM<hr className='hr-line3' /></div>
+				<div className="column" id="box-right">JOIN A VIEWING ROOM NOW<hr className='hr-line4' /></div>
 			</div>
 			<div className="box">
 				<div className="column" id="box-left"><img src="/static/images/ticket.png" /></div>
@@ -100,14 +91,14 @@ export function Options()
 				<div className="column" id="text-box-left">
 					<div>
 						<div className="row">
-							<span><input className="slide-up-left" id='playlist' type="text" placeholder="GOES HERE" />
+							<span><input className="slide-up-left" onKeyUp={onKeyUp} id='playlist' type="text" placeholder="GOES HERE" />
 								<label htmlFor="card">URL</label></span>
 						</div>
 					</div>
 				</div>
 				<div className="column" id="text-box-right">
 					<div className="row">
-						<span><input className="slide-up-right" id='roomCode' type="text" placeholder="GOES HERE" />
+						<span><input className="slide-up-right" id='roomCode' onKeyUp={onKeyUp} type="text" placeholder="GOES HERE" />
 							<label htmlFor="card">CODE</label></span>
 					</div>
 				</div>

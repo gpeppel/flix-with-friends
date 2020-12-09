@@ -120,7 +120,7 @@ class LoginNamespace(flask_socketio.Namespace):
         result = User.get_from_db(cur, user, oauth={
             'id': data['googleId'],
             'type': 'GOOGLE'
-        })
+    })
 
         user.username = data['name']
         user.email = data['email']
