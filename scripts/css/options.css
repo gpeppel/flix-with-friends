@@ -107,7 +107,7 @@ div#box-last {
   transform: translateX(0);
   top: 0;
   left: 0;
-  padding: 6px 15px;
+  padding: 10px 15px;
   text-shadow: 0 1px 0 rgba(19, 74, 70, 0.4);
   transition: all .3s ease-in-out;
   border-top-left-radius: 3px;
@@ -181,7 +181,7 @@ div#box-last {
   transform: translateX(0);
   top: 0;
   left: 0;
-  padding: 6px 15px;
+  padding: 10px 15px;
   text-shadow: 0 1px 0 rgba(19, 74, 70, 0.4);
   transition: all .3s ease-in-out;
   border-top-left-radius: 3px;
