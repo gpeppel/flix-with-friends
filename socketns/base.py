@@ -31,10 +31,11 @@ class BaseNamespace(flask_socketio.Namespace):
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
 
-        cur = self.flaskserver.db.cursor()
-        user.remove_from_db(cur)
-        self.flaskserver.db.commit()
-        cur.close()
+        if self.flaskserver.db_connected():
+            cur = self.flaskserver.db.cursor()
+            user.remove_from_db(cur)
+            self.flaskserver.db.commit()
+            cur.close()
 
         self.flaskserver.delete_user(user)
 
