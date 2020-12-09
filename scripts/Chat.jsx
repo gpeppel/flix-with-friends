@@ -8,13 +8,18 @@ export function Chat()
 {
 	const [messages, setMessages] = React.useState([]);
 
+
 	React.useEffect(() =>
 	{
 		Socket.on('messages_received', (data) =>
 		{
 			console.log('Message feed updated.');
-			setMessages(data);
-			console.log(data);
+			var sorted = data.sort(function (a, b)
+			{
+				return a.timestamp - b.timestamp;
+			});
+			setMessages(sorted);
+			console.log(sorted);
 
 			const messageBox = document.getElementById('messageFeed');
 			messageBox.scrollTop = messageBox.scrollHeight - messageBox.clientHeight;

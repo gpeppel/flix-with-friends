@@ -22,7 +22,7 @@ class Message(Base):
         ))
 
         result = cur.fetchone()
-        if cur.lastrowid != None:
+        if cur.lastrowid == None:
             self.flaskserver.db.rollback()
 
         self.message_id = result['message_id']
