@@ -7,7 +7,7 @@ export function Footer()
         return (
           <div className='footer'>
             <div className="footer-top">Created by:</div>
-            <div className="footer-bot">FOOTER</div>
+            <div className="footer-bot">Avkash Patel -- Matt Gonzalez -- Dan Vergilis -- Greg Peppel</div>
             </div>
         );
 }
