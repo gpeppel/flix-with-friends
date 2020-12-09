@@ -63,6 +63,7 @@ class Message(Base):
                 }
             ))
 
+        messages.sort(key=lambda x: x.timestamp)
         return messages
 
     @staticmethod
