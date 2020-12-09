@@ -9,10 +9,12 @@ import './css/theme-eric.css';
 
 export function Options()
 {
-	window.addEventListener('beforeunload', function (e) {
-		e.preventDefault();
-		e.returnValue = Socket.emit('disconnect');
-        });
+	window.addEventListener('unload', () =>
+	{
+		Socket.emit('disconnect', {
+			// 'userId': userId,
+		});
+	});
 
 	// window.onbeforeunload = function (event) { Socket.emit('disconnect');};
 
