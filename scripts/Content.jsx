@@ -6,9 +6,10 @@ import { YoutubeContainer } from './YoutubeContainer';
 import { HostOptions } from './HostOptions';
 import { UserContext, UserDispatchContext } from './UserProvider';
 import { Socket } from './Socket';
+import { AwesomeButton } from "react-awesome-button";
 import { Queue } from './Queue';
 import './css/content.css';
-
+import './css/theme-eric.css';
 
 export function Content()
 {
@@ -53,7 +54,13 @@ export function Content()
 			</div>
 			<div className='media-area'>
 				<YoutubeContainer />
-				<button onClick={copyRoomId} id='btnID'>Copy Room ID</button>
+				<AwesomeButton
+					onPress={copyRoomId}
+					id='btnID'
+					type='primary'
+				>
+				Copy Room
+				</AwesomeButton>
 			</div>
 			<div className='main-panel'>
 				<div>

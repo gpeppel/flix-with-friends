@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { UserContext, isCreator } from './UserProvider';
 import { Socket } from './Socket';
+import { AwesomeButton } from "react-awesome-button";
+import './css/theme-eric.css';
 
 import './css/host-options.css';
 
@@ -171,9 +173,12 @@ export function HostOptions()
 			<div style={{
 				display: 'flex'
 			}}>
-				<button style={{
-					margin: 'auto'
-				}} onClick={onSaveChanges}>Save Changes</button>
+				<AwesomeButton
+					type='primary'
+					onPress={onSaveChanges}
+				>
+					Save changes
+				</AwesomeButton>
 			</div>
 		</div>
 	);

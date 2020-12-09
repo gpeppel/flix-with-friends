@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { ChatMessage } from './ChatMessage';
 import { Socket } from './Socket';
+import { AwesomeButton } from "react-awesome-button";
 import './css/chat.css';
-
+import './css/theme-eric.css';
 
 export function Chat()
 {
@@ -57,7 +58,13 @@ export function Chat()
 			</div>
 
 			<input type='text' id='messageInput' placeholder='Message' onKeyPress={checkForEnter}></input>
-			<button type='submit' onClick={handleSubmit}>Send</button>
+			<AwesomeButton
+				onPress={handleSubmit}
+				type='secondary'
+			>
+				Send chat message
+			</AwesomeButton>
+			{/* <button type='submit' onClick={handleSubmit}>Send</button> */}
 		</div>
 	);
 }
