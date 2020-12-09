@@ -19,10 +19,12 @@ class RoomNamespace(flask_socketio.Namespace):
 
         room = self.flaskserver.create_room(user.get_session_id())
         playlist = RoomVideoPlaylist.from_room_id(room.room_id)
-        cur = self.flaskserver.db.cursor()
-        playlist.insert_to_db(cur)
-        self.flaskserver.db.commit()
-        cur.close()
+
+        if self.flaskserver.db_connected():
+            cur = self.flaskserver.db.cursor()
+            playlist.insert_to_db(cur)
+            self.flaskserver.db.commit()
+            cur.close()
 
         room.add_user(user)
         room.set_creator(user)

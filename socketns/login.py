@@ -55,6 +55,7 @@ class LoginNamespace(flask_socketio.Namespace):
             user.profile_url = data['response']['picture']['data']['url']
             user.oauth_id = data['response']['id']
             user.oauth_type = 'FACEBOOK'
+
         user.insert_to_db(cur)
         self.flaskserver.db.commit()
         cur.close()
