@@ -13,13 +13,20 @@ body {
 	font-family: 'greggiefont';
 	width: 100%;
 }
+
 .login {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
 	align-items: center;
+	justify-content: space-evenly;
 	flex: 1;
+
 	padding-bottom: 50px;
+}
+
+.login .login-img {
+	display: block;
+	margin: 20px auto;
 }
 
 .top {
@@ -27,7 +34,12 @@ body {
 	padding-top: 50px;
 	font-family: 'greggiefont';
 	color: #eee;
-	font-size: 100px;
+	font-size: 80px;
+	text-align: center;
+}
+
+.top > div {
+	display: inline-block;
 }
 
 .bottom {
@@ -38,43 +50,42 @@ body {
 	color: #eee;
 	font-size: 100px;
 }
-.hr-line { border-top: 5px solid #eee; box-shadow: 0px 4px 2px #019292; width: 100%;}
 
-.login .kep-login-facebook, .login .google-button {
-	width: 300px;
+.hr-line {
+	border-top: 5px solid #eee;
+	box-shadow: 0px 4px 2px #019292;
+	margin-top: 15px;
+	width: 100%;
 }
 
-.flex-container {
-  padding: 0;
-  /* margin: 0; */
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.flex-container2 {
-	padding: 0;
-	background: #eea1b8;
-	/* margin: 0; */
-	list-style: none;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-  }
-.center { 
-  justify-content: center; 
-}  
+@media (max-width: 850px) {
+	.aws-btn {
+		font-size: 26px;
+	}
 
-.space-evenly { 
-  justify-content: space-evenly; 
-}
-.flex-item {
-	width: 400px;
-	text-align: center;
+	.top {
+		font-size: 70px;
+	}
+
+	.login .login-img {
+		width: 180px;
+	}
 }
 
-.flex-item2 {
-	height: auto;
-	display: flex;
-	/* text-align: center; */
+@media (max-width: 767px) {
+	.aws-btn {
+		font-size: 24px;
+	}
+
+	.top {
+		font-size: 50px;
+	}
+
+	.login {
+		flex-direction: column;
+	}
+
+	.login .login-img {
+		width: 140px;
+	}
 }
