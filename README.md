@@ -27,7 +27,7 @@ pip install -r requirements.txt
 
 1. Install PostgreSQL:
 ```bash
-sudo apt install postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs
+sudo apt install postgresql
 ```
 2. Set up PostgreSQL:
 ```bash
@@ -36,9 +36,10 @@ sudo service postgresql start
 sudo -u postgres createuser --superuser <username>
 sudo -u postgres createdb <db name>
 ```
-In a terminal, run `psql` and use these commands (replace username and password):
+
+Changing the password for <username>:
 ```
-create user <username> superuser password '<password>';
+\password <username>
 \q
 ```
 Create `sql.env` and put the username and password set above.
@@ -271,8 +272,6 @@ Avkash Patel:
 
 * Made room URL a sharable link through a copy button
 
-* Was unable to create multiple individualized rooms, so user story was moved to Sprint 2
-
 * Helped with styling for login page and viewing room
 
 * Changed logic so that viewing room creation is only possible if Facebook login is passed
@@ -286,24 +285,16 @@ For the most part, we collaborated on lots of different parts of the project. Sp
 * Facebook button and connecting the login functionality
 * Overall css and styling of the project (also art assets logo, buttons, etc.)
 
-Things that are incomplete
-
-* Adding a google login button
-* Overall css of the chat window and chat box
-
 ---
 
 Daniel Vergilis:
-- Wrote the YouTube IFrame Embed API code that syncs the videos between users
-- Wrote skeleton backend server code
+- Wrote YouTube IFrame Embed API code that syncs the videos between users
+- Added functionality for controlling 360 degree videos
+- Designed backend server code and websocket communication
 - Wrote test cases
 - Used linter for source code
 - Set up Travis CI configuration
-
-Incomplete:
-- Complete coverage, all working test cases
-- Better syncing when buffering
-- Host-priority sync mode
+- Designed backend database schema
 
 ---
 
