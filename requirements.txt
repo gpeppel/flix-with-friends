@@ -1,5 +1,4 @@
 Flask
-flask-socketio
 google-api-python-client
 psycopg2-binary
 python-dotenv
@@ -7,3 +6,6 @@ requests
 flask-session
 redis
 eventlet
+Flask-SocketIO==4.3.1
+python-engineio==3.13.2
+python-socketio==4.6.0
