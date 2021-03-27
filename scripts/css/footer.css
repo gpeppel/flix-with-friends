@@ -1,8 +1,13 @@
 .footer {
+	width: 100%;
+	color: white;
+	text-align: center;
+
   padding: 1.5rem 1.5rem;
   background: #333333;
-  font-size: 0.85em;
+  font-size: 1.25em;
   overflow-x: hidden;
+  box-shadow: 0 50vh 0 50vh #333;
 }
 
 .footer-top {
