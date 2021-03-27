@@ -8,7 +8,6 @@ export function Chat()
 {
 	const [messages, setMessages] = React.useState([]);
 
-
 	React.useEffect(() =>
 	{
 		Socket.on('messages_received', (data) =>

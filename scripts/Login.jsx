@@ -4,6 +4,7 @@ import { Options } from './Options';
 import { FacebookButton } from './FacebookButton';
 import { GoogleButton } from './GoogleButton';
 import { TwitterButton } from './TwitterButton';
+import { GuestButton } from './GuestButton';
 import { Socket } from './Socket';
 import { UserDispatchContext } from './UserProvider';
 
@@ -51,7 +52,7 @@ export function Login()
 		<div>
 			<div className='top'>
 				<div>
-					SIMPLE & EASY TO USE
+					WATCH VIDEOS WITH FRIENDS
 					<br />
 					GET STARTED BY CLICKING BELOW
 					<hr className='hr-line' />
@@ -70,6 +71,9 @@ export function Login()
 								<img className='login-img' src='static/images/twitter.png' alt='twitter' />
 								<TwitterButton />
 							</div>
+						</div>
+						<div className="login">
+							<GuestButton />
 						</div>
 					</div>
 				</div>

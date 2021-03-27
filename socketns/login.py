@@ -24,9 +24,6 @@ class LoginNamespace(flask_socketio.Namespace):
         self.namespace = namespace
         self.flaskserver = server
 
-    def on_login_temporary(self, data):
-        print("Got an event for new temp user input with data:", data)
-
     def on_login_oauth_facebook(self, data):
         user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         if 'status' in data['response'].keys():
@@ -121,7 +118,7 @@ class LoginNamespace(flask_socketio.Namespace):
         result = User.get_from_db(cur, user, oauth={
             'id': data['googleId'],
             'type': 'GOOGLE'
-    })
+        })
 
         user.username = data['name']
         user.email = data['email']
@@ -133,6 +130,11 @@ class LoginNamespace(flask_socketio.Namespace):
         self.flaskserver.db.commit()
         cur.close()
 
+        self.emit_login_ok(user)
+
+    def on_login_guest(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        user.user_id = -random.randint(1, 65535)
         self.emit_login_ok(user)
 
     def on_login_test(self, data):
