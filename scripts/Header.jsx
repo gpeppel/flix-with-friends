@@ -4,9 +4,12 @@ import * as React from 'react';
 
 import { Socket } from './Socket';
 import { AwesomeButton } from 'react-awesome-button';
+import { UserContext } from './UserProvider';
 
 export function Header()
 {
+    const userDetails = React.useContext(UserContext);
+
     function signout()
     {
         Socket.emit('login_signout', {});
@@ -20,7 +23,14 @@ export function Header()
             </div>
 
 			<div>
-                <AwesomeButton type="twitter" onPress={(event) => {signout();}}>SIGN OUT</AwesomeButton>
+			    {(() => {
+			        if(userDetails.id !== undefined)
+			        {
+			            return (
+			                <AwesomeButton type="twitter" onPress={(event) => {signout();}}>SIGN OUT</AwesomeButton>
+			            );
+			        }
+			    })()}
 			</div>
         </div>
     );
