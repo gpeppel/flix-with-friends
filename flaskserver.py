@@ -69,8 +69,6 @@ class FlaskServer:
         )
 
     def index(self):
-        user = self.get_user_by_request(flask.request, flask.session)
-
         resp = flask.make_response(flask.render_template('index.html'))
         if flask.request.cookies.get(COOKIE_SESSION_ID) is None:
             resp.set_cookie(COOKIE_SESSION_ID, User.create_session_id())
