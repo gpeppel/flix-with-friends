@@ -77,16 +77,10 @@ export function Options()
 
 	return (
 		<div className="options-wrapper">
-			<div className="box">
-				<div className="column" id="box-left">CREATE A NEW VIEWING ROOM<hr className='hr-line3' /></div>
-				<div className="column" id="box-right">JOIN A VIEWING ROOM NOW<hr className='hr-line4' /></div>
-			</div>
-			<div className="box">
-				<div className="column" id="box-left"><img src="/static/images/ticket.png" /></div>
-				<div className="column" id="box-right"><img src="/static/images/popcorn_icon.png" /></div>
-			</div>
-			<div className="box">
-				<div className="column" id="text-box-left">
+			<div className="column column-left">
+				<div>CREATE A NEW VIEWING ROOM<hr className='hr-line3' /></div>
+				<div><img src="/static/images/ticket.png" /></div>
+				<div id="text-box-left">
 					<div>
 						<div className="row">
 							<span><input className="slide-up-left" onKeyUp={onKeyUp} id='playlist' type="text" placeholder="GOES HERE" />
@@ -94,15 +88,7 @@ export function Options()
 						</div>
 					</div>
 				</div>
-				<div className="column" id="text-box-right">
-					<div className="row">
-						<span><input className="slide-up-right" id='roomCode' onKeyUp={onKeyUp} type="text" placeholder="GOES HERE" />
-							<label htmlFor="card">CODE</label></span>
-					</div>
-				</div>
-			</div>
-			<div className="box">
-				<div className="column" id="box-left-btn">
+				<div>
 					<AwesomeButtonProgress
 						type='twitter2'
 						loadingLabel='I HOPE NOTHING BREAKS..'
@@ -116,7 +102,17 @@ export function Options()
 					CREATE NEW VIEWING ROOM!
 					</AwesomeButtonProgress>
 				</div>
-				<div className="column" id="box-right-btn">
+			</div>
+			<div className="column column-right">
+				<div>JOIN A VIEWING ROOM NOW<hr className='hr-line4' /></div>
+				<div><img src="/static/images/popcorn_icon.png" /></div>
+				<div id="text-box-right">
+					<div className="row">
+						<span><input className="slide-up-right" id='roomCode' onKeyUp={onKeyUp} type="text" placeholder="GOES HERE" />
+							<label htmlFor="card">CODE</label></span>
+					</div>
+				</div>
+				<div id="box-right-btn">
 					<AwesomeButtonProgress
 						type='whatsapp'
 						loadingLabel='JOINING...'
@@ -129,15 +125,6 @@ export function Options()
 					JOIN VIEWING ROOM
 					</AwesomeButtonProgress>
 				</div>
-			</div>
-			<div className="box" id="box-last">
-				<div className="column" id="box-left"></div>
-				<div className="column" id="box-right-last">
-					COPY &amp; PASTE YOUR INVITATION CODE IN THE ABOVE BOX
-					<hr className='hr-line2'/>
-				</div>
-			</div>
-			<div className="box" id="box-last">
 			</div>
 		</div>
 	);
