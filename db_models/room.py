@@ -10,7 +10,7 @@ class Room(Base):
         self.room_id = room_id
         self.description = description
 
-        self.room_code = Room.generate_room_id(length=16)
+        self.room_code = Room.generate_room_id(length=6)
         self.settings = None
 
         self.users = {}

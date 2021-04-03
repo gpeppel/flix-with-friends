@@ -38,6 +38,7 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok',
             'room_id': room.room_id,
+            'room_code': room.room_code,
             'description': data['description'],
             'current_video_code': room.get_current_video_code()
         }
@@ -68,6 +69,7 @@ class RoomNamespace(flask_socketio.Namespace):
         return {
             'status': 'ok',
             'room_id': room.room_id,
+            'room_code': room.room_code,
             'description': room.description,
             'current_video_code': room.get_current_video_code()
         }

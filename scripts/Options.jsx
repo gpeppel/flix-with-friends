@@ -33,6 +33,7 @@ export function Options()
 			updateUserDetails({
 				room: {
 					id: data.room_id,
+					code: data.room_code,
 					description: data.room_name,
 					currentVideoCode: data.current_video_code,
 					isCreator: true
@@ -57,6 +58,7 @@ export function Options()
 			updateUserDetails({
 				room: {
 					id: data.room_id,
+					code: data.room_code,
 					description: data.room_name,
 					currentVideoCode: data.current_video_code,
 					isCreator: false

@@ -38,3 +38,8 @@ body {
 
 	margin: 5px 20px;
 }
+
+.room-code-container {
+	display: flex;
+	flex-direction: column;
+}

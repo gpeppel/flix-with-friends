@@ -58,6 +58,8 @@ class FlaskServer:
         self.rooms = {}
         self.users = {}
 
+        self.room_alias = {}
+
         self.test_login_enabled = False
 
     def run(self, host, port, debug=False):
@@ -163,8 +165,6 @@ class FlaskServer:
         if session_id is None:
             return None
 
-        print(session_id, self.users)
-
         user = self.get_user_by_session_id(session_id)
         if user is not None and hasattr(request, 'sid'):
             user.sid = request.sid
@@ -193,6 +193,7 @@ class FlaskServer:
         else:
             room = Room(self.socketio, room_id)
             self.rooms[room.room_id] = room
+            self.room_alias[room.room_code] = room
 
             if self.db_connected():
                 cur = self.db.cursor()
@@ -207,8 +208,12 @@ class FlaskServer:
             room.remove_user(user)
 
         del self.rooms[room.room_id]
+        del self.room_alias[room.room_code]
 
     def get_room(self, room_id):
+        room = self.room_alias.get(room_id)
+        if room is not None:
+            return room
         return self.rooms.get(room_id)
 
     def db_connected(self):

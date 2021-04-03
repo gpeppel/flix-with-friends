@@ -35,14 +35,14 @@ export function Content()
 	function copyRoomId()
 	{
 		const input = document.createElement('input');
-		input.value = userDetails.room.id;
+		input.value = userDetails.room.code;
 
 		document.body.appendChild(input);
 		input.select();
 		document.execCommand('copy');
 		document.body.removeChild(input);
 
-		alert('Copied Room ID ' + userDetails.room.id);
+		alert('Copied Room ID ' + userDetails.room.code);
 	}
 
 	return (
@@ -53,7 +53,10 @@ export function Content()
 			</div>
 			<div className='media-area'>
 				<YoutubeContainer />
-				<button onClick={copyRoomId} id='btnID'>Copy Room ID</button>
+				<div className='room-code-container'>
+					<span>Room Code: {userDetails.room.code}</span>
+					<button onClick={copyRoomId} id='btnID'>Copy Room ID</button>
+				</div>
 			</div>
 			<div className='main-panel'>
 				<div>
