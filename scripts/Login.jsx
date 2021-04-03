@@ -41,6 +41,8 @@ export function Login()
 
 			setFlag(true);
 		});
+
+		Socket.emit('login_visit', {});
 	}, []);
 
 	if (userFlag)

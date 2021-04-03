@@ -15,6 +15,7 @@ class BaseNamespace(flask_socketio.Namespace):
 
     def connect_user(self, request, session):
         user = self.flaskserver.create_user_from_request(request, session)
+
         user.socket_connected = True
         user.last_socket_connect = None
 
@@ -31,13 +32,12 @@ class BaseNamespace(flask_socketio.Namespace):
         user.socket_connected = False
         user.last_socket_connect = datetime.datetime.utcnow()
 
-        if self.flaskserver.db_connected():
-            cur = self.flaskserver.db.cursor()
-            user.remove_from_db(cur)
-            self.flaskserver.db.commit()
-            cur.close()
-
-        self.flaskserver.delete_user(user)
+        #if self.flaskserver.db_connected():
+        #    cur = self.flaskserver.db.cursor()
+        #    user.remove_from_db(cur)
+        #    self.flaskserver.db.commit()
+        #    cur.close()
+        #self.flaskserver.delete_user(user)
 
         if room is not None:
             self.flaskserver.emit_room_info(room)

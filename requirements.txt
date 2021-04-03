@@ -3,7 +3,6 @@ google-api-python-client
 psycopg2-binary
 python-dotenv
 requests
-flask-session
 redis
 eventlet
 Flask-SocketIO==4.3.1

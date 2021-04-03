@@ -1,8 +1,5 @@
 from db_models.base import Base
-
-
-COOKIE_SESSION_ID = 'session_id'
-COOKIE_SESSION_TOKEN = 'session_token'
+import utils
 
 
 class User(Base):
@@ -36,9 +33,7 @@ class User(Base):
         self.room = None
 
     def get_session_id(self):
-        if self.session_id is not None:
-            return self.session_id
-        return self.sid
+        return self.session_id
 
     def insert_to_db(self, cur):
         cur.execute("""
@@ -92,10 +87,14 @@ class User(Base):
     def from_request(req, session):
         user = User(
             None,
-            sid=req.sid,
+            sid=None,
             session_id=session.get('id')
         )
         return user
+
+    @staticmethod
+    def create_session_id():
+        return utils.random_hex(32)
 
     @staticmethod
     def get_from_db(cur, user, username=None, email=None, oauth=None):

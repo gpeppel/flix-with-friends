@@ -134,6 +134,7 @@ class LoginNamespace(flask_socketio.Namespace):
 
     def on_login_guest(self, data):
         user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        user.username = 'guest%04d' % random.randint(0, 9999)
         user.user_id = -random.randint(1, 65535)
         self.emit_login_ok(user)
 
@@ -144,6 +145,18 @@ class LoginNamespace(flask_socketio.Namespace):
         user = self.flaskserver.get_user_by_request(flask.request, flask.session)
         user.user_id = -random.randint(1, 65535)
         self.emit_login_ok(user)
+
+    def on_login_visit(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        if user is not None and user.is_authenticated():
+            self.emit_login_ok(user)
+
+    def on_login_signout(self, data):
+        user = self.flaskserver.get_user_by_request(flask.request, flask.session)
+        if user is None:
+            return
+
+        self.flaskserver.delete_user(user)
 
     def emit_login_ok(self, user):
         self.flaskserver.socketio.emit('login_response', {

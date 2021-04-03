@@ -3,7 +3,6 @@ import os
 
 from dotenv import load_dotenv
 import flask
-import flask_session
 import flask_socketio
 
 from db_models.message import Message
@@ -23,25 +22,19 @@ dotenv_path = os.path.join(os.path.dirname(__file__), 'flask.env')
 load_dotenv(dotenv_path)
 
 
+COOKIE_SESSION_ID = 'sessionId'
 MESSAGES_EMIT_CHANNEL = 'messages_received'
 
-SESSION_USE = False
 DEBUG = True
 
 class FlaskServer:
     def __init__(self, app, db):
         self.app = app
         self.app.add_url_rule('/', 'index', self.index)
-        self.app.add_url_rule('/create-join', 'create-join', self.create_join)
 
         if DEBUG:
             self.app.add_url_rule('/debug', 'debug', self.debug)
             self.app.add_url_rule('/debug.json', 'debug.json', self.debug_json)
-
-        # self.app.config['SESSION_TYPE'] = 'redis'
-        # self.app.config['SECRET_KEY'] = os.environ['FLASK_SECRET_KEY']
-        # self.session = flask_session.Session()
-        # self.session.init_app(self.app)
 
         self.socketio = flask_socketio.SocketIO(self.app)
         self.socketio.init_app(self.app, cors_allowed_origins='*')
@@ -77,21 +70,12 @@ class FlaskServer:
 
     def index(self):
         user = self.get_user_by_request(flask.request, flask.session)
-        if user is not None and user.is_authenticated():
-            return flask.redirect('/create-join', code=302)
 
-        if SESSION_USE:
-            if 'id' not in flask.session:
-                flask.session['id'] = utils.random_hex(32)
+        resp = flask.make_response(flask.render_template('index.html'))
+        if flask.request.cookies.get(COOKIE_SESSION_ID) is None:
+            resp.set_cookie(COOKIE_SESSION_ID, User.create_session_id())
 
-        return flask.render_template('index.html')
-
-    def create_join(self):
-        user = self.get_user_by_request(flask.request, flask.session)
-        if user is None or not user.is_authenticated():
-            return flask.redirect('/', code=302)
-
-        return flask.render_template('create-join.html')
+        return resp
 
     def debug(self):
         return flask.render_template('debug.html')
@@ -159,10 +143,13 @@ class FlaskServer:
 
         if user is None:
             user = User.from_request(request, session)
-            if not SESSION_USE:
-                user.session_id = None
 
-            self.users[user.get_session_id()] = user
+        session_id = request.cookies.get(COOKIE_SESSION_ID)
+        if session_id is None:
+            raise Exception()
+
+        user.session_id = session_id
+        self.users[user.get_session_id()] = user
 
         return user
 
@@ -171,20 +158,19 @@ class FlaskServer:
             user.room.remove_user(user)
 
         del self.users[user.get_session_id()]
+        user.session_id = None
 
     def get_user_by_request(self, request, session):
-        session_id = None
-        if SESSION_USE:
-            session_id = session.get('id')
-
+        session_id = request.cookies.get(COOKIE_SESSION_ID)
         if session_id is None:
-            if not hasattr(request, 'sid'):
-                return None
-            session_id = request.sid
+            return None
+
+        print(session_id, self.users)
 
         user = self.get_user_by_session_id(session_id)
-        if user is None:
-            return None
+        if user is not None and hasattr(request, 'sid'):
+            user.sid = request.sid
+
         return user
 
     def get_user_by_session_id(self, session_id):
