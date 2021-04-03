@@ -27,7 +27,7 @@ export function Header()
 			        if(userDetails.id !== undefined)
 			        {
 			            return (
-			                <AwesomeButton type="twitter" onPress={(event) => {signout();}}>SIGN OUT</AwesomeButton>
+			                <AwesomeButton size="small" type="facebook" onPress={(event) => {signout();}}>SIGN OUT</AwesomeButton>
 			            );
 			        }
 			    })()}
