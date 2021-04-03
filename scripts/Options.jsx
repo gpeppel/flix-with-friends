@@ -49,8 +49,10 @@ export function Options()
 		}, (data) =>
 		{
 			console.log(data);
-			if(data.status != 'ok')
+			if(data.status != 'ok') {
+				alert("Failed: " + data.error);
 				return;
+			}
 
 			updateUserDetails({
 				room: {
