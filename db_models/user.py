@@ -87,7 +87,7 @@ class User(Base):
     def from_request(req, session):
         user = User(
             None,
-            sid=None,
+            sid=req.sid,
             session_id=session.get('id')
         )
         return user

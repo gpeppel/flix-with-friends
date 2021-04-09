@@ -43,7 +43,7 @@ class ChatTest(unittest.TestCase):
 
     def test_parse_chat_message_success(self):
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
+            _, sio_client, _ = result
             with create_room(self.flaskserver, sio_client):
                 # TODO
                 return

@@ -124,4 +124,4 @@ class RoomTest(unittest.TestCase):
 
     def test_generate_room_code(self):
         random.seed(7883)
-        self.assertEqual(Room(None, None).room_code, 'Zp5s_mMGCaTykVbk')
+        self.assertEqual(Room(None, None).room_code, 'Zp5s_m')

@@ -229,7 +229,7 @@ class YoutubeTest(unittest.TestCase):
 
     def test_handle_yt_load(self):
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
+            _, sio_client, _ = result
 
             with hook_socket_emit() as emit_list:
                 with create_room(self.flaskserver, sio_client):
@@ -255,7 +255,7 @@ class YoutubeTest(unittest.TestCase):
 
     def test_handle_yt_state_change_success(self):
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
+            _, sio_client, _ = result
 
             with hook_socket_emit() as emit_list:
                 with create_room(self.flaskserver, sio_client):
@@ -284,7 +284,7 @@ class YoutubeTest(unittest.TestCase):
 
     def test_handle_yt_state_change_fail(self):
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
+            _, sio_client, _ = result
 
             with hook_socket_emit() as emit_list:
                 with create_room(self.flaskserver, sio_client):
@@ -300,10 +300,8 @@ class YoutubeTest(unittest.TestCase):
     def test_handle_yt_sphere_update(self):
         with connect_login_test_user(self.flaskserver) as result,\
             connect_login_test_user(self.flaskserver) as result2:
-            _, sio_client = result
-            _, sio_client2 = result2
-
-            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+            _, sio_client, user = result
+            _, sio_client2, _ = result2
 
             with hook_socket_emit() as emit_list:
                 with create_room(self.flaskserver, sio_client):

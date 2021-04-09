@@ -15,8 +15,7 @@ class FlaskServerTest(unittest.TestCase):
 
     def test_create_delete_user(self):
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
-            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+            _, sio_client, user = result
 
             self.assertEqual(user.sid, sio_client.sid)
             self.flaskserver.delete_user(user)
@@ -28,8 +27,7 @@ class FlaskServerTest(unittest.TestCase):
         self.assertEqual(self.flaskserver.rooms['abc'], room_abc)
 
         with connect_login_test_user(self.flaskserver) as result:
-            _, sio_client = result
-            user = self.flaskserver.get_user_by_session_id(sio_client.sid)
+            _, sio_client, user = result
 
             room_abc.add_user(user)
             self.assertTrue(len(room_abc) == 1)

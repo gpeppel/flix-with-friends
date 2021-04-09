@@ -146,7 +146,8 @@ class FlaskServer:
 
         session_id = request.cookies.get(COOKIE_SESSION_ID)
         if session_id is None:
-            raise Exception()
+            session_id = User.create_session_id()
+            #raise Exception()
 
         user.session_id = session_id
         self.users[user.get_session_id()] = user
@@ -163,7 +164,9 @@ class FlaskServer:
     def get_user_by_request(self, request, session):
         session_id = request.cookies.get(COOKIE_SESSION_ID)
         if session_id is None:
-            return None
+            if not hasattr(request, 'sid'):
+                return None
+            return self.get_user_by_sid(request.sid)
 
         user = self.get_user_by_session_id(session_id)
         if user is not None and hasattr(request, 'sid'):
