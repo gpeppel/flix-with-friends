@@ -42,23 +42,25 @@ class ChatTest(unittest.TestCase):
         return attribute_dict
 
     def test_parse_chat_message_success(self):
-        with connect_login_test_user(self.flaskserver) as result:
+        # TODO
+        return
+        with connect_login_test_user(self.flaskserver) as result, \
+            connect_login_test_user(self.flaskserver) as result2:
             _, sio_client, _ = result
+            _, sio_client2, _ = result2
+
             with create_room(self.flaskserver, sio_client):
-                # TODO
-                return
+                with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
+                    for test in self.success_tests:
+                        sio_client.emit('message_send', (
+                            test[INPUT_MESSAGE]
+                        ))
+                        expected = test[MESSAGE_EXPECTED]
 
-            with mock.patch('socketns.chat.ChatNamespace.add_to_db', self.mocked_db_add):
-                for test in self.success_tests:
-                    sio_client.emit('message_send', (
-                        test[INPUT_MESSAGE]
-                    ))
-                    expected = test[MESSAGE_EXPECTED]
-
-                    with hook_socket_emit() as emit_list:
-                        emit = emit_list.pop()
-                        for key, val in expected.items():
-                            if key == 'timestamp':
-                                self.assertTrue((emit['args'][key] - val).total_seconds() < 3)
-                            else:
-                                self.assertEqual(emit['args'][key], val)
+                        with hook_socket_emit() as emit_list:
+                            emit = emit_list.pop()
+                            for key, val in expected.items():
+                                if key == 'timestamp':
+                                    self.assertTrue((emit['args'][key] - val).total_seconds() < 3)
+                                else:
+                                    self.assertEqual(emit['args'][key], val)

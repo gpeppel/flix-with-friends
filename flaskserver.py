@@ -58,6 +58,8 @@ class FlaskServer:
         self.rooms = {}
         self.users = {}
 
+        self.messages = {}
+
         self.room_alias = {}
 
         self.test_login_enabled = False
@@ -101,13 +103,18 @@ class FlaskServer:
 
         return data
 
-    def emit_all_messages(self, room):
-        if not self.db_connected():
-            return
+    def add_message(self, msg):
+        self.messages[msg.room_id].append(msg)
 
-        cur = self.db.cursor()
-        messages = Message.get_messages(cur, room_id=room.room_id)
-        cur.close()
+    def emit_all_messages(self, room):
+        """
+        if self.db_connected():
+            cur = self.db.cursor()
+            messages = Message.get_messages(cur, room_id=room.room_id)
+            cur.close()
+        else:
+        """
+        messages = self.messages[room.room_id]
 
         room.emit(MESSAGES_EMIT_CHANNEL, list(map(
             lambda msg: msg.serialize(),
@@ -191,12 +198,13 @@ class FlaskServer:
         })
 
     def create_room(self, room_id):
-        if room_id in self.rooms:
-            room = self.rooms[room_id]
-        else:
+        room = self.rooms.get(room_id)
+        if room is None:
             room = Room(self.socketio, room_id)
             self.rooms[room.room_id] = room
             self.room_alias[room.room_code] = room
+
+            self.messages[room.room_id] = []
 
             if self.db_connected():
                 cur = self.db.cursor()
@@ -212,6 +220,7 @@ class FlaskServer:
 
         del self.rooms[room.room_id]
         del self.room_alias[room.room_code]
+        del self.messages[room.room_id]
 
     def get_room(self, room_id):
         room = self.room_alias.get(room_id)
