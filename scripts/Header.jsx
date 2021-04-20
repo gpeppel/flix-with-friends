@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { Socket } from './Socket';
 import { AwesomeButton } from 'react-awesome-button';
-import { UserContext } from './UserProvider';
+import { UserContext, debugElement } from './UserProvider';
 
 export function Header()
 {
@@ -20,6 +20,10 @@ export function Header()
         <div className='main-header'>
             <div>
                 <img className='logo' src="static/images/logo.png" alt="logo" />
+            </div>
+
+            <div>
+                { debugElement(userDetails) }
             </div>
 
 			<div>

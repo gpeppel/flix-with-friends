@@ -36,9 +36,12 @@ export default class YoutubePlayer
 		return this.player.getPlayerState() == state;
 	}
 
-	static checkSyncIgnore(player, t)
+	seek(t, force=false)
 	{
-		return Math.abs(t - player.getCurrentTime()) < YoutubePlayer.prototype.SYNC_IGNORE_SEC;
+		if(!force && Math.abs(t - this.player.getCurrentTime()) < YoutubePlayer.prototype.SYNC_IGNORE_SEC)
+			return;
+
+		this.player.seekTo(t);
 	}
 
 	static onReadyWrapper(player, event)
@@ -47,40 +50,28 @@ export default class YoutubePlayer
 
 		player.player.play = function(t)
 		{
-			if(
-				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING)
-				&& YoutubePlayer.checkSyncIgnore(this.player, t)
-			)
-			{
+			if(this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PLAYING))
 				return;
-			}
 
-			this.player.seekTo(t);
+			this.seek(t, false);
 			this.player.playVideo();
 		}.bind(player);
 
 		player.player.pause = function(t)
 		{
-			if(
-				this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED)
-				&& YoutubePlayer.checkSyncIgnore(this.player, t)
-			)
-			{
+			if(this.isPlayerInState(YoutubePlayer.prototype.PLAYER_PAUSED))
 				return;
-			}
 
-			this.player.seekTo(t);
+			this.seek(t, false);
 			this.player.pauseVideo();
 		}.bind(player);
 
 		player.player.setPlayback = function(t, s)
 		{
-			if(this.player.getPlaybackRate() == s && YoutubePlayer.checkSyncIgnore(this.player, t))
-			{
+			if(this.player.getPlaybackRate() == s)
 				return;
-			}
 
-			this.player.seekTo(t);
+			this.seek(t, false);
 			this.player.setPlaybackRate(s);
 		}.bind(player);
 
